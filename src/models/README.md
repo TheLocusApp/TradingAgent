@@ -11,6 +11,7 @@ GROQ_API_KEY=your_key_here     # For Groq models (includes Mixtral, Llama, etc.)
 OPENAI_KEY=your_key_here       # For OpenAI models (GPT-4, O1, etc.)
 GEMINI_KEY=your_key_here       # For Gemini models
 DEEPSEEK_KEY=your_key_here     # For DeepSeek models
+QWEN_API_KEY=your_key_here     # For Qwen models (Alibaba Cloud)
 ```
 
 ## 🤖 Available Models
@@ -61,6 +62,16 @@ Preview Models:
 - `deepseek-reasoner`: Enhanced reasoning model (Better for complex problem-solving)
 - `deepseek-r1`: DeepSeek's first-generation reasoning model (Excellent for trading strategies)
 
+### Qwen Models (Alibaba Cloud)
+Latest Models:
+- `qwen-max-2025-01-25`: Most powerful Qwen model with enhanced reasoning (Best for complex analysis)
+- `qwen-plus`: Balanced performance and cost (Good for most trading tasks)
+- `qwen-turbo`: Fast and efficient for high-volume tasks (Best for quick decisions)
+- `qwen-long`: Extended context window up to 1M tokens (Best for analyzing long documents/videos)
+- `qwen-coder-turbo`: Specialized for code generation and backtesting (Best for strategy development)
+
+Get API Key: Register at [Qwen API Platform](https://qwen.ai/apiplatform) and create a DashScope API key
+
 ### Local Ollama: Free, Fast, Private LLMs 🚀
 
 To get started with Ollama:
@@ -101,6 +112,12 @@ model = factory.get_model("ollama", "gemma:2b")
 
 # For the most powerful reasoning, use DeepSeek API
 model = factory.get_model("deepseek", "deepseek-reasoner")
+
+# Or use Qwen for enhanced reasoning and long context
+model = factory.get_model("qwen", "qwen-max-2025-01-25")
+
+# Or Qwen Coder for strategy backtesting
+model = factory.get_model("qwen", "qwen-coder-turbo")
 ```
 
 Interesting models for future use:
