@@ -1,0 +1,57 @@
+STRATEGY_NAME: DivergentOscillator
+
+STRATEGY_DETAILS:
+
+KEY STRATEGY COMPONENTS:
+This strategy combines RSI divergence patterns with MACD confirmation signals specifically for Bitcoin daily timeframe trading. The core approach focuses on identifying momentum shifts through divergence analysis while using MACD for additional confirmation to filter false signals.
+
+REQUIRED INDICATORS:
+1. RSI (Relative Strength Index) - Period 14, applied to closing prices
+2. MACD (Moving Average Convergence Divergence) - Standard settings (12,26,9)
+3. Price action analysis for swing high/low identification
+
+ENTRY RULES:
+
+BULLISH DIVERGENCE SETUP:
+1. Price forms LOWER LOW while RSI forms HIGHER LOW
+2. MACD histogram shows decreasing bearish momentum (rising from lows)
+3. MACD line shows potential bullish crossover or flattening
+4. Enter long position when price breaks above the most recent swing high
+
+BEARISH DIVERGENCE SETUP:
+1. Price forms HIGHER HIGH while RSI forms LOWER HIGH
+2. MACD histogram shows decreasing bullish momentum (falling from highs)
+3. MACD line shows potential bearish crossover or flattening
+4. Enter short position when price breaks below the most recent swing low
+
+CONFIRMATION REQUIREMENTS:
+- Both RSI and MACD must align in their divergence signals
+- Wait for price confirmation through swing breakouts
+- Divergence should be clearly visible on daily charts
+- Minimum 3-5 candles between divergence points for validity
+
+EXIT RULES:
+- Take profit at 1:2 risk-reward ratio minimum
+- Exit when opposite divergence signal appears
+- Stop loss placed beyond the divergence swing point
+- Consider partial profits at key resistance/support levels
+
+RISK MANAGEMENT:
+- Position size: 1-2% of capital per trade
+- Stop loss: 1.5-2x the average true range (ATR)
+- Maximum daily drawdown: 5%
+- Only trade clear, well-defined divergence patterns
+- Avoid trading during major news events or extreme volatility
+
+TIME FRAME SPECIFICS:
+- Primary: Daily charts for signal generation
+- Confirm with 4-hour charts for entry timing
+- Weekly charts for broader trend context
+- Minimum holding period: 3-7 days for divergence plays
+
+ADDITIONAL CONSIDERATIONS:
+- Works best in ranging or slowly trending markets
+- Less effective during strong, sustained trends
+- Requires patience for proper divergence development
+- Combine with volume analysis for additional confirmation
+- Monitor Bitcoin dominance and overall crypto market sentiment

@@ -1,0 +1,66 @@
+STRATEGY_NAME: VolatilityDivergence
+
+STRATEGY_DETAILS:
+This strategy combines volatility analysis with divergence detection specifically designed for BTC on 4-hour timeframes. The approach focuses on identifying momentum shifts during periods of high volatility through multiple divergence confirmations.
+
+KEY STRATEGY COMPONENTS:
+1. Primary Indicators:
+   - RSI (14-period) for momentum divergence detection
+   - Bollinger Bands (20,2) for volatility assessment
+   - Volume profile for confirmation
+   - MACD (12,26,9) for trend direction
+
+2. Volatility Framework:
+   - Monitor Bollinger Band width expansion/contraction
+   - Track price position relative to bands (upper/middle/lower)
+   - Identify volatility breakouts when price moves outside bands
+
+ENTRY RULES:
+LONG ENTRY (Bullish Divergence):
+1. RSI forms higher low while price forms lower low
+2. Price touches or crosses below lower Bollinger Band
+3. MACD histogram shows bullish divergence
+4. Volume increases on the divergence bar
+5. Wait for price to close back inside Bollinger Bands
+
+SHORT ENTRY (Bearish Divergence):
+1. RSI forms lower high while price forms higher high
+2. Price touches or crosses above upper Bollinger Band
+3. MACD histogram shows bearish divergence
+4. Volume increases on the divergence bar
+5. Wait for price to close back inside Bollinger Bands
+
+EXIT RULES:
+LONG EXIT:
+- Price reaches middle Bollinger Band (take partial profits)
+- RSI crosses above 70 (overbought)
+- MACD shows bearish crossover
+- Price closes below recent swing low
+
+SHORT EXIT:
+- Price reaches middle Bollinger Band (take partial profits)
+- RSI crosses below 30 (oversold)
+- MACD shows bullish crossover
+- Price closes above recent swing high
+
+RISK MANAGEMENT:
+- Position size: 2-3% of capital per trade
+- Stop loss: 2% below/above entry price or recent swing low/high
+- Maximum drawdown: 8% per week
+- Risk-reward ratio: Minimum 1:2
+- Only trade during high volatility periods (Bollinger Band width expanding)
+
+REQUIRED INDICATORS:
+1. RSI (14) - for divergence detection
+2. Bollinger Bands (20,2) - for volatility and support/resistance
+3. MACD (12,26,9) - for trend confirmation
+4. Volume - for momentum validation
+5. Price action - for swing high/low identification
+
+FILTERING CONDITIONS:
+- Only trade when Bollinger Band width is above its 20-period average (high volatility)
+- Avoid trading during consolidation (narrow bands)
+- Confirm divergence across at least 2 timeframes (4h + 1h)
+- Wait for volume confirmation on divergence bars
+
+This strategy excels in capturing reversal opportunities during volatile market conditions while using multiple confirmations to filter false signals.

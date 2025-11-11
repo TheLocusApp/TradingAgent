@@ -1,0 +1,59 @@
+STRATEGY_NAME: AdaptiveTrendFlow
+
+STRATEGY_DETAILS:
+This is a sophisticated trend-following strategy specifically designed for SPY daily charts that combines multiple timeframe analysis with adaptive entry/exit mechanisms.
+
+KEY STRATEGY COMPONENTS:
+1. Multi-timeframe trend confirmation using 20-day and 50-day EMAs
+2. Volume-weighted momentum confirmation
+3. Adaptive stop-loss and take-profit levels based on ATR
+4. Trend strength assessment using ADX
+
+REQUIRED INDICATORS:
+- EMA 20 (Exponential Moving Average)
+- EMA 50 (Exponential Moving Average)
+- ATR 14 (Average True Range)
+- ADX 14 (Average Directional Index)
+- Volume (standard volume indicator)
+
+ENTRY RULES:
+LONG ENTRY:
+1. Price must be above both EMA 20 and EMA 50
+2. EMA 20 must be above EMA 50 (confirmed uptrend)
+3. ADX must be above 25 (strong trend confirmation)
+4. Current day's close must be higher than previous day's close
+5. Volume should be above 20-day average volume
+
+SHORT ENTRY:
+1. Price must be below both EMA 20 and EMA 50
+2. EMA 20 must be below EMA 50 (confirmed downtrend)
+3. ADX must be above 25 (strong trend confirmation)
+4. Current day's close must be lower than previous day's close
+5. Volume should be above 20-day average volume
+
+EXIT RULES:
+LONG EXIT:
+1. Price closes below EMA 20
+2. EMA 20 crosses below EMA 50
+3. ADX drops below 20 (trend weakening)
+4. Trailing stop: 2x ATR below the highest high since entry
+
+SHORT EXIT:
+1. Price closes above EMA 20
+2. EMA 20 crosses above EMA 50
+3. ADX drops below 20 (trend weakening)
+4. Trailing stop: 2x ATR above the lowest low since entry
+
+RISK MANAGEMENT:
+- Position size: Maximum 2% of portfolio per trade
+- Initial stop-loss: 2.5x ATR from entry price
+- Maximum drawdown per trade: 5% of position value
+- No new entries if portfolio drawdown exceeds 10%
+- Only one position active at a time (long or short)
+
+ADDITIONAL FILTERS:
+- Avoid entering during first/last 30 minutes of trading day
+- Skip trading on major economic announcement days (FOMC, CPI releases)
+- Monitor for excessive gap openings (>1.5x ATR) which may invalidate setup
+
+This adaptive approach ensures you're only trading strong, confirmed trends while dynamically adjusting risk parameters based on market volatility through ATR-based stops.

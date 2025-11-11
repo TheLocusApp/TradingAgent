@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AG Bot - Strategy Optimizer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='modern-style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .spinner {
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .metric-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .metric-good { background: #d1fae5; color: #065f46; }
+        .metric-warning { background: #fef3c7; color: #92400e; }
+        .metric-bad { background: #fee2e2; color: #991b1b; }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen">
+    <!-- Top Navigation -->
+    <div class="top-nav">
+        <div class="nav-links">
+            <a href="/">LIVE TRADING</a>
+            <a href="/screener">SCREENER</a>
+            <a href="/portfolio">PORTFOLIO</a>
+            <a href="/strategy-lab">STRATEGY LAB</a>
+            <a href="/strategy-optimizer" class="active">AG BOT</a>
+        </div>
+    </div>
+    
+    <div class="container mx-auto px-4 py-8">
+        <!-- Main Content -->
+        <div class="max-w-7xl mx-auto p-6">
+            <!-- Configuration Panel -->
+            <div class="bg-gray-800 rounded-lg p-6 mb-6 card-hover">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                    <i class="fas fa-cog text-purple-400"></i> Optimization Settings
+                </h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <!-- Ticker Input -->
+                    <div>
+                        <label class="block text-sm font-semibold mb-2">Ticker Symbol</label>
+                        <input 
+                            type="text" 
+                            id="tickerInput" 
+                            placeholder="e.g., TSLA, AAPL, NVDA"
+                            class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500"
+                        >
+                    </div>
+
+                    <!-- Trade Type Selection -->
+                    <div>
+                        <label class="block text-sm font-semibold mb-2">Trade Type</label>
+                        <select 
+                            id="tradeTypeSelect"
+                            class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white focus:outline-none focus:border-purple-500"
+                        >
+                            <option value="swing">Swing Trade (1h, 4h, 1d)</option>
+                            <option value="daytrade">Day Trade (5m, 15m, 30m)</option>
+                        </select>
+                    </div>
+
+                    <!-- Start Button -->
+                    <div class="flex items-end">
+                        <button 
+                            id="startBtn"
+                            class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition"
+                        >
+                            <i class="fas fa-play"></i> Start Optimization
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status Panel -->
+            <div id="statusPanel" class="bg-gray-800 rounded-lg p-6 mb-6 hidden">
+                <div class="flex items-center gap-4">
+                    <div class="spinner"></div>
+                    <div>
+                        <h3 class="text-lg font-bold">Optimization in Progress</h3>
+                        <p id="statusText" class="text-gray-400 mt-1">Initializing...</p>
+                    </div>
+                </div>
+                <div class="mt-4 bg-gray-700 rounded-full h-2">
+                    <div id="progressBar" class="bg-purple-600 h-2 rounded-full transition-all" style="width: 0%"></div>
+                </div>
+                <div class="mt-4 text-sm text-gray-400">
+                    <p>💡 Tip: This can take 30-45 minutes. You can close this page and come back later.</p>
+                    <p>The optimization will continue running in the background.</p>
+                </div>
+                <div class="mt-4 flex gap-2">
+                    <button id="checkResultsBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition">
+                        <i class="fas fa-sync"></i> Check Results
+                    </button>
+                    <button id="cancelBtn" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded transition">
+                        <i class="fas fa-times"></i> Stop Checking
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div id="resultsSection" class="hidden">
+                <!-- Page Title -->
+                <h1 id="pageTitle" class="text-3xl font-bold mb-6 text-center">
+                    <i class="fas fa-robot"></i> AG Bot - Strategy Optimizer
+                </h1>
+                
+                <!-- Best Combinations Table -->
+                <div class="bg-gray-800 rounded-lg p-6 mb-6 card-hover">
+                    <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                        <i class="fas fa-trophy text-yellow-400"></i> Top Parameter Combinations
+                    </h2>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="border-b border-gray-700">
+                                    <th class="text-left py-3 px-4">Rank</th>
+                                    <th class="text-left py-3 px-4">Ticker</th>
+                                    <th class="text-left py-3 px-4">TF</th>
+                                    <th class="text-left py-3 px-4">MA</th>
+                                    <th class="text-left py-3 px-4">Key</th>
+                                    <th class="text-left py-3 px-4">ATR</th>
+                                    <th class="text-left py-3 px-4">TP1 RR</th>
+                                    <th class="text-left py-3 px-4">TP1 %</th>
+                                    <th class="text-right py-3 px-4">Sharpe</th>
+                                    <th class="text-right py-3 px-4">Return</th>
+                                    <th class="text-right py-3 px-4">B&H</th>
+                                    <th class="text-right py-3 px-4">Alpha</th>
+                                    <th class="text-right py-3 px-4">Duration</th>
+                                    <th class="text-right py-3 px-4">Win Rate</th>
+                                    <th class="text-right py-3 px-4">Trades</th>
+                                    <th class="text-center py-3 px-4">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="resultsTable">
+                                <!-- Populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Timeframe Summary -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    <div id="timeframesSummary">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Performance Comparison Chart -->
+                <div class="bg-gray-800 rounded-lg p-6 card-hover">
+                    <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                        <i class="fas fa-chart-bar text-blue-400"></i> Performance Comparison
+                    </h2>
+                    <canvas id="performanceChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="bg-gray-800 rounded-lg p-12 text-center">
+                <i class="fas fa-search text-gray-600 text-5xl mb-4"></i>
+                <h3 class="text-xl font-bold mb-2">No Results Yet</h3>
+                <p class="text-gray-400">Configure settings and click "Start Optimization" to begin</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let optimizationInProgress = false;
+        let currentResults = null;
+        let performanceChart = null;
+        let pollInterval = null;
+
+        const isNumber = (value) => typeof value === 'number' && Number.isFinite(value);
+
+        const formatNumber = (value, decimals = 2, fallback = 'N/A') => {
+            if (!isNumber(value)) return fallback;
+            return value.toFixed(decimals);
+        };
+
+        const formatInteger = (value, fallback = 'N/A') => {
+            if (!isNumber(value)) return fallback;
+            return Math.round(value);
+        };
+
+        // Load ALL saved results on page load
+        async function loadPersistedResults() {
+            try {
+                console.log('🔍 [FRONTEND] Fetching /api/optimizer/all-saved-results...');
+                const response = await fetch('/api/optimizer/all-saved-results');
+                const data = await response.json();
+                
+                console.log('📊 [FRONTEND] Response received:', {
+                    status: response.status,
+                    count: data.count,
+                    results_length: data.results ? data.results.length : 0,
+                    data: data
+                });
+                
+                if (data.results && data.results.length > 0) {
+                    console.log('✅ [FRONTEND] Loaded persisted results:', data.results);
+                    displayAllSavedResults(data.results);
+                    document.getElementById('resultsSection').classList.remove('hidden');
+                    document.getElementById('emptyState').classList.add('hidden');
+                } else {
+                    console.log('⚠️ [FRONTEND] No saved results found. Count:', data.count);
+                    console.log('⚠️ [FRONTEND] Results array:', data.results);
+                    document.getElementById('resultsSection').classList.add('hidden');
+                    document.getElementById('emptyState').classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error('❌ [FRONTEND] Error loading results:', error);
+                document.getElementById('resultsSection').classList.add('hidden');
+                document.getElementById('emptyState').classList.remove('hidden');
+            }
+        }
+
+        // Display ALL saved results in table
+        function displayAllSavedResults(results) {
+            // Update page title
+            const pageTitle = document.getElementById('pageTitle');
+            if (pageTitle) {
+                pageTitle.innerHTML = `
+                    <i class="fas fa-robot"></i> AG Bot - Strategy Optimizer (${results.length} Tickers)
+                `;
+            }
+
+            // Display table
+            const tableBody = document.getElementById('resultsTable');
+            tableBody.innerHTML = '';
+
+            results.forEach((combo, index) => {
+                const row = document.createElement('tr');
+                row.className = 'border-b border-gray-700 hover:bg-gray-700 transition';
+
+                const sharpeValue = isNumber(combo.sharpe) ? combo.sharpe : null;
+                const returnValue = isNumber(combo.return) ? combo.return : null;
+                const buyHoldValue = isNumber(combo.buy_hold_return) ? combo.buy_hold_return : null;
+                const alphaValue = isNumber(combo.alpha) ? combo.alpha : null;
+                const winRateValue = isNumber(combo.win_rate) ? combo.win_rate : null;
+
+                const sharpeClass = sharpeValue !== null
+                    ? (sharpeValue > 1.5 ? 'metric-good' : sharpeValue > 1.0 ? 'metric-warning' : 'metric-bad')
+                    : 'metric-warning';
+                const returnClass = returnValue !== null
+                    ? (returnValue > 20 ? 'metric-good' : returnValue > 0 ? 'metric-warning' : 'metric-bad')
+                    : 'metric-warning';
+
+                const sharpeDisplay = formatNumber(sharpeValue, 2, 'N/A');
+                const returnDisplay = formatNumber(returnValue, 2, '0.00');
+                const buyHoldDisplay = formatNumber(buyHoldValue, 2, 'N/A');
+                const alphaDisplay = formatNumber(alphaValue, 2, 'N/A');
+                const winRateDisplay = formatNumber(winRateValue, 1, '0.0');
+
+                // Format duration
+                let durationDisplay = 'N/A';
+                if (isNumber(combo.duration_days)) {
+                    if (combo.duration_days >= 365) {
+                        const years = (combo.duration_days / 365).toFixed(1);
+                        durationDisplay = `${years}y`;
+                    } else if (combo.duration_days >= 30) {
+                        const months = Math.floor(combo.duration_days / 30);
+                        durationDisplay = `${months}mo`;
+                    } else {
+                        durationDisplay = `${combo.duration_days}d`;
+                    }
+                }
+
+                const alphaClass = alphaValue !== null ? (alphaValue > 0 ? 'metric-good' : 'metric-bad') : 'metric-warning';
+                const buyHoldClass = buyHoldValue !== null ? (buyHoldValue > 0 ? 'metric-good' : 'metric-bad') : 'metric-warning';
+
+                const timeframeLabel = (combo.timeframe ? String(combo.timeframe) : 'N/A').toUpperCase();
+                const tickerLabel = combo.ticker || 'N/A';
+                const maLengthDisplay = isNumber(combo.ma_length) ? combo.ma_length : 'N/A';
+                const keyValueDisplay = formatNumber(combo.key_value, 1, 'N/A');
+                const atrDisplay = formatNumber(combo.adaptive_atr_mult, 1, 'N/A');
+                const tp1RRDisplay = formatNumber(combo.tp1_rr_long, 1, 'N/A');
+                const tp1PercentDisplay = isNumber(combo.tp1_percent) ? combo.tp1_percent : 'N/A';
+                const tradesDisplay = formatInteger(combo.trades, 'N/A');
+                const tradeType = combo.trade_type || 'unknown';
+                
+                row.innerHTML = `
+                    <td class="py-3 px-4 font-bold">#${index + 1}</td>
+                    <td class="py-3 px-4"><span class="bg-blue-900 px-2 py-1 rounded font-bold">${tickerLabel}</span></td>
+                    <td class="py-3 px-4"><span class="bg-purple-900 px-2 py-1 rounded font-bold">${timeframeLabel}</span></td>
+                    <td class="py-3 px-4">${maLengthDisplay}</td>
+                    <td class="py-3 px-4">${keyValueDisplay}</td>
+                    <td class="py-3 px-4">${atrDisplay}</td>
+                    <td class="py-3 px-4">${tp1RRDisplay}</td>
+                    <td class="py-3 px-4">${tp1PercentDisplay}</td>
+                    <td class="text-right py-3 px-4"><span class="metric-badge ${sharpeClass}">${sharpeDisplay}</span></td>
+                    <td class="text-right py-3 px-4"><span class="metric-badge ${returnClass}">${returnDisplay}%</span></td>
+                    <td class="text-right py-3 px-4"><span class="metric-badge ${buyHoldClass}">${buyHoldDisplay}%</span></td>
+                    <td class="text-right py-3 px-4"><span class="metric-badge ${alphaClass}">${alphaDisplay}%</span></td>
+                    <td class="text-right py-3 px-4">${durationDisplay}</td>
+                    <td class="text-right py-3 px-4">${winRateDisplay}%</td>
+                    <td class="py-3 px-4">${tradesDisplay}</td>
+                    <td class="text-center py-3 px-4">
+                        <button onclick="deleteOptimization('${tickerLabel}', '${tradeType}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+
+            // Display performance chart for all tickers
+            displayPerformanceChartAll(results);
+        }
+        
+        // Show loading row in table
+        function showLoadingRow(ticker) {
+            const tableBody = document.getElementById('resultsTable');
+            const loadingRow = document.createElement('tr');
+            loadingRow.id = 'loading-row';
+            loadingRow.className = 'border-b border-gray-700 bg-gray-800';
+            loadingRow.innerHTML = `
+                <td colspan="16" class="py-6 px-4 text-center">
+                    <div class="flex items-center justify-center gap-3">
+                        <div class="spinner" style="width: 20px; height: 20px; border: 2px solid #4f46e5; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                        <span class="text-purple-400 font-semibold">Optimizing ${ticker}... This may take 2-3 minutes</span>
+                    </div>
+                </td>
+            `;
+            tableBody.insertBefore(loadingRow, tableBody.firstChild);
+        }
+        
+        // Remove loading row
+        function removeLoadingRow() {
+            const loadingRow = document.getElementById('loading-row');
+            if (loadingRow) {
+                loadingRow.remove();
+            }
+        }
+        
+        // Delete optimization
+        async function deleteOptimization(ticker, tradeType) {
+            if (!confirm(`Delete optimization for ${ticker} (${tradeType})? This cannot be undone.`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/optimizer/delete/${ticker}/${tradeType}`, {
+                    method: 'DELETE'
+                });
+                
+                if (!response.ok) throw new Error('Failed to delete optimization');
+                
+                const result = await response.json();
+                console.log(`✅ Deleted ${ticker} (${tradeType})`);
+                
+                // Reload table
+                await loadPersistedResults();
+            } catch (error) {
+                console.error('Error deleting optimization:', error);
+                alert('Error deleting optimization: ' + error.message);
+            }
+        }
+
+        // Load ALL saved results when page loads
+        document.addEventListener('DOMContentLoaded', loadPersistedResults);
+
+        // Check Results Button
+        document.getElementById('checkResultsBtn').addEventListener('click', async () => {
+            console.log('Checking for results...');
+            try {
+                const response = await fetch('/api/optimizer/status');
+                const status = await response.json();
+
+                if (status.status === 'complete') {
+                    const resultsResponse = await fetch('/api/optimizer/results');
+                    currentResults = await resultsResponse.json();
+                    
+                    displayResults(currentResults);
+                    document.getElementById('statusPanel').classList.add('hidden');
+                    document.getElementById('resultsSection').classList.remove('hidden');
+                    optimizationInProgress = false;
+                    document.getElementById('startBtn').disabled = false;
+                    if (pollInterval) clearInterval(pollInterval);
+                } else {
+                    alert('Optimization still in progress. Check again in a few minutes.');
+                }
+            } catch (error) {
+                alert('Error checking results: ' + error.message);
+            }
+        });
+
+        // Cancel Button
+        document.getElementById('cancelBtn').addEventListener('click', () => {
+            optimizationInProgress = false;
+            document.getElementById('statusPanel').classList.add('hidden');
+            document.getElementById('startBtn').disabled = false;
+            if (pollInterval) clearInterval(pollInterval);
+            alert('Stopped checking for results. Optimization continues in background.');
+        });
+
+        // Start Optimization
+        document.getElementById('startBtn').addEventListener('click', async () => {
+            const ticker = document.getElementById('tickerInput').value.toUpperCase();
+            const tradeType = document.getElementById('tradeTypeSelect').value;
+
+            if (!ticker) {
+                alert('Please enter a ticker symbol');
+                return;
+            }
+
+            // Show loading state immediately
+            optimizationInProgress = true;
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('statusPanel').classList.remove('hidden');
+            document.getElementById('resultsSection').classList.add('hidden');
+            document.getElementById('emptyState').classList.add('hidden');
+            document.getElementById('statusText').textContent = 'Checking for cached results...';
+            document.getElementById('progressBar').style.width = '5%';
+
+            try {
+                // Start optimization (automatically uses 365 days of data)
+                const response = await fetch('/api/optimizer/start', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ symbol: ticker, trade_type: tradeType })
+                });
+
+                if (!response.ok) throw new Error('Failed to start optimization');
+
+                const startData = await response.json();
+                
+                // Check if results are already cached
+                if (startData.status === 'complete') {
+                    // Cached results - load immediately
+                    document.getElementById('statusText').textContent = 'Loading cached results...';
+                    document.getElementById('progressBar').style.width = '100%';
+                    await new Promise(resolve => setTimeout(resolve, 500)); // Brief delay for UX
+                    await loadPersistedResults();
+                    document.getElementById('statusPanel').classList.add('hidden');
+                    document.getElementById('resultsSection').classList.remove('hidden');
+                    optimizationInProgress = false;
+                    document.getElementById('startBtn').disabled = false;
+                    console.log(`✅ Loaded cached results for ${ticker}`);
+                } else {
+                    // New optimization - show loading row in table and poll
+                    document.getElementById('statusPanel').classList.add('hidden');
+                    document.getElementById('resultsSection').classList.remove('hidden');
+                    document.getElementById('emptyState').classList.add('hidden');
+                    showLoadingRow(ticker);
+                    await pollForResults();
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error starting optimization: ' + error.message);
+                document.getElementById('statusPanel').classList.add('hidden');
+                document.getElementById('startBtn').disabled = false;
+                optimizationInProgress = false;
+            }
+        });
+
+        async function pollForResults() {
+            const maxAttempts = 3600; // 60 minutes with 1-second intervals
+            let attempts = 0;
+            let lastCheckTime = Date.now();
+
+            while (attempts < maxAttempts && optimizationInProgress) {
+                try {
+                    const response = await fetch('/api/optimizer/status');
+                    const status = await response.json();
+
+                    if (status.status === 'complete') {
+                        // Remove loading row and reload ALL saved results
+                        removeLoadingRow();
+                        await loadPersistedResults();
+                        document.getElementById('statusPanel').classList.add('hidden');
+                        document.getElementById('resultsSection').classList.remove('hidden');
+                        optimizationInProgress = false;
+                        document.getElementById('startBtn').disabled = false;
+                        // No alert - table updates automatically
+                        break;
+                    } else if (status.status === 'error') {
+                        throw new Error(status.error);
+                    } else {
+                        // Still running - update status
+                        const minutes = Math.floor(attempts / 60);
+                        const seconds = attempts % 60;
+                        const timeStr = `${minutes}m ${seconds}s`;
+                        
+                        document.getElementById('statusText').textContent = 
+                            `Testing parameters... (${timeStr} elapsed)`;
+                        
+                        // Progress bar: estimate based on typical time
+                        const estimatedTotal = 2400; // 40 minutes typical
+                        const progress = Math.min((attempts / estimatedTotal) * 100, 95);
+                        document.getElementById('progressBar').style.width = `${progress}%`;
+                    }
+
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    attempts++;
+
+                } catch (error) {
+                    console.error('Poll error:', error);
+                    attempts++;
+                }
+            }
+
+            if (attempts >= maxAttempts) {
+                alert('Optimization is still running. Check back in a few minutes or refresh the page.');
+                document.getElementById('statusPanel').classList.add('hidden');
+                document.getElementById('startBtn').disabled = false;
+                optimizationInProgress = false;
+            }
+        }
+
+        function displayResults(results) {
+            if (!results.best_combinations || results.best_combinations.length === 0) {
+                document.getElementById('emptyState').classList.remove('hidden');
+                return;
+            }
+
+            // Update page title with ticker
+            const ticker = results.symbol || document.getElementById('tickerInput').value.toUpperCase();
+            document.querySelector('h1').innerHTML = `
+                <i class="fas fa-robot"></i> Strategy Optimizer - ${ticker}
+            `;
+
+            // Display best combinations table (1 per timeframe)
+            const tableBody = document.getElementById('resultsTable');
+            tableBody.innerHTML = '';
+
+            results.best_combinations.forEach((combo, index) => {
+                const row = document.createElement('tr');
+                row.className = 'border-b border-gray-700 hover:bg-gray-700 transition';
+                
+                const sharpeClass = combo.sharpe > 1.5 ? 'metric-good' : 
+                                   combo.sharpe > 1.0 ? 'metric-warning' : 'metric-bad';
+                const returnClass = combo.return > 20 ? 'metric-good' : 
+                                   combo.return > 0 ? 'metric-warning' : 'metric-bad';
+
+                const sharpeDisplay = combo.sharpe !== null ? combo.sharpe.toFixed(2) : 'N/A';
+                const returnDisplay = combo.return !== null ? combo.return.toFixed(2) : '0.00';
+                const winRateDisplay = combo.win_rate !== null ? combo.win_rate.toFixed(1) : '0.0';
+                
+                row.innerHTML = `
+                    <td class="py-3 px-4 font-bold">#${index + 1}</td>
+                    <td class="py-3 px-4"><span class="bg-purple-900 px-2 py-1 rounded font-bold">${combo.timeframe.toUpperCase()}</span></td>
+                    <td class="py-3 px-4">${combo.ma_length}</td>
+                    <td class="py-3 px-4">${combo.key_value.toFixed(1)}</td>
+                    <td class="py-3 px-4">${combo.adaptive_atr_mult.toFixed(1)}</td>
+                    <td class="py-3 px-4">${combo.tp1_rr_long.toFixed(1)}</td>
+                    <td class="py-3 px-4">${combo.tp1_percent}</td>
+                    <td class="text-right py-3 px-4"><span class="metric-badge ${sharpeClass}">${sharpeDisplay}</span></td>
+                    <td class="text-right py-3 px-4"><span class="metric-badge ${returnClass}">${returnDisplay}%</span></td>
+                    <td class="text-right py-3 px-4">${winRateDisplay}%</td>
+                    <td class="py-3 px-4">${combo.trades}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+
+            // Display timeframe summary
+            displayTimeframeSummary(results.all_results);
+
+            // Display chart
+            displayPerformanceChart(results.best_combinations);
+        }
+
+        function displayTimeframeSummary(allResults) {
+            const container = document.getElementById('timeframesSummary');
+            container.innerHTML = '';
+
+            Object.entries(allResults).forEach(([timeframe, results]) => {
+                if (!results || results.length === 0) return;
+
+                const best = results[0];
+                
+                // Skip if no trades
+                if (best.trades === 0) return;
+                
+                const sharpeDisplay = best.sharpe !== null ? best.sharpe.toFixed(2) : 'N/A';
+                const returnDisplay = best.return !== null ? best.return.toFixed(2) : '0.00';
+                
+                const card = document.createElement('div');
+                card.className = 'bg-gray-700 rounded-lg p-4 card-hover';
+                card.innerHTML = `
+                    <h3 class="font-bold text-lg mb-3">${timeframe.toUpperCase()}</h3>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Best Sharpe:</span>
+                            <span class="font-bold text-green-400">${sharpeDisplay}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Best Return:</span>
+                            <span class="font-bold text-blue-400">${returnDisplay}%</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Combinations:</span>
+                            <span class="font-bold">${results.length}</span>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function displayPerformanceChart(combinations) {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            
+            const labels = combinations.slice(0, 10).map((c, i) => `#${i + 1} (${c.timeframe})`);
+            const sharpeData = combinations.slice(0, 10).map(c => c.sharpe);
+            const returnData = combinations.slice(0, 10).map(c => c.return);
+
+            if (performanceChart) {
+                performanceChart.destroy();
+            }
+
+            performanceChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Sharpe Ratio',
+                            data: sharpeData,
+                            backgroundColor: 'rgba(147, 112, 219, 0.8)',
+                            borderColor: 'rgba(147, 112, 219, 1)',
+                            borderWidth: 1,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Return (%)',
+                            data: returnData,
+                            backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                            borderColor: 'rgba(59, 130, 246, 1)',
+                            borderWidth: 1,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'Sharpe Ratio',
+                                color: '#9370db'
+                            },
+                            ticks: {
+                                color: '#9ca3af'
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: 'Return (%)',
+                                color: '#3b82f6'
+                            },
+                            ticks: {
+                                color: '#9ca3af'
+                            },
+                            grid: {
+                                drawOnChartArea: false,
+                            },
+                        },
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#d1d5db'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function displayPerformanceChartAll(results) {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            
+            // Group by ticker
+            const tickerGroups = {};
+            results.forEach(r => {
+                if (!tickerGroups[r.ticker]) {
+                    tickerGroups[r.ticker] = [];
+                }
+                tickerGroups[r.ticker].push(r);
+            });
+            
+            // Take top 10 overall
+            const top10 = results.slice(0, 10);
+            const labels = top10.map(r => `${r.ticker} (${r.timeframe})`);
+            const sharpeData = top10.map(r => r.sharpe || 0);
+            const returnData = top10.map(r => r.return || 0);
+            
+            if (performanceChart) {
+                performanceChart.destroy();
+            }
+
+            performanceChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Sharpe Ratio',
+                            data: sharpeData,
+                            backgroundColor: 'rgba(147, 112, 219, 0.8)',
+                            borderColor: 'rgba(147, 112, 219, 1)',
+                            borderWidth: 1,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Return (%)',
+                            data: returnData,
+                            backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                            borderColor: 'rgba(59, 130, 246, 1)',
+                            borderWidth: 1,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'Sharpe Ratio',
+                                color: '#9370db'
+                            },
+                            ticks: {
+                                color: '#9ca3af'
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: 'Return (%)',
+                                color: '#3b82f6'
+                            },
+                            ticks: {
+                                color: '#9ca3af'
+                            },
+                            grid: {
+                                drawOnChartArea: false,
+                            },
+                        },
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#d1d5db'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

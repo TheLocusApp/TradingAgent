@@ -1,0 +1,54 @@
+STRATEGY_NAME: AdaptiveTrendshift
+
+STRATEGY_DETAILS:
+This strategy uses dual exponential moving averages on QQQ's 1-hour chart to identify significant trend changes and capture sustained directional moves while filtering out market noise.
+
+KEY COMPONENTS:
+- Primary Instrument: QQQ (NASDAQ 100 ETF)
+- Timeframe: 1-hour chart
+- Core Indicators: 20-period EMA (fast) and 200-period EMA (slow)
+- Trend Filter: 200 EMA serves as primary trend direction indicator
+- Signal Generator: 20 EMA crossover relative to 200 EMA
+
+ENTRY RULES:
+LONG ENTRY:
+1. 20 EMA crosses ABOVE 200 EMA (bullish crossover)
+2. Price confirms by closing above both EMAs
+3. Enter on next candle open after crossover confirmation
+4. Optional: Wait for pullback to 20 EMA for better risk-reward
+
+SHORT ENTRY:
+1. 20 EMA crosses BELOW 200 EMA (bearish crossover)
+2. Price confirms by closing below both EMAs
+3. Enter on next candle open after crossover confirmation
+4. Optional: Wait for pullback to 20 EMA for better risk-reward
+
+EXIT RULES:
+LONG EXIT:
+1. 20 EMA crosses below 200 EMA (reverse signal)
+2. Price closes below 200 EMA (trend break)
+3. Protective stop loss hit
+
+SHORT EXIT:
+1. 20 EMA crosses above 200 EMA (reverse signal)
+2. Price closes above 200 EMA (trend break)
+3. Protective stop loss hit
+
+RISK MANAGEMENT:
+- Position Size: 1-2% of account capital per trade
+- Stop Loss: Place below 200 EMA for longs, above 200 EMA for shorts (adjust based on volatility)
+- Alternative Stop: Recent swing low/high with buffer
+- Take Profit: No fixed target - let trend run until exit signal
+- Risk-Reward: Minimum 1:2 ratio required
+
+REQUIRED INDICATORS:
+1. 20-period Exponential Moving Average (EMA)
+2. 200-period Exponential Moving Average (EMA)
+3. Optional: Volume confirmation for crossover validity
+
+STRATEGY NOTES:
+- This strategy works best in trending markets, may produce whipsaws in ranging conditions
+- The 200 EMA acts as major support/resistance and trend filter
+- Consider market context and overall trend alignment for higher probability trades
+- Monitor for false breakouts by waiting for candle close confirmation
+- Best suited for swing trading with positions held for days to weeks

@@ -268,6 +268,26 @@ INDICATOR CALCULATION RULES:
    - Instead of: self.data.High.rolling(window=20).max()
    - Use: self.I(talib.MAX, self.data.High, timeperiod=20)
 
+🚨 CRITICAL: TA-LIB REQUIRES FLOAT64 DTYPE 🚨
+TA-Lib functions REQUIRE numpy arrays with dtype float64 (double precision).
+yfinance returns mixed dtypes (int64 for Volume, float64 for prices).
+
+❌ WRONG - Will crash with "input array type is not double":
+```python
+self.vol_sma = self.I(talib.SMA, self.data.Volume, timeperiod=20)
+self.rsi = self.I(talib.RSI, self.data.Close, timeperiod=14)
+```
+
+✅ CORRECT - Explicit conversion to float:
+```python
+self.vol_sma = self.I(talib.SMA, self.data.Volume.astype(float), timeperiod=20)
+self.rsi = self.I(talib.RSI, self.data.Close.astype(float), timeperiod=14)
+self.atr = self.I(talib.ATR, self.data.High.astype(float), self.data.Low.astype(float), self.data.Close.astype(float), timeperiod=14)
+```
+
+⚠️ ALWAYS add .astype(float) to ALL data columns passed to TA-Lib functions!
+This applies to: Close, Open, High, Low, Volume - ALL of them!
+
 BACKTEST EXECUTION ORDER:
 1. Run initial backtest with default parameters first
 2. Print full stats using print(stats) and print(stats._strategy)

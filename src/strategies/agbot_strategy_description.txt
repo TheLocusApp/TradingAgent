@@ -1,0 +1,55 @@
+AGBot Trading Strategy - TSLA 1H Backtest & Optimization
+
+ASSET: TSLA (Tesla)
+TIMEFRAME: 1 Hour
+INITIAL BACKTEST: 1 week of data
+FULL BACKTEST: 1 year of data
+
+STRATEGY OVERVIEW:
+The AGBot strategy is an ATR-based trend-following system with dynamic risk management. It combines:
+1. EMA trend filter (200-period by default)
+2. UT Bot ATR Trailing Stop for entry signals
+3. Multi-level take profit with partial exits
+4. ATR-based stop losses with dynamic multipliers
+
+CORE LOGIC:
+- Entry: Price crosses above/below ATR trailing stop with trend confirmation (EMA)
+- Long: Price > EMA + UT Bot buy signal
+- Short: Price < EMA + UT Bot sell signal
+- Exit: Take profit levels (TP1 partial, TP2 full) or stop loss hit
+- Risk Management: Position sizing based on ATR and risk percentage
+
+PARAMETERS TO OPTIMIZE:
+1. ma_length: EMA period for trend filter (test: 50, 100, 150, 200, 250, 300)
+2. key_value: UT Bot ATR multiplier (test: 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0)
+3. adaptive_atr_mult: Stop loss ATR multiplier (test: 0.5, 1.0, 1.5, 2.0, 2.5)
+4. tp1_rr_long: First take profit risk-reward ratio (test: 0.5, 1.0, 1.5, 2.0)
+5. tp2_rr_long: Second take profit risk-reward ratio (test: 2.0, 3.0, 4.0, 5.0)
+6. tp1_percent: Percentage to close at TP1 (test: 20, 30, 40, 50)
+
+OPTIMIZATION OBJECTIVE:
+Maximize: Equity Final [$] (total profit)
+Constraints:
+- tp2_rr_long > tp1_rr_long (second TP must be higher than first)
+- Minimum 10 trades required for valid result
+- Win rate > 30%
+
+BACKTEST SETTINGS:
+- Initial Capital: $10,000
+- Commission: 0.03% (typical for stocks)
+- Slippage: None (assume perfect fills)
+- Long & Short positions: Both enabled
+- Session: 9:30 AM - 4:00 PM EST (US market hours)
+- EOD Close: Enabled (close all positions at market close)
+
+EXPECTED BEHAVIOR:
+- UT Bot should generate trend-following signals
+- ATR-based stops should adapt to volatility
+- Multi-level TP should lock in profits progressively
+- Risk management should keep drawdowns controlled
+
+NOTES:
+- Start with 1 week to verify strategy generates trades
+- If trades are generated, expand to full 1-year backtest
+- Use optimization to find best parameter combination
+- Focus on Sharpe ratio and win rate, not just raw profit

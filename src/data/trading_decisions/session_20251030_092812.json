@@ -1,0 +1,212 @@
+{
+  "session_id": "20251030_092812",
+  "config": {
+    "models": [
+      "deepseek"
+    ],
+    "model_temperature": 0.7,
+    "model_max_tokens": 1024,
+    "system_prompt": "",
+    "asset_type": "crypto",
+    "ticker": "BTC",
+    "timeframe": "1m",
+    "cycle_interval": 180,
+    "use_simulation": true,
+    "initial_balance": 10000,
+    "position_size_percentage": 0.9,
+    "save_decisions": true,
+    "decisions_dir": "src/data/trading_decisions",
+    "use_live_data": false
+  },
+  "session_start": "2025-10-30T09:28:12.300517",
+  "decisions_count": 11,
+  "decisions": [
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-30T09:28:25.918771",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "Price is trading slightly above EMA(20) by approximately $26, indicating minimal bullish momentum. RSI at 53.61 is neutral, showing neither overbought nor oversold conditions. MACD remains negative at -50.596, suggesting underlying bearish pressure despite the slight price premium. The conflicting signals between price position and MACD, combined with neutral RSI, create an unclear short-term direction. Risk-reward appears unfavorable for entering new positions at this level.",
+          "raw_response": "SIGNAL: HOLD\nCONFIDENCE: 65%\nREASONING: Price is trading slightly above EMA(20) by approximately $26, indicating minimal bullish momentum. RSI at 53.61 is neutral, showing neither overbought nor oversold conditions. MACD remains negative at -50.596, suggesting underlying bearish pressure despite the slight price premium. The conflicting signals between price position and MACD, combined with neutral RSI, create an unclear short-term direction. Risk-reward appears unfavorable for entering new positions at this level.",
+          "prompt": "\nMARKET DATA FOR BTC:\nPrice: $113,793.50\nEMA(20): $113,767.33\nRSI(7): 53.61\nMACD: -50.596\n\nAnalyze and provide trading signal.\n",
+          "system_prompt": "You are an expert crypto trading AI.\n\nYour role is to analyze real-time market data for BTC/USD and make trading decisions on 1m candles.\n\nOBJECTIVE: Maximize risk-adjusted returns on 1m timeframe.\n\nProvide your response in this format:\nSIGNAL: [BUY/SELL/HOLD]\nCONFIDENCE: [0-100]%\nREASONING: [your analysis]\n"
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-30T09:31:30.986967",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "Price is trading slightly above EMA(20) by approximately $26, indicating minimal bullish momentum. RSI at 53.61 is neutral, showing neither overbought nor oversold conditions. MACD remains negative at -50.596, suggesting underlying bearish pressure despite recent price stability. The conflicting signals between price position and MACD, combined with neutral RSI, suggest consolidation is likely. Wait for clearer directional confirmation before entering a position.",
+          "raw_response": "SIGNAL: HOLD\nCONFIDENCE: 65%\nREASONING: Price is trading slightly above EMA(20) by approximately $26, indicating minimal bullish momentum. RSI at 53.61 is neutral, showing neither overbought nor oversold conditions. MACD remains negative at -50.596, suggesting underlying bearish pressure despite recent price stability. The conflicting signals between price position and MACD, combined with neutral RSI, suggest consolidation is likely. Wait for clearer directional confirmation before entering a position.",
+          "prompt": "\nMARKET DATA FOR BTC:\nPrice: $113,793.50\nEMA(20): $113,767.33\nRSI(7): 53.61\nMACD: -50.596\n\nAnalyze and provide trading signal.\n",
+          "system_prompt": "You are an expert crypto trading AI.\n\nYour role is to analyze real-time market data for BTC/USD and make trading decisions on 1m candles.\n\nOBJECTIVE: Maximize risk-adjusted returns on 1m timeframe.\n\nProvide your response in this format:\nSIGNAL: [BUY/SELL/HOLD]\nCONFIDENCE: [0-100]%\nREASONING: [your analysis]\n"
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-30T09:34:37.327008",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "The current price is slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing neither overbought nor oversold conditions. Given the conflicting signals\u2014modest price strength versus a negative MACD\u2014there is insufficient evidence for a decisive entry. A HOLD position is prudent until clearer momentum or a MACD crossover emerges.",
+          "raw_response": "SIGNAL: HOLD  \nCONFIDENCE: 65%  \nREASONING: The current price is slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing neither overbought nor oversold conditions. Given the conflicting signals\u2014modest price strength versus a negative MACD\u2014there is insufficient evidence for a decisive entry. A HOLD position is prudent until clearer momentum or a MACD crossover emerges.",
+          "prompt": "\nMARKET DATA FOR BTC:\nPrice: $113,793.50\nEMA(20): $113,767.33\nRSI(7): 53.61\nMACD: -50.596\n\nAnalyze and provide trading signal.\n",
+          "system_prompt": "You are an expert crypto trading AI.\n\nYour role is to analyze real-time market data for BTC/USD and make trading decisions on 1m candles.\n\nOBJECTIVE: Maximize risk-adjusted returns on 1m timeframe.\n\nProvide your response in this format:\nSIGNAL: [BUY/SELL/HOLD]\nCONFIDENCE: [0-100]%\nREASONING: [your analysis]\n"
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-30T09:37:43.422749",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "Price is trading slightly above EMA(20) by approximately $26, indicating minimal bullish momentum. RSI(7) at 53.61 is neutral, showing neither overbought nor oversold conditions. MACD remains negative at -50.596, suggesting underlying bearish pressure despite the slight price premium. The conflicting signals between price position and MACD, combined with neutral RSI, create an unclear short-term direction. Risk-reward appears balanced at current levels, warranting a hold position until clearer momentum emerges.",
+          "raw_response": "SIGNAL: HOLD\nCONFIDENCE: 65%\nREASONING: Price is trading slightly above EMA(20) by approximately $26, indicating minimal bullish momentum. RSI(7) at 53.61 is neutral, showing neither overbought nor oversold conditions. MACD remains negative at -50.596, suggesting underlying bearish pressure despite the slight price premium. The conflicting signals between price position and MACD, combined with neutral RSI, create an unclear short-term direction. Risk-reward appears balanced at current levels, warranting a hold position until clearer momentum emerges.",
+          "prompt": "\nMARKET DATA FOR BTC:\nPrice: $113,793.50\nEMA(20): $113,767.33\nRSI(7): 53.61\nMACD: -50.596\n\nAnalyze and provide trading signal.\n",
+          "system_prompt": "You are an expert crypto trading AI.\n\nYour role is to analyze real-time market data for BTC/USD and make trading decisions on 1m candles.\n\nOBJECTIVE: Maximize risk-adjusted returns on 1m timeframe.\n\nProvide your response in this format:\nSIGNAL: [BUY/SELL/HOLD]\nCONFIDENCE: [0-100]%\nREASONING: [your analysis]\n"
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-30T09:40:51.919213",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "Price is trading slightly above EMA(20) by approximately $26, indicating minimal bullish momentum. RSI at 53.61 is neutral, showing neither overbought nor oversold conditions. MACD remains negative at -50.596, suggesting underlying bearish pressure despite the slight price premium. The conflicting signals between price position and MACD, combined with neutral RSI, create an unclear short-term direction. Risk-reward appears balanced at current levels, warranting a hold position until clearer momentum emerges.",
+          "raw_response": "SIGNAL: HOLD\nCONFIDENCE: 65%\nREASONING: Price is trading slightly above EMA(20) by approximately $26, indicating minimal bullish momentum. RSI at 53.61 is neutral, showing neither overbought nor oversold conditions. MACD remains negative at -50.596, suggesting underlying bearish pressure despite the slight price premium. The conflicting signals between price position and MACD, combined with neutral RSI, create an unclear short-term direction. Risk-reward appears balanced at current levels, warranting a hold position until clearer momentum emerges.",
+          "prompt": "\nMARKET DATA FOR BTC:\nPrice: $113,793.50\nEMA(20): $113,767.33\nRSI(7): 53.61\nMACD: -50.596\n\nAnalyze and provide trading signal.\n",
+          "system_prompt": "You are an expert crypto trading AI.\n\nYour role is to analyze real-time market data for BTC/USD and make trading decisions on 1m candles.\n\nOBJECTIVE: Maximize risk-adjusted returns on 1m timeframe.\n\nProvide your response in this format:\nSIGNAL: [BUY/SELL/HOLD]\nCONFIDENCE: [0-100]%\nREASONING: [your analysis]\n"
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-30T09:43:57.806310",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "Price is trading slightly above EMA(20) indicating mild bullish momentum, but RSI(7) at 53.61 is neutral and MACD remains negative at -50.596 suggesting underlying bearish pressure. The conflicting signals between price position and momentum indicators create uncertainty. Without clear directional conviction, maintaining current position is prudent until either MACD shows signs of reversal or RSI moves decisively away from neutral territory.",
+          "raw_response": "SIGNAL: HOLD\nCONFIDENCE: 65%\nREASONING: Price is trading slightly above EMA(20) indicating mild bullish momentum, but RSI(7) at 53.61 is neutral and MACD remains negative at -50.596 suggesting underlying bearish pressure. The conflicting signals between price position and momentum indicators create uncertainty. Without clear directional conviction, maintaining current position is prudent until either MACD shows signs of reversal or RSI moves decisively away from neutral territory.",
+          "prompt": "\nMARKET DATA FOR BTC:\nPrice: $113,793.50\nEMA(20): $113,767.33\nRSI(7): 53.61\nMACD: -50.596\n\nAnalyze and provide trading signal.\n",
+          "system_prompt": "You are an expert crypto trading AI.\n\nYour role is to analyze real-time market data for BTC/USD and make trading decisions on 1m candles.\n\nOBJECTIVE: Maximize risk-adjusted returns on 1m timeframe.\n\nProvide your response in this format:\nSIGNAL: [BUY/SELL/HOLD]\nCONFIDENCE: [0-100]%\nREASONING: [your analysis]\n"
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-30T09:47:05.986297",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "Price is trading slightly above EMA(20) by approximately $26, indicating minimal bullish momentum. RSI at 53.61 is neutral, showing neither overbought nor oversold conditions. MACD remains negative at -50.596, suggesting underlying bearish pressure despite recent price stability. The conflicting signals between price/EMA alignment and MACD indicate market indecision. With no clear directional bias and mixed momentum indicators, maintaining current positions is prudent until clearer momentum emerges.",
+          "raw_response": "SIGNAL: HOLD\nCONFIDENCE: 65%\nREASONING: Price is trading slightly above EMA(20) by approximately $26, indicating minimal bullish momentum. RSI at 53.61 is neutral, showing neither overbought nor oversold conditions. MACD remains negative at -50.596, suggesting underlying bearish pressure despite recent price stability. The conflicting signals between price/EMA alignment and MACD indicate market indecision. With no clear directional bias and mixed momentum indicators, maintaining current positions is prudent until clearer momentum emerges.",
+          "prompt": "\nMARKET DATA FOR BTC:\nPrice: $113,793.50\nEMA(20): $113,767.33\nRSI(7): 53.61\nMACD: -50.596\n\nAnalyze and provide trading signal.\n",
+          "system_prompt": "You are an expert crypto trading AI.\n\nYour role is to analyze real-time market data for BTC/USD and make trading decisions on 1m candles.\n\nOBJECTIVE: Maximize risk-adjusted returns on 1m timeframe.\n\nProvide your response in this format:\nSIGNAL: [BUY/SELL/HOLD]\nCONFIDENCE: [0-100]%\nREASONING: [your analysis]\n"
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-30T09:50:12.298801",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "Price is trading slightly above EMA(20) by approximately $26, indicating very mild bullish momentum, but the difference is minimal. RSI at 53.61 is neutral, showing neither overbought nor oversold conditions. MACD remains negative at -50.596, suggesting underlying bearish momentum persists despite the slight price premium. With conflicting signals between price position and MACD, and RSI in neutral territory, the current setup lacks a clear directional bias for a 1m timeframe trade.",
+          "raw_response": "SIGNAL: HOLD\nCONFIDENCE: 65%\nREASONING: Price is trading slightly above EMA(20) by approximately $26, indicating very mild bullish momentum, but the difference is minimal. RSI at 53.61 is neutral, showing neither overbought nor oversold conditions. MACD remains negative at -50.596, suggesting underlying bearish momentum persists despite the slight price premium. With conflicting signals between price position and MACD, and RSI in neutral territory, the current setup lacks a clear directional bias for a 1m timeframe trade.",
+          "prompt": "\nMARKET DATA FOR BTC:\nPrice: $113,793.50\nEMA(20): $113,767.33\nRSI(7): 53.61\nMACD: -50.596\n\nAnalyze and provide trading signal.\n",
+          "system_prompt": "You are an expert crypto trading AI.\n\nYour role is to analyze real-time market data for BTC/USD and make trading decisions on 1m candles.\n\nOBJECTIVE: Maximize risk-adjusted returns on 1m timeframe.\n\nProvide your response in this format:\nSIGNAL: [BUY/SELL/HOLD]\nCONFIDENCE: [0-100]%\nREASONING: [your analysis]\n"
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-30T09:53:53.758663",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing neither overbought nor oversold conditions. Given the conflicting signals\u2014modest bullish price action versus bearish MACD\u2014and the absence of a strong directional trend, the best approach is to wait for clearer momentum before entering a trade.",
+          "raw_response": "SIGNAL: HOLD  \nCONFIDENCE: 65%  \nREASONING: The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing neither overbought nor oversold conditions. Given the conflicting signals\u2014modest bullish price action versus bearish MACD\u2014and the absence of a strong directional trend, the best approach is to wait for clearer momentum before entering a trade.",
+          "prompt": "\nMARKET DATA FOR BTC:\nPrice: $113,793.50\nEMA(20): $113,767.33\nRSI(7): 53.61\nMACD: -50.596\n\nAnalyze and provide trading signal.\n",
+          "system_prompt": "You are an expert crypto trading AI.\n\nYour role is to analyze real-time market data for BTC/USD and make trading decisions on 1m candles.\n\nOBJECTIVE: Maximize risk-adjusted returns on 1m timeframe.\n\nProvide your response in this format:\nSIGNAL: [BUY/SELL/HOLD]\nCONFIDENCE: [0-100]%\nREASONING: [your analysis]\n"
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-30T09:56:59.407749",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing no strong overbought or oversold conditions. Given the conflicting signals\u2014modest bullish price action versus bearish MACD\u2014and the absence of a clear trend, it's prudent to wait for stronger directional confirmation before entering a trade.",
+          "raw_response": "SIGNAL: HOLD  \nCONFIDENCE: 65%  \nREASONING: The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing no strong overbought or oversold conditions. Given the conflicting signals\u2014modest bullish price action versus bearish MACD\u2014and the absence of a clear trend, it's prudent to wait for stronger directional confirmation before entering a trade.",
+          "prompt": "\nMARKET DATA FOR BTC:\nPrice: $113,793.50\nEMA(20): $113,767.33\nRSI(7): 53.61\nMACD: -50.596\n\nAnalyze and provide trading signal.\n",
+          "system_prompt": "You are an expert crypto trading AI.\n\nYour role is to analyze real-time market data for BTC/USD and make trading decisions on 1m candles.\n\nOBJECTIVE: Maximize risk-adjusted returns on 1m timeframe.\n\nProvide your response in this format:\nSIGNAL: [BUY/SELL/HOLD]\nCONFIDENCE: [0-100]%\nREASONING: [your analysis]\n"
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-30T10:00:06.684962",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "Price is trading slightly above EMA(20) by approximately $26, indicating very mild bullish momentum but not a strong trend. RSI at 53.61 is in neutral territory, showing neither overbought nor oversold conditions. MACD remains negative at -50.596, suggesting underlying bearish momentum persists despite the slight price premium. The conflicting signals between price position and MACD, combined with neutral RSI, create an unclear short-term direction. Risk-reward appears balanced at this moment, warranting a hold position until clearer momentum emerges.",
+          "raw_response": "SIGNAL: HOLD\nCONFIDENCE: 65%\nREASONING: Price is trading slightly above EMA(20) by approximately $26, indicating very mild bullish momentum but not a strong trend. RSI at 53.61 is in neutral territory, showing neither overbought nor oversold conditions. MACD remains negative at -50.596, suggesting underlying bearish momentum persists despite the slight price premium. The conflicting signals between price position and MACD, combined with neutral RSI, create an unclear short-term direction. Risk-reward appears balanced at this moment, warranting a hold position until clearer momentum emerges.",
+          "prompt": "\nMARKET DATA FOR BTC:\nPrice: $113,793.50\nEMA(20): $113,767.33\nRSI(7): 53.61\nMACD: -50.596\n\nAnalyze and provide trading signal.\n",
+          "system_prompt": "You are an expert crypto trading AI.\n\nYour role is to analyze real-time market data for BTC/USD and make trading decisions on 1m candles.\n\nOBJECTIVE: Maximize risk-adjusted returns on 1m timeframe.\n\nProvide your response in this format:\nSIGNAL: [BUY/SELL/HOLD]\nCONFIDENCE: [0-100]%\nREASONING: [your analysis]\n"
+        }
+      }
+    }
+  ]
+}

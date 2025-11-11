@@ -1,0 +1,47 @@
+STRATEGY_NAME: DivergenceConfirmer
+
+STRATEGY_DETAILS:
+
+KEY STRATEGY COMPONENTS:
+This strategy combines RSI divergence patterns with MACD confirmation signals specifically designed for Tesla (TSLA) hourly charts. The core approach focuses on identifying momentum divergences between price action and RSI, then using MACD for additional confirmation before entering trades. The strategy is particularly effective for capturing short-term reversals in Tesla's volatile price movements.
+
+REQUIRED INDICATORS:
+1. RSI (Relative Strength Index) - Period 14, applied to close prices
+2. MACD (Moving Average Convergence Divergence) - Standard settings (12,26,9)
+3. Price action analysis for divergence identification
+
+ENTRY RULES:
+
+BULLISH DIVERGENCE ENTRY:
+1. Identify lower lows in price while RSI forms higher lows (bullish divergence)
+2. Wait for MACD histogram to show bullish momentum (rising histogram bars)
+3. MACD line should be above signal line or showing upward momentum
+4. Enter long position when price breaks above the most recent swing high
+
+BEARISH DIVERGENCE ENTRY:
+1. Identify higher highs in price while RSI forms lower highs (bearish divergence)
+2. Wait for MACD histogram to show bearish momentum (falling histogram bars)
+3. MACD line should be below signal line or showing downward momentum
+4. Enter short position when price breaks below the most recent swing low
+
+EXIT RULES:
+- Take profit at 2:1 risk-reward ratio minimum
+- Exit when RSI reaches overbought (70+) for long positions or oversold (30-) for short positions
+- Exit when MACD shows reversal signal (histogram changes direction significantly)
+- Use trailing stop based on recent swing points
+- Maximum trade duration: 24 hours (to maintain hourly timeframe focus)
+
+RISK MANAGEMENT:
+- Position size: Maximum 2% of account per trade
+- Stop loss: Place below recent swing low for long trades, above recent swing high for short trades
+- Risk-reward ratio: Minimum 1:2, target 1:3
+- Only trade during active market hours (9:30 AM - 4:00 PM EST)
+- Avoid trading during major Tesla news events or earnings releases
+
+ADDITIONAL FILTERS:
+- Ensure divergence is clear and spans at least 3-4 price swings
+- Volume should confirm the divergence pattern (increasing volume on breakout)
+- Consider overall market sentiment and NASDAQ direction
+- Wait for confirmation candle to close beyond the swing point before entering
+
+This strategy leverages Tesla's characteristic volatility while using multiple confirmation layers to filter out false signals, making it particularly suitable for the stock's hourly price movements.

@@ -1,0 +1,427 @@
+//@version=5
+strategy("AGBot Dynamic Regime Strategy - FIXED", overlay=true, default_qty_type=strategy.percent_of_equity, default_qty_value=2.5)
+
+// =============== DYNAMIC REGIME-BASED STRATEGY (FIXED) ===============
+// KEY FIXES APPLIED:
+// 1. ✅ Real ADX (replaced RSI proxy with ta.dmi)
+// 2. ✅ Volatility Regime Detection (stdev/sma ratio)
+// 3. ✅ Adaptive Longs Stops (20% tighter in bear markets)
+// 4. ✅ Improved Shorts Stops (considers volatility)
+//
+// LONGS: Adaptive (tighter stops in bear markets)
+// SHORTS: Adaptive (swing high in bear/high vol, reduced size in bull)
+
+// =============== USER INPUTS ===============
+group_capital = "CAPITAL SETTINGS"
+userCapital = input.float(100000, "Account Capital ($)", minval=1000, step=1000, group=group_capital, tooltip="Enter your trading account size")
+riskPerTradePct = input.float(2.5, "Risk % per Trade", minval=0.01, maxval=10, step=0.01, group=group_capital)
+
+group_trading = "TRADING MODE"
+tradingMode = input.string("both", "Trading Mode", options=["longs_only", "shorts_only", "both"], group=group_trading)
+useEMAFilterShorts = input.bool(true, "Use EMA Filter for Shorts", group=group_trading, tooltip="Only short when price below EMA13 < EMA48 < EMA200")
+
+group_regime = "REGIME DETECTION"
+useRegimeDetection = input.bool(true, "Use Dynamic Regime Detection", group=group_regime, tooltip="Automatically adjust based on market conditions")
+regimeSMA50 = input.int(50, "Regime SMA50", minval=1, group=group_regime)
+regimeSMA200 = input.int(200, "Regime SMA200", minval=1, group=group_regime)
+useADXFilter = input.bool(true, "Use ADX Trend Filter", group=group_regime)
+adxLength = input.int(14, "ADX Length", minval=1, group=group_regime)
+adxThreshold = input.float(25, "ADX Threshold (trending)", minval=0, group=group_regime)
+
+group_time = "TIME FILTERS"
+useTimeFilter = input.bool(true, "Use Time-Based Filters", group=group_time, tooltip="Avoid market open/close volatility")
+marketOpenHour = input.int(9, "Market Open Hour (EST)", minval=0, maxval=23, group=group_time)
+marketOpenMinutes = input.int(30, "Avoid First N Minutes", minval=0, maxval=59, group=group_time)
+marketCloseHour = input.int(15, "Market Close Hour (EST)", minval=0, maxval=23, group=group_time)
+marketCloseMinutes = input.int(30, "Avoid Last N Minutes", minval=0, maxval=59, group=group_time)
+
+group_indicators = "INDICATORS"
+maLength = input.int(100, "EMA Length", minval=1, group=group_indicators)
+keyValue = input.float(2.0, "UT Bot Key (×ATR)", minval=0.1, step=0.1, group=group_indicators)
+atrPeriodUT = input.int(1, "UT Bot ATR Period", minval=1, group=group_indicators)
+atrPeriod = input.int(14, "ATR Period (SL/Trail)", minval=1, group=group_indicators)
+
+group_longs = "LONGS PARAMETERS"
+adaptiveAtrMultLongs = input.float(2.0, "ATR Mult Longs (SL/Trail)", minval=0.1, step=0.1, group=group_longs)
+tp1RRLong = input.float(1.0, "TP1 R:R Long", step=0.1, group=group_longs)
+tp2RRLong = input.float(3.0, "TP2 R:R Long", step=0.1, group=group_longs)
+tp1PercentLongs = input.float(35.0, "TP1 Close % Longs", minval=0, maxval=100, step=1, group=group_longs)
+
+group_shorts = "SHORTS PARAMETERS"
+adaptiveAtrMultShorts = input.float(1.0, "ATR Mult Shorts (SL/Trail)", minval=0.1, step=0.1, group=group_shorts)
+tp1RRShort = input.float(1.5, "TP1 R:R Short", step=0.1, group=group_shorts)
+tp2RRShort = input.float(2.0, "TP2 R:R Short", step=0.1, group=group_shorts)
+tp1PercentShorts = input.float(70.0, "TP1 Close % Shorts", minval=0, maxval=100, step=1, group=group_shorts)
+useSwingHighShorts = input.bool(true, "Use Swing High Stop for Shorts", group=group_shorts, tooltip="Use swing high instead of ATR for shorts")
+swingHighBarsShorts = input.int(5, "Swing High Bars (Shorts)", minval=1, group=group_shorts)
+swingHighBarsLongs = input.int(10, "Swing Low Bars (Longs)", minval=1, group=group_shorts)
+
+group_tp = "TAKE PROFIT"
+useTP = input.bool(true, "Use Take Profits", group=group_tp)
+numTPs = input.int(2, "Number of TPs (1 or 2)", minval=1, maxval=2, group=group_tp)
+secondTPType = input.string("atr_trailing", "Second TP Type", options=["rr","atr_trailing"], group=group_tp)
+
+// =============== CALCULATIONS ===============
+// EMAs
+emaVal = ta.ema(close, maLength)
+ema13 = ta.ema(close, 13)
+ema48 = ta.ema(close, 48)
+ema200 = ta.ema(close, 200)
+
+// ATR
+atr_ut = ta.atr(atrPeriodUT)
+atr14 = ta.atr(atrPeriod)
+nLoss = keyValue * atr_ut
+
+// UT Bot Trailing Stop
+var float xATRTrail = na
+xATRTrail := na(xATRTrail[1]) ? close :
+     (close > xATRTrail[1] ? math.max(xATRTrail[1], close - nLoss) :
+      close < xATRTrail[1] ? math.min(xATRTrail[1], close + nLoss) :
+      (close[1] > xATRTrail[1] ? close - nLoss : close + nLoss))
+
+// =============== REGIME DETECTION (FIXED) ===============
+sma50 = ta.sma(close, regimeSMA50)
+sma200 = ta.sma(close, regimeSMA200)
+
+// Bull/Bear alignment
+bullAlignment = close > ema13 and ema13 > ema48 and ema48 > ema200
+bearAlignment = close < ema13 and ema13 < ema48 and ema48 < ema200
+
+// Market regime
+isBullRegime = sma50 > sma200
+isBearRegime = sma50 < sma200
+
+// FIXED: Real ADX (not RSI proxy)
+[diPlus, diMinus, adx] = ta.dmi(adxLength, adxLength)
+isTrendingMarket = useADXFilter ? adx > adxThreshold : true
+
+// NEW: Volatility Regime Detection
+volatility = ta.stdev(close, 20) / ta.sma(close, 20) * 100
+avgVolatility = ta.sma(volatility, 100)
+highVolRegime = volatility > avgVolatility * 1.2
+lowVolRegime = volatility < avgVolatility * 0.8
+
+// Combined regime
+marketRegime = isBullRegime ? "BULL" : (isBearRegime ? "BEAR" : "NEUTRAL")
+isStrongTrend = isTrendingMarket
+
+// =============== TIME FILTERS ===============
+hourVal = hour(time)
+minuteVal = minute(time)
+
+isMarketOpen = (hourVal == marketOpenHour and minuteVal >= marketOpenMinutes) or (hourVal > marketOpenHour and hourVal < marketCloseHour) or (hourVal == marketCloseHour and minuteVal < marketCloseMinutes)
+isValidTradingTime = not useTimeFilter or isMarketOpen
+
+isMarketOpenVolatility = useTimeFilter and (hourVal == marketOpenHour and minuteVal < marketOpenMinutes)
+isMarketCloseVolatility = useTimeFilter and (hourVal == marketCloseHour and minuteVal >= marketCloseMinutes)
+isValidShortTime = not (isMarketOpenVolatility or isMarketCloseVolatility)
+
+// =============== STOP LOSS SELECTION (FIXED) ===============
+longStopATR = close - atr14 * adaptiveAtrMultLongs
+shortStopATR = close + atr14 * adaptiveAtrMultShorts
+longStopSwing = ta.lowest(low, swingHighBarsLongs)
+shortStopSwing = ta.highest(high, swingHighBarsShorts)
+
+// FIXED: Adaptive longs stops (tighter in bear markets)
+longStopChosen = if useRegimeDetection and isBearRegime
+    close - atr14 * adaptiveAtrMultLongs * 0.8  // 20% tighter in bear
+else
+    longStopATR  // Normal in bull
+
+// IMPROVED: Shorts stops with volatility regime
+shortStopChosen = if useSwingHighShorts
+    if isBearRegime or bearAlignment or highVolRegime
+        shortStopSwing  // Bear/high vol: Use swing high
+    else
+        close + atr14 * adaptiveAtrMultShorts * 1.5  // Bull: Wider ATR
+else
+    shortStopATR
+
+// =============== SIGNALS ===============
+bullish = close > emaVal
+bearish = close < emaVal
+buySignal = ta.crossover(close, xATRTrail)
+sellSignal = ta.crossunder(close, xATRTrail)
+
+// Filtered signals (with trend filter)
+longSignal = buySignal and isTrendingMarket
+shortSignal = useEMAFilterShorts ? (sellSignal and bearAlignment and isTrendingMarket) : (sellSignal and isTrendingMarket)
+
+// Trading mode flags
+enableLongs = tradingMode == "longs_only" or tradingMode == "both"
+enableShorts = tradingMode == "shorts_only" or tradingMode == "both"
+
+// =============== SESSION MANAGEMENT ===============
+inSession = isValidTradingTime
+havePos = strategy.position_size != 0
+isLongPos = strategy.position_size > 0
+isShortPos = strategy.position_size < 0
+
+// Position tracking
+var float entryPrice = na
+var float initialSL = na
+var bool tp1Hit = false
+var float hiSince = na
+var float loSince = na
+var int entryBar = na
+var float positionSizePct = na
+var float positionSizeShares = na
+var string positionType = na
+var float bullMarketAdjustment = na
+
+// =============== DYNAMIC POSITION SIZING ===============
+calcQtyLong(entryPrice, stopPrice) =>
+    if na(entryPrice) or na(stopPrice) or stopPrice >= entryPrice
+        0.0
+    else
+        riskAmount = userCapital * (riskPerTradePct / 100)
+        stopDistance = entryPrice - stopPrice
+        qty = riskAmount / stopDistance
+        math.min(qty, userCapital * 0.1 / entryPrice)
+
+calcQtyShort(entryPrice, stopPrice) =>
+    if na(entryPrice) or na(stopPrice) or stopPrice <= entryPrice
+        0.0
+    else
+        riskAmount = userCapital * (riskPerTradePct / 100)
+        
+        // Reduce risk in bull markets for shorts
+        adjustedRisk = if not isBearRegime and not bearAlignment
+            riskAmount * 0.5  // 50% risk reduction in bull markets
+        else
+            riskAmount
+        
+        stopDistance = stopPrice - entryPrice
+        qty = adjustedRisk / stopDistance
+        math.min(qty, userCapital * 0.1 / entryPrice)
+
+// =============== ENTRY LOGIC ===============
+if inSession and not havePos
+    // LONGS: Always available (primary strategy)
+    if enableLongs and longSignal and bullish and not na(longStopChosen)
+        qtyL = calcQtyLong(close, longStopChosen)
+        if qtyL > 0
+            regimeComment = isBearRegime ? " (Bear-Tight)" : ""
+            strategy.entry(id="Long", direction=strategy.long, qty=qtyL, comment="Long" + regimeComment)
+            entryPrice := close
+            initialSL := longStopChosen
+            tp1Hit := false
+            hiSince := high
+            loSince := na
+            entryBar := bar_index
+            positionSizePct := qtyL
+            positionSizeShares := qtyL
+            positionType := "LONG"
+            bullMarketAdjustment := 1.0
+    
+    // SHORTS: With regime-based sizing
+    if enableShorts and shortSignal and bearish and isValidShortTime and not na(shortStopChosen)
+        qtyS = calcQtyShort(close, shortStopChosen)
+        if qtyS > 0
+            filterStatus = useEMAFilterShorts ? " (EMA)" : ""
+            regimeStatus = isBearRegime ? " (Bear)" : " (Bull-Red)"
+            volStatus = highVolRegime ? " (HiVol)" : ""
+            strategy.entry(id="Short", direction=strategy.short, qty=qtyS, comment="Short" + filterStatus + regimeStatus + volStatus)
+            entryPrice := close
+            initialSL := shortStopChosen
+            tp1Hit := false
+            loSince := low
+            hiSince := na
+            entryBar := bar_index
+            positionSizePct := qtyS
+            positionSizeShares := qtyS
+            positionType := "SHORT"
+            bullMarketAdjustment := isBearRegime ? 1.0 : 0.5
+
+// =============== POSITION MANAGEMENT ===============
+if isLongPos and not na(initialSL)
+    longSLDist = entryPrice - initialSL
+    
+    if useTP and numTPs >= 1
+        tp1Long = entryPrice + longSLDist * tp1RRLong
+        if not tp1Hit and high >= tp1Long
+            qtyPct = math.min(math.max(tp1PercentLongs, 0.0), 100.0)
+            strategy.close(id="Long", qty=strategy.position_size * (qtyPct / 100), comment="TP1 Long")
+            tp1Hit := true
+            if numTPs == 2
+                hiSince := high
+    
+    if useTP and numTPs == 2 and tp1Hit
+        if secondTPType == "rr"
+            tp2Long = entryPrice + longSLDist * tp2RRLong
+            if high >= tp2Long
+                strategy.close(id="Long", comment="TP2 Long (RR)")
+        else
+            if not na(hiSince)
+                trailStopL = hiSince - atr14 * adaptiveAtrMultLongs
+                if low <= trailStopL
+                    strategy.close(id="Long", comment="TP2 Long (ATR Trail)")
+    
+    strategy.exit(id="LX", from_entry="Long", stop=initialSL)
+
+if isShortPos and not na(initialSL)
+    shortSLDist = initialSL - entryPrice
+    
+    if useTP and numTPs >= 1
+        tp1Short = entryPrice - shortSLDist * tp1RRShort
+        if not tp1Hit and low <= tp1Short
+            qtyPct = math.min(math.max(tp1PercentShorts, 0.0), 100.0)
+            strategy.close(id="Short", qty=math.abs(strategy.position_size) * (qtyPct / 100), comment="TP1 Short")
+            tp1Hit := true
+            if numTPs == 2
+                loSince := low
+    
+    if useTP and numTPs == 2 and tp1Hit
+        if secondTPType == "rr"
+            tp2Short = entryPrice - shortSLDist * tp2RRShort
+            if low <= tp2Short
+                strategy.close(id="Short", comment="TP2 Short (RR)")
+        else
+            if not na(loSince)
+                trailStopS = loSince + atr14 * adaptiveAtrMultShorts
+                if high >= trailStopS
+                    strategy.close(id="Short", comment="TP2 Short (ATR Trail)")
+    
+    // Exit if bear alignment breaks (only if filter enabled)
+    if useEMAFilterShorts and not bearAlignment
+        strategy.close(id="Short", comment="Bear Broken")
+    
+    strategy.exit(id="SX", from_entry="Short", stop=initialSL)
+
+// =============== PLOTS ===============
+plot(emaVal, "EMA", color=color.new(color.teal, 0))
+plot(xATRTrail, "UT ATR Trail", color=color.new(color.orange, 0))
+
+// EMA Ribbon
+plot(ema13, "EMA 13", color=color.new(color.green, 50), linewidth=1)
+plot(ema48, "EMA 48", color=color.new(color.blue, 50), linewidth=1)
+plot(ema200, "EMA 200", color=color.new(color.red, 50), linewidth=2)
+
+// Trend background
+bgcolor(useRegimeDetection and bearAlignment ? color.new(color.red, 95) : na, title="Bear Alignment")
+bgcolor(highVolRegime ? color.new(color.orange, 97) : na, title="High Volatility")
+
+plot(longStopChosen, "Long Stop Ref", color=color.new(color.lime, 70))
+plot(shortStopChosen, "Short Stop Ref", color=color.new(color.red, 70))
+
+plotshape(longSignal and bullish, title="Buy", style=shape.triangleup, location=location.belowbar, color=color.new(color.teal, 0), size=size.tiny, text="BUY")
+plotshape(shortSignal and bearish, title="Sell", style=shape.triangledown, location=location.abovebar, color=color.new(color.red, 0), size=size.tiny, text="SELL")
+
+// =============== REGIME DISPLAY ===============
+var table regimeTable = na
+if na(regimeTable)
+    regimeTable := table.new(position.top_left, 2, 7, bgcolor=color.new(color.gray, 80), border_color=color.white)
+    table.cell(regimeTable, 0, 0, "MARKET REGIME (FIXED)", text_color=color.white, text_size=size.small)
+
+regimeColor = isBullRegime ? color.green : (isBearRegime ? color.red : color.orange)
+regimeText = isBullRegime ? "BULL" : (isBearRegime ? "BEAR" : "NEUTRAL")
+
+table.cell(regimeTable, 0, 1, "Regime:", text_color=color.white, text_size=size.small)
+table.cell(regimeTable, 1, 1, regimeText, text_color=regimeColor, text_size=size.small)
+
+table.cell(regimeTable, 0, 2, "ADX:", text_color=color.white, text_size=size.small)
+adxColor = adx > adxThreshold ? color.green : color.orange
+table.cell(regimeTable, 1, 2, str.tostring(adx, "#.#"), text_color=adxColor, text_size=size.small)
+
+table.cell(regimeTable, 0, 3, "Volatility:", text_color=color.white, text_size=size.small)
+volText = highVolRegime ? "HIGH" : (lowVolRegime ? "LOW" : "NORMAL")
+volColor = highVolRegime ? color.red : (lowVolRegime ? color.green : color.yellow)
+table.cell(regimeTable, 1, 3, volText, text_color=volColor, text_size=size.small)
+
+table.cell(regimeTable, 0, 4, "Trading Mode:", text_color=color.white, text_size=size.small)
+modeColor = tradingMode == "longs_only" ? color.green : (tradingMode == "shorts_only" ? color.red : color.yellow)
+modeText = tradingMode == "longs_only" ? "LONGS" : (tradingMode == "shorts_only" ? "SHORTS" : "BOTH")
+table.cell(regimeTable, 1, 4, modeText, text_color=modeColor, text_size=size.small)
+
+table.cell(regimeTable, 0, 5, "Shorts Filter:", text_color=color.white, text_size=size.small)
+filterText = useEMAFilterShorts ? "ON" : "OFF"
+filterColor = useEMAFilterShorts ? color.green : color.gray
+table.cell(regimeTable, 1, 5, filterText, text_color=filterColor, text_size=size.small)
+
+table.cell(regimeTable, 0, 6, "Capital:", text_color=color.white, text_size=size.small)
+table.cell(regimeTable, 1, 6, "$" + str.tostring(userCapital, "#,##0"), text_color=color.yellow, text_size=size.small)
+
+// =============== ENTRY DETAILS TABLE ===============
+var table entryTable = na
+if na(entryTable)
+    entryTable := table.new(position.top_right, 2, 8, bgcolor=color.new(color.gray, 80), border_color=color.white)
+    table.cell(entryTable, 0, 0, "ENTRY DETAILS", text_color=color.white, text_size=size.small)
+
+if havePos
+    table.cell(entryTable, 0, 1, "Position Type:", text_color=color.white, text_size=size.small)
+    posTypeColor = isLongPos ? color.green : color.red
+    posTypeText = isLongPos ? "LONG" : "SHORT"
+    table.cell(entryTable, 1, 1, posTypeText, text_color=posTypeColor, text_size=size.small)
+    
+    table.cell(entryTable, 0, 2, "Entry Price:", text_color=color.white, text_size=size.small)
+    table.cell(entryTable, 1, 2, str.tostring(entryPrice, "#.##"), text_color=color.yellow, text_size=size.small)
+    
+    table.cell(entryTable, 0, 3, "Position Size:", text_color=color.white, text_size=size.small)
+    table.cell(entryTable, 1, 3, str.tostring(math.abs(strategy.position_size), "#.##") + " shares", text_color=color.yellow, text_size=size.small)
+    
+    table.cell(entryTable, 0, 4, "Risk Amount:", text_color=color.white, text_size=size.small)
+    riskAmount = userCapital * (riskPerTradePct / 100)
+    table.cell(entryTable, 1, 4, "$" + str.tostring(riskAmount, "#.##"), text_color=color.yellow, text_size=size.small)
+    
+    table.cell(entryTable, 0, 5, "Stop Loss:", text_color=color.white, text_size=size.small)
+    table.cell(entryTable, 1, 5, str.tostring(initialSL, "#.##"), text_color=color.red, text_size=size.small)
+    
+    table.cell(entryTable, 0, 6, "R:R Ratio:", text_color=color.white, text_size=size.small)
+    rrVal = 0.0
+    if isLongPos
+        rrVal := (close - entryPrice) / (entryPrice - initialSL)
+    else
+        rrVal := (entryPrice - close) / (initialSL - entryPrice)
+    rrColor = rrVal > 0 ? color.green : color.red
+    table.cell(entryTable, 1, 6, str.tostring(rrVal, "#.##") + ":1", text_color=rrColor, text_size=size.small)
+    
+    table.cell(entryTable, 0, 7, "Bars Held:", text_color=color.white, text_size=size.small)
+    barsHeld = bar_index - entryBar
+    table.cell(entryTable, 1, 7, str.tostring(barsHeld), text_color=color.yellow, text_size=size.small)
+else
+    table.cell(entryTable, 0, 1, "Status:", text_color=color.white, text_size=size.small)
+    table.cell(entryTable, 1, 1, "NO POSITION", text_color=color.gray, text_size=size.small)
+    
+    table.cell(entryTable, 0, 2, "Capital:", text_color=color.white, text_size=size.small)
+    table.cell(entryTable, 1, 2, "$" + str.tostring(userCapital, "#,##0"), text_color=color.yellow, text_size=size.small)
+    
+    table.cell(entryTable, 0, 3, "Risk per Trade:", text_color=color.white, text_size=size.small)
+    riskAmount = userCapital * (riskPerTradePct / 100)
+    table.cell(entryTable, 1, 3, "$" + str.tostring(riskAmount, "#.##"), text_color=color.yellow, text_size=size.small)
+    
+    table.cell(entryTable, 0, 4, "Max Position:", text_color=color.white, text_size=size.small)
+    maxPos = userCapital * 0.1
+    table.cell(entryTable, 1, 4, "$" + str.tostring(maxPos, "#,##0"), text_color=color.yellow, text_size=size.small)
+    
+    table.cell(entryTable, 0, 5, "Regime:", text_color=color.white, text_size=size.small)
+    table.cell(entryTable, 1, 5, regimeText, text_color=regimeColor, text_size=size.small)
+    
+    table.cell(entryTable, 0, 6, "ADX:", text_color=color.white, text_size=size.small)
+    table.cell(entryTable, 1, 6, str.tostring(adx, "#.#"), text_color=adxColor, text_size=size.small)
+    
+    table.cell(entryTable, 0, 7, "Valid Time:", text_color=color.white, text_size=size.small)
+    validTimeText = isValidTradingTime ? "YES" : "NO"
+    validTimeColor = isValidTradingTime ? color.green : color.red
+    table.cell(entryTable, 1, 7, validTimeText, text_color=validTimeColor, text_size=size.small)
+
+// =============== INFO DISPLAY ===============
+var table infoTable = na
+if na(infoTable)
+    infoTable := table.new(position.bottom_right, 2, 8, bgcolor=color.new(color.gray, 80), border_color=color.white)
+    table.cell(infoTable, 0, 0, "STRATEGY PARAMETERS", text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 0, 1, "Longs ATR Mult:", text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 1, 1, str.tostring(adaptiveAtrMultLongs, "#.##"), text_color=color.yellow, text_size=size.small)
+    table.cell(infoTable, 0, 2, "Longs Bear Adj:", text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 1, 2, "0.8x (Tighter)", text_color=color.orange, text_size=size.small)
+    table.cell(infoTable, 0, 3, "Shorts ATR Mult:", text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 1, 3, str.tostring(adaptiveAtrMultShorts, "#.##"), text_color=color.yellow, text_size=size.small)
+    table.cell(infoTable, 0, 4, "Shorts Bull Adj:", text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 1, 4, "1.5x (Wider)", text_color=color.orange, text_size=size.small)
+    table.cell(infoTable, 0, 5, "Longs TP1%:", text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 1, 5, str.tostring(tp1PercentLongs, "#") + "%", text_color=color.yellow, text_size=size.small)
+    table.cell(infoTable, 0, 6, "Shorts TP1%:", text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 1, 6, str.tostring(tp1PercentShorts, "#") + "%", text_color=color.yellow, text_size=size.small)
+    table.cell(infoTable, 0, 7, "Stop Type:", text_color=color.white, text_size=size.small)
+    stopTypeText = useSwingHighShorts ? "Swing High" : "ATR"
+    table.cell(infoTable, 1, 7, stopTypeText, text_color=color.orange, text_size=size.small)

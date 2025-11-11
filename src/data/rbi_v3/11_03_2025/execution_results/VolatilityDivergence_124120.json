@@ -1,0 +1,8 @@
+{
+  "success": false,
+  "return_code": 1,
+  "stdout": "\ud83c\udf19 Moon Dev: Data loaded successfully! Shape: (17544, 7)\n",
+  "stderr": "\nBacktest.run:   0%|          | 0/17510 [00:00<?, ?bar/s]\n                                                        \nTraceback (most recent call last):\n  File \"C:\\Users\\ahmed\\CascadeProjects\\moon-dev-ai-agents\\src\\data\\rbi_v3\\11_03_2025\\backtests_final\\VolatilityDivergence_BTFinal_v1.py\", line 124, in <module>\n    stats = bt.run()\n            ^^^^^^^^\n  File \"C:\\Users\\ahmed\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\backtesting\\backtesting.py\", line 1339, in run\n    strategy.next()\n  File \"C:\\Users\\ahmed\\CascadeProjects\\moon-dev-ai-agents\\src\\data\\rbi_v3\\11_03_2025\\backtests_final\\VolatilityDivergence_BTFinal_v1.py\", line 118, in next\n    self.sell(sl=stop_loss, tp=take_profit, size=position_size)\n  File \"C:\\Users\\ahmed\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\backtesting\\backtesting.py\", line 268, in sell\n    return self._broker.new_order(-size, limit, stop, sl, tp, tag)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\ahmed\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\backtesting\\backtesting.py\", line 811, in new_order\n    raise ValueError(\nValueError: Short orders require: TP (46033.37019552352) < LIMIT (45528.08203125) < SL (46324.8839631864)\n",
+  "execution_time": 5.884209,
+  "timestamp": "2025-11-03T12:41:20.939538"
+}

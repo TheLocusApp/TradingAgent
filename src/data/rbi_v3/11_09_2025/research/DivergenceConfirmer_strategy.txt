@@ -1,0 +1,45 @@
+STRATEGY_NAME: DivergenceConfirmer
+
+STRATEGY_DETAILS:
+This strategy combines RSI divergence patterns with MACD confirmation signals specifically for BTC daily timeframe trading. The approach focuses on identifying potential trend reversals through divergence analysis while using MACD for additional validation.
+
+KEY STRATEGY COMPONENTS:
+1. RSI (Relative Strength Index) - Set to 14 periods for divergence detection
+2. MACD (Moving Average Convergence Divergence) - Standard settings (12,26,9) for trend confirmation
+3. Price action analysis on daily BTC charts
+
+ENTRY RULES:
+LONG ENTRY:
+- RSI shows bullish divergence (price makes lower low, RSI makes higher low)
+- MACD histogram shows bullish momentum (rising above signal line or positive crossover)
+- Price confirms by breaking above recent swing high
+- All conditions must align on daily timeframe
+
+SHORT ENTRY:
+- RSI shows bearish divergence (price makes higher high, RSI makes lower high)
+- MACD histogram shows bearish momentum (falling below signal line or negative crossover)
+- Price confirms by breaking below recent swing low
+- All conditions must align on daily timeframe
+
+EXIT RULES:
+- Take profit: 2:1 risk-reward ratio minimum
+- Stop loss: Place below recent swing low for long trades, above recent swing high for short trades
+- Alternative exit: When MACD shows opposite signal (crossover in opposite direction)
+- Time-based exit: Consider closing after 5-7 days if target not reached
+
+RISK MANAGEMENT:
+- Maximum risk per trade: 1-2% of capital
+- Position sizing based on stop loss distance
+- No more than 3 concurrent open positions
+- Avoid trading during major news events or extreme volatility periods
+
+REQUIRED INDICATORS:
+- RSI (14 periods) - for divergence detection
+- MACD (12,26,9) - for trend confirmation and momentum
+- Support/Resistance levels - for stop loss and target placement
+
+ADDITIONAL NOTES:
+- Wait for daily candle close to confirm signals
+- Higher timeframe confluence (weekly chart alignment) increases probability
+- Volume confirmation adds additional validation
+- Strategy works best in ranging or early reversal markets, less effective in strong trending conditions

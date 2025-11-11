@@ -34,6 +34,7 @@ This helps keep your strategy research organized by day!
 Remember: Past performance doesn't guarantee future results!
 """
 
+import os
 
 ## Previous presets (kept for easy switching) 👇
 # RESEARCH_CONFIG = {
@@ -61,26 +62,27 @@ Remember: Past performance doesn't guarantee future results!
 #     "name": "deepseek-chat"  # Using DeepSeek Chat for package optimization
 # }
 
-# New OpenAI presets using GPT-5 for all agents 🌙🚀
-RESEARCH_CONFIG = {
-    "type": "openai",
-    "name": "gpt-5"
-}
+# Dynamic Model Configuration - Reads from environment variable set by frontend
+def get_model_config():
+    """Get model configuration from environment variable or use default"""
+    model_type = os.getenv('RBI_AI_MODEL', 'deepseek').lower()
+    
+    model_defaults = {
+        'deepseek': {'type': 'deepseek', 'name': 'deepseek-chat'},
+        'openai': {'type': 'openai', 'name': 'gpt-4o'},
+        'claude': {'type': 'claude', 'name': 'claude-3-5-sonnet-20241022'},
+        'gemini': {'type': 'gemini', 'name': 'gemini-2.5-flash'},
+        'xai': {'type': 'xai', 'name': 'grok-4-fast-reasoning'},
+        'groq': {'type': 'groq', 'name': 'llama-3.3-70b-versatile'},
+    }
+    
+    return model_defaults.get(model_type, model_defaults['deepseek'])
 
-BACKTEST_CONFIG = {
-    "type": "openai",
-    "name": "gpt-5"
-}
-
-DEBUG_CONFIG = {
-    "type": "openai",
-    "name": "gpt-5"
-}
-
-PACKAGE_CONFIG = {
-    "type": "openai",
-    "name": "gpt-5"
-}
+# Initialize configs (will be dynamically updated based on environment)
+RESEARCH_CONFIG = get_model_config()
+BACKTEST_CONFIG = get_model_config()
+DEBUG_CONFIG = get_model_config()
+PACKAGE_CONFIG = get_model_config()
 
 
 
@@ -211,6 +213,48 @@ INDICATOR CALCULATION RULES:
    - Instead of: self.data.High.rolling(window=20).max()
    - Use: self.I(talib.MAX, self.data.High, timeperiod=20)
 
+🚨 CRITICAL: TA-LIB REQUIRES FLOAT64 DTYPE 🚨
+TA-Lib functions REQUIRE numpy arrays with dtype float64 (double precision).
+yfinance returns mixed dtypes (int64 for Volume, float64 for prices).
+
+❌ WRONG - Will crash with "input array type is not double":
+```python
+self.vol_sma = self.I(talib.SMA, self.data.Volume, timeperiod=20)
+self.rsi = self.I(talib.RSI, self.data.Close, timeperiod=14)
+```
+
+✅ CORRECT - Explicit conversion to float:
+```python
+self.vol_sma = self.I(talib.SMA, self.data.Volume.astype(float), timeperiod=20)
+self.rsi = self.I(talib.RSI, self.data.Close.astype(float), timeperiod=14)
+self.atr = self.I(talib.ATR, self.data.High.astype(float), self.data.Low.astype(float), self.data.Close.astype(float), timeperiod=14)
+```
+
+⚠️ ALWAYS add .astype(float) to ALL data columns passed to TA-Lib functions!
+This applies to: Close, Open, High, Low, Volume - ALL of them!
+
+🚨 CRITICAL: CUSTOM INDICATOR FUNCTIONS MUST RETURN ARRAYS 🚨
+When using self.I() with custom functions, they MUST return numpy arrays of same length as data.
+
+❌ WRONG - Returns scalar:
+```python
+def vix_shift_func(x):
+    return x[-5]  # Single value - WILL CRASH
+```
+
+✅ CORRECT - Returns array:
+```python
+def vix_shift_func(x):
+    result = np.empty_like(x)
+    for i in range(len(x)):
+        result[i] = x[max(0, i-5)]  # Shift by 5 bars
+    return result
+
+self.vix_shifted = self.I(vix_shift_func, self.data.VIX)
+```
+
+Every custom function passed to self.I() must return an array matching data length!
+
 BACKTEST EXECUTION ORDER:
 1. Run initial backtest with default parameters first
 2. Print full stats using print(stats) and print(stats._strategy)
@@ -218,30 +262,275 @@ BACKTEST EXECUTION ORDER:
 
 do not creeate charts to plot this, just print stats. no charts needed.
 
-CRITICAL POSITION SIZING RULE:
-When calculating position sizes in backtesting.py, the size parameter must be either:
-1. A fraction between 0 and 1 (for percentage of equity)
-2. A whole number (integer) of units
+🚨 CRITICAL POSITION SIZING RULE - THIS DETERMINES IF STRATEGY WORKS OR FAILS 🚨
 
-The common error occurs when calculating position_size = risk_amount / risk, which results in floating-point numbers. Always use:
-position_size = int(round(position_size))
+When calculating position sizes in backtesting.py, the size parameter MUST be:
+1. A fraction between 0 and 1 (for percentage of equity) - THIS IS THE ONLY WAY THAT WORKS
+2. NEVER use integer share counts - backtesting.py will SILENTLY REJECT them (0 trades!)
+3. NEVER use floating point numbers like 3546.0993 - backtesting.py will SILENTLY REJECT them!
 
-Example fix:
-❌ self.buy(size=3546.0993)  # Will fail
-✅ self.buy(size=int(round(3546.0993)))  # Will work
+🚨 IF YOU USE WRONG POSITION SIZING:
+- backtesting.py will NOT throw an error
+- It will silently reject your trades
+- You will get 0 trades and 0% return
+- This is the #1 reason strategies fail!
 
-RISK MANAGEMENT:
+CORRECT position sizing formula (THE ONLY WAY):
+```python
+def calculate_position_size(self, entry_price, stop_loss, risk_pct):
+    # Calculate risk distance
+    risk_distance = abs(entry_price - stop_loss) / entry_price
+    
+    # Calculate risk amount in dollars
+    risk_amount = self.equity * (risk_pct / 100)
+    
+    # Calculate position value needed
+    position_value = risk_amount / risk_distance
+    
+    # Convert to FRACTION of equity (0 to 1)
+    size = position_value / self.equity
+    
+    # Ensure it's between 0 and 1
+    size = max(0.01, min(size, 1.0))
+    
+    return size  # Return as fraction, NOT as integer!
+
+# Usage:
+size = calculate_position_size(entry_price=100, stop_loss=95, risk_pct=2)
+self.buy(size=size, sl=stop_loss, tp=take_profit)  # size is 0.0-1.0
+```
+
+❌ WRONG EXAMPLES (WILL FAIL SILENTLY):
+```python
+position_size = int(round(400000))
+self.buy(size=position_size)  # ❌ FAILS - integer share count
+
+position_size = 400000.0
+self.buy(size=position_size)  # ❌ FAILS - floating point number
+
+position_size = 3546.0993
+self.buy(size=position_size)  # ❌ FAILS - floating point number
+```
+
+✅ CORRECT EXAMPLES (WILL WORK):
+```python
+size = 0.4
+self.buy(size=size)  # ✅ WORKS - 40% of equity
+
+size = 0.5
+self.buy(size=size)  # ✅ WORKS - 50% of equity
+
+size = min(0.1, position_value / self.equity)
+self.buy(size=size)  # ✅ WORKS - fraction of equity
+```
+
+RISK MANAGEMENT & POSITION API:
 1. Always calculate position sizes based on risk percentage
 2. Use proper stop loss and take profit calculations
-4. Print entry/exit signals with Moon Dev themed messages
+3. Print entry/exit signals with Moon Dev themed messages
+
+🚨 CRITICAL: BACKTESTING.PY ORDER VALIDATION RULES 🚨
+
+backtesting.py has STRICT validation for all orders. UNDERSTAND THESE RULES OR YOUR CODE WILL CRASH!
+
+FOR LONG ORDERS (self.buy):
+✅ REQUIRED: SL < Entry < TP
+```python
+entry = 100.00
+sl = 99.00      # MUST be BELOW entry
+tp = 102.00     # MUST be ABOVE entry
+self.buy(size=0.5, sl=sl, tp=tp)  # ✅ WORKS: 99 < 100 < 102
+```
+
+❌ WRONG - Will crash:
+```python
+entry = 100.00
+sl = 101.00     # WRONG! Above entry
+tp = 102.00
+self.buy(size=0.5, sl=sl, tp=tp)  # ❌ CRASHES: 101 > 100
+```
+
+FOR SHORT ORDERS (self.sell):
+✅ REQUIRED: TP < Entry < SL
+```python
+entry = 100.00
+sl = 101.00     # MUST be ABOVE entry
+tp = 98.00      # MUST be BELOW entry
+self.sell(size=0.5, sl=sl, tp=tp)  # ✅ WORKS: 98 < 100 < 101
+```
+
+❌ WRONG - Will crash:
+```python
+entry = 100.00
+sl = 99.00      # WRONG! Below entry
+tp = 98.00
+self.sell(size=0.5, sl=sl, tp=tp)  # ❌ CRASHES: 99 < 100
+```
+
+CORRECT ENTRY/EXIT LOGIC TEMPLATE:
+```python
+def next(self):
+    current_price = self.data.Close[-1]
+    
+    if not self.position:
+        # LONG ENTRY
+        if buy_signal:
+            entry_price = current_price
+            stop_loss = entry_price - 0.05  # MUST be BELOW entry
+            take_profit = entry_price + 0.10  # MUST be ABOVE entry
+            
+            # Validate before submitting
+            if stop_loss < entry_price < take_profit:  # ✅ Always check!
+                size = self.calculate_position_size(entry_price, stop_loss)
+                self.buy(size=size, sl=stop_loss, tp=take_profit)
+        
+        # SHORT ENTRY
+        elif sell_signal:
+            entry_price = current_price
+            stop_loss = entry_price + 0.05  # MUST be ABOVE entry
+            take_profit = entry_price - 0.10  # MUST be BELOW entry
+            
+            # Validate before submitting
+            if take_profit < entry_price < stop_loss:  # ✅ Always check!
+                size = self.calculate_position_size(entry_price, stop_loss)
+                self.sell(size=size, sl=stop_loss, tp=take_profit)
+```
+
+🚨 HOW TO CALCULATE SL/TP CORRECTLY USING ATR 🚨
+
+FOR LONG ORDERS (buying, expecting price to go UP):
+```python
+entry_price = self.data.Close[-1]
+atr = self.atr[-1]  # Assuming you have self.atr = self.I(talib.ATR, ...)
+
+# ✅ CORRECT: SL BELOW entry, TP ABOVE entry
+stop_loss_price = entry_price - (2.0 * atr)     # SUBTRACT for SL (below entry)
+take_profit_price = entry_price + (3.0 * atr)   # ADD for TP (above entry)
+
+# Validate: SL < Entry < TP
+if stop_loss_price < entry_price < take_profit_price:
+    size = self.calculate_position_size(entry_price, stop_loss_price)
+    self.buy(size=size, sl=stop_loss_price, tp=take_profit_price)
+else:
+    print(f"🌙 MOON DEV DEBUG: Long order validation failed - SL: {stop_loss_price}, Entry: {entry_price}, TP: {take_profit_price}")
+```
+
+FOR SHORT ORDERS (selling, expecting price to go DOWN):
+```python
+entry_price = self.data.Close[-1]
+atr = self.atr[-1]
+
+# ✅ CORRECT: TP BELOW entry, SL ABOVE entry
+take_profit_price = entry_price - (3.0 * atr)   # SUBTRACT for TP (below entry, profit when price drops)
+stop_loss_price = entry_price + (2.0 * atr)     # ADD for SL (above entry, stop when price rises)
+
+# Validate: TP < Entry < SL
+if take_profit_price < entry_price < stop_loss_price:
+    size = self.calculate_position_size(entry_price, stop_loss_price)
+    self.sell(size=size, sl=stop_loss_price, tp=take_profit_price)
+else:
+    print(f"🌙 MOON DEV DEBUG: Short order validation failed - TP: {take_profit_price}, Entry: {entry_price}, SL: {stop_loss_price}")
+```
+
+❌ COMMON MISTAKE TO AVOID:
+```python
+# ❌ WRONG for SHORT orders - TP ends up ABOVE entry!
+take_profit_price = entry_price + (3.0 * atr)  # This puts TP above entry - WRONG!
+stop_loss_price = entry_price - (2.0 * atr)    # This puts SL below entry - WRONG!
+# Result: ValueError: Short orders require: TP < LIMIT < SL
+```
+
+🚨 CRITICAL: POSITION OBJECT API (backtesting.py) 🚨
+The Position object has VERY LIMITED attributes. Here's what EXISTS:
+
+✅ AVAILABLE Position attributes:
+- self.position.size (current position size, 0 if no position)
+- self.position.is_long (True if long position)
+- self.position.is_short (True if short position)
+- self.position.pl (current profit/loss)
+- self.position.pl_pct (current profit/loss percentage)
+
+❌ DOES NOT EXIST (will crash):
+- self.position.price (NO! Track entry price manually)
+- self.position.sl (NO! Cannot read stop loss)
+- self.position.tp (NO! Cannot read take profit)
+- self.position.modify() (NO! Cannot modify existing position)
+- self.position.set_sl() (NO! Cannot set stop loss after entry)
+
+✅ CORRECT way to track entry price:
+```python
+def init(self):
+    self.entry_price = None
+
+def next(self):
+    if not self.position:
+        # Entry logic
+        self.buy(sl=stop_price, tp=target_price, size=size)
+        self.entry_price = self.data.Close[-1]  # Track manually!
+    elif self.position.is_long:
+        # Use self.entry_price, NOT self.position.price
+        if self.data.Close[-1] >= self.entry_price + profit_target:
+            self.position.close()
+```
+
+✅ Stop loss/take profit MUST be set at entry time:
+```python
+self.buy(sl=stop_price, tp=target_price, size=size)  # Set SL/TP here!
+```
+
+❌ CANNOT modify SL/TP after entry - backtesting.py doesn't support it!
 
 If you need indicators use TA lib or pandas TA. 
 
-Use this data path: /Users/md/Dropbox/dev/github/moon-dev-ai-agents-for-trading/src/data/rbi/BTC-USD-15m.csv
-the above data head looks like below
-datetime, open, high, low, close, volume,
-2023-01-01 00:00:00, 16531.83, 16532.69, 16509.11, 16510.82, 231.05338022,
-2023-01-01 00:15:00, 16509.78, 16534.66, 16509.11, 16533.43, 308.12276951,
+🚨 CRITICAL: USE YFINANCE TO DOWNLOAD DATA DYNAMICALLY 🚨
+
+⚠️ YFINANCE DATA LIMITS (CRITICAL - DO NOT IGNORE):
+- 5-minute data: MAX 60 days only! (yfinance limitation)
+- 15-minute data: MAX 60 days only!
+- 1-hour data: MAX 730 days (2 years)
+- Daily data: MAX unlimited
+
+🚨 IF THE STRATEGY MENTIONS "5 MINUTE" OR "5M" CANDLES:
+Use 1-hour data instead! Convert the logic to hourly timeframe.
+NEVER try to download 5m data for more than 60 days - it will CRASH!
+
+```python
+import yfinance as yf
+import pandas as pd
+
+# Download data for the ticker specified in the strategy (e.g., SPY, BTC-USD, etc.)
+ticker = yf.Ticker("TICKER_SYMBOL")  # Replace TICKER_SYMBOL with actual ticker
+
+# ALWAYS use 1-hour data for backtesting (most reliable)
+# Even if strategy mentions 5m, use 1h for backtesting
+data = ticker.history(period="730d", interval="1h")  # Use 1h, NOT 5m!
+
+# Reset index and clean columns
+data = data.reset_index()
+data.columns = data.columns.str.strip().str.lower()
+data = data.drop(columns=[col for col in data.columns if 'unnamed' in col.lower()])
+
+# Rename columns to match backtesting.py requirements
+data = data.rename(columns={
+    'date': 'datetime',
+    'open': 'Open',
+    'high': 'High',
+    'low': 'Low',
+    'close': 'Close',
+    'volume': 'Volume'
+})
+
+# Set datetime as index
+data['datetime'] = pd.to_datetime(data['datetime'])
+data = data.set_index('datetime')
+
+# Run backtest
+bt = Backtest(data, YourStrategyClassName, cash=1000000, commission=.002)
+stats = bt.run()
+print(stats)
+print(stats._strategy)
+```
+⚠️ Replace TICKER_SYMBOL with the actual ticker from the strategy (SPY, BTC-USD, AAPL, etc.)
 
 Always add plenty of Moon Dev themed debug prints with emojis to make debugging easier! 🌙 ✨ 🚀
 
@@ -252,6 +541,79 @@ ONLY SEND BACK CODE, NO OTHER TEXT.
 DEBUG_PROMPT = """
 You are Moon Dev's Debug AI 🌙
 Fix technical issues in the backtest code WITHOUT changing the strategy logic.
+
+🚨 CRITICAL: DATA LOADING MUST USE YFINANCE 🚨
+If you see hardcoded CSV paths or missing data loading, use yfinance:
+```python
+import yfinance as yf
+import pandas as pd
+
+ticker = yf.Ticker("TICKER_SYMBOL")  # Use the correct ticker from strategy
+data = ticker.history(period="2y", interval="1h")
+data = data.reset_index()
+data.columns = data.columns.str.strip().str.lower()
+data = data.drop(columns=[col for col in data.columns if 'unnamed' in col.lower()])
+data = data.rename(columns={'date': 'datetime', 'open': 'Open', 'high': 'High', 'low': 'Low', 'close': 'Close', 'volume': 'Volume'})
+data['datetime'] = pd.to_datetime(data['datetime'])
+data = data.set_index('datetime')
+```
+
+🚨 CRITICAL: POSITION OBJECT API 🚨
+✅ AVAILABLE: self.position.size, .is_long, .is_short, .pl, .pl_pct
+❌ DOES NOT EXIST: self.position.price, .sl, .tp, .modify(), .set_sl()
+
+If code uses self.position.price, REPLACE with manual tracking:
+```python
+def init(self):
+    self.entry_price = None
+
+def next(self):
+    if not self.position:
+        self.buy(sl=stop, size=size)
+        self.entry_price = self.data.Close[-1]  # Track manually
+    elif self.position.is_long:
+        # Use self.entry_price instead of self.position.price
+        if self.data.Close[-1] >= self.entry_price + target:
+            self.position.close()
+```
+
+If code tries to modify SL/TP after entry, REMOVE IT - not supported!
+
+🚨 CRITICAL: TA-LIB DTYPE CONVERSION 🚨
+TA-Lib requires float64 dtype. If you see errors like "input array type is not double":
+
+❌ WRONG:
+```python
+self.rsi = self.I(talib.RSI, self.data.Close, timeperiod=14)
+self.vol_sma = self.I(talib.SMA, self.data.Volume, timeperiod=20)
+```
+
+✅ CORRECT - Add .astype(float) to ALL data columns:
+```python
+self.rsi = self.I(talib.RSI, self.data.Close.astype(float), timeperiod=14)
+self.vol_sma = self.I(talib.SMA, self.data.Volume.astype(float), timeperiod=20)
+self.atr = self.I(talib.ATR, self.data.High.astype(float), self.data.Low.astype(float), self.data.Close.astype(float), timeperiod=14)
+```
+
+ALWAYS add .astype(float) when passing data to TA-Lib functions!
+
+🚨 CRITICAL: CUSTOM INDICATOR FUNCTIONS MUST RETURN ARRAYS 🚨
+If you see errors like "Indicators must return numpy.arrays of same length as data":
+
+❌ WRONG:
+```python
+def custom_func(x):
+    return x[-1]  # Returns scalar
+```
+
+✅ CORRECT:
+```python
+def custom_func(x):
+    result = np.empty_like(x)
+    for i in range(len(x)):
+        result[i] = x[max(0, i-lookback)]
+    return result
+```
 
 CRITICAL BACKTESTING REQUIREMENTS:
 1. Position Sizing Rules:
@@ -264,13 +626,61 @@ CRITICAL BACKTESTING REQUIREMENTS:
    - Round position sizes to whole numbers if using units
    - Convert to fraction if using percentage of equity
    - Ensure stop loss and take profit are price levels, not distances
+   - REPLACE hardcoded CSV paths with yfinance data fetching
+
+3. 🚨 CRITICAL: Stop Loss & Take Profit Ordering Errors 🚨
+   If you see "ValueError: Short orders require: TP < LIMIT < SL" or similar:
+   
+   FOR LONG ORDERS (buying, expecting price to go UP):
+   ```python
+   entry_price = self.data.Close[-1]
+   atr = self.atr[-1]
+   
+   # ✅ CORRECT: SL BELOW entry, TP ABOVE entry
+   stop_loss_price = entry_price - (2.0 * atr)     # SUBTRACT for SL (below entry)
+   take_profit_price = entry_price + (3.0 * atr)   # ADD for TP (above entry)
+   
+   # Validate: SL < Entry < TP
+   if stop_loss_price < entry_price < take_profit_price:
+       size = self.calculate_position_size(entry_price, stop_loss_price)
+       self.buy(size=size, sl=stop_loss_price, tp=take_profit_price)
+   else:
+       print(f"🌙 MOON DEV DEBUG: Long order validation failed")
+       return
+   ```
+   
+   FOR SHORT ORDERS (selling, expecting price to go DOWN):
+   ```python
+   entry_price = self.data.Close[-1]
+   atr = self.atr[-1]
+   
+   # ✅ CORRECT: TP BELOW entry, SL ABOVE entry
+   take_profit_price = entry_price - (3.0 * atr)   # SUBTRACT for TP (below entry, profit when price drops)
+   stop_loss_price = entry_price + (2.0 * atr)     # ADD for SL (above entry, stop when price rises)
+   
+   # Validate: TP < Entry < SL
+   if take_profit_price < entry_price < stop_loss_price:
+       size = self.calculate_position_size(entry_price, stop_loss_price)
+       self.sell(size=size, sl=stop_loss_price, tp=take_profit_price)
+   else:
+       print(f"🌙 MOON DEV DEBUG: Short order validation failed")
+       return
+   ```
+   
+   ❌ COMMON MISTAKE TO AVOID:
+   ```python
+   # ❌ WRONG for SHORT orders - TP ends up ABOVE entry!
+   take_profit_price = entry_price + (3.0 * atr)  # This puts TP above entry - WRONG!
+   stop_loss_price = entry_price - (2.0 * atr)    # This puts SL below entry - WRONG!
+   ```
 
 Focus on:
 1. Syntax errors (like incorrect string formatting)
-2. Import statements and dependencies
+2. Import statements and dependencies (ensure yfinance is imported)
 3. Class and function definitions
 4. Variable scoping and naming
 5. Print statement formatting
+6. Data loading (must use yfinance, not CSV files)
 
 DO NOT change:
 1. Strategy logic
@@ -302,6 +712,8 @@ Your job is to ensure the backtest code NEVER uses ANY backtesting.lib imports o
    - Use talib for all standard indicators (SMA, RSI, MACD, etc.)
    - Use pandas-ta for specialized indicators
    - ALWAYS wrap in self.I()
+   - ⚠️ CRITICAL: Add .astype(float) to ALL data columns passed to TA-Lib!
+   - Example: self.I(talib.SMA, self.data.Close.astype(float), timeperiod=20)
 
 3. For signal generation:
    - Use numpy/pandas boolean conditions
@@ -345,6 +757,10 @@ import sys
 import hashlib  # Added for idea hashing
 from src.config import *  # Import config settings including AI_MODEL
 from src.models import model_factory
+
+# AI Configuration Constants (required for model calls)
+AI_TEMPERATURE = 0.7
+AI_MAX_TOKENS = 4000
 
 # DeepSeek Configuration
 DEEPSEEK_BASE_URL = "https://api.deepseek.com"
@@ -883,7 +1299,7 @@ def log_processed_idea(idea: str, strategy_name: str = "Unknown") -> None:
     cprint(f"📝 Idea logged as processed: {idea_hash}", "green")
 
 def process_trading_idea(idea: str) -> None:
-    """Process a single trading idea completely independently"""
+    """Process a single trading idea with optimized 2-phase pipeline (Research + Backtest only)"""
     print("\n🚀 Moon Dev's RBI AI Processing New Idea!")
     print("🌟 Let's find some alpha in the chaos!")
     print(f"📝 Processing idea: {idea[:100]}...")
@@ -928,32 +1344,15 @@ def process_trading_idea(idea: str) -> None:
         backtest_file = BACKTEST_DIR / f"{strategy_name}_BT.py"
         with open(backtest_file, 'w') as f:
             f.write(backtest)
-            
-        # Phase 3: Package Check using only the backtest code
-        print("\n📦 Phase 3: Package Check")
-        package_checked = package_check(backtest, strategy_name)
         
-        if not package_checked:
-            print("❌ Package check failed!")
-            return
-            
-        # Save package check output
-        package_file = PACKAGE_DIR / f"{strategy_name}_PKG.py"
-        with open(package_file, 'w') as f:
-            f.write(package_checked)
-            
-        # Phase 4: Debug using only the package-checked code
-        print("\n🔧 Phase 4: Debug")
-        final_backtest = debug_backtest(package_checked, strategy, strategy_name)
+        # ✅ OPTIMIZED: Skip Package Check and Debug phases
+        # The BACKTEST_PROMPT now includes all necessary instructions for correct code generation
+        # This reduces execution time from 5+ minutes to ~2 minutes
         
-        if not final_backtest:
-            print("❌ Debug phase failed!")
-            return
-            
-        # Save final backtest
+        # Save final backtest directly (no intermediate phases)
         final_file = FINAL_BACKTEST_DIR / f"{strategy_name}_BTFinal.py"
         with open(final_file, 'w') as f:
-            f.write(final_backtest)
+            f.write(backtest)
             
         print("\n🎉 Mission Accomplished!")
         print(f"🚀 Strategy '{strategy_name}' is ready to make it rain! 💸")

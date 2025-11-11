@@ -1,0 +1,780 @@
+{
+  "session_id": "20251028_190750",
+  "config": {
+    "models": [
+      "deepseek"
+    ],
+    "model_temperature": 0.7,
+    "model_max_tokens": 1024,
+    "system_prompt": "",
+    "asset_type": "crypto",
+    "ticker": "BTC",
+    "timeframe": "3m",
+    "cycle_interval": 180,
+    "use_simulation": true,
+    "initial_balance": 10000,
+    "position_size_percentage": 0.9,
+    "save_decisions": true,
+    "decisions_dir": "src/data/trading_decisions",
+    "use_live_data": false
+  },
+  "session_start": "2025-10-28T19:07:50.934020",
+  "decisions_count": 53,
+  "decisions": [
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-28T19:08:03.217852",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "Price is trading slightly above EMA(20) by approximately $26, indicating very mild bullish momentum but no strong directional bias. RSI at 53.61 is in neutral territory, showing neither overbought nor oversold conditions. MACD remains negative at -50.596, suggesting underlying bearish momentum persists despite the slight price premium to EMA. The conflicting signals - price above EMA but negative MACD with neutral RSI - create an unclear short-term direction. Given the mixed indicators and lack of strong momentum in either direction, holding current positions is prudent until clearer directional signals emerge.",
+          "raw_response": "SIGNAL: HOLD\nCONFIDENCE: 65%\nREASONING: Price is trading slightly above EMA(20) by approximately $26, indicating very mild bullish momentum but no strong directional bias. RSI at 53.61 is in neutral territory, showing neither overbought nor oversold conditions. MACD remains negative at -50.596, suggesting underlying bearish momentum persists despite the slight price premium to EMA. The conflicting signals - price above EMA but negative MACD with neutral RSI - create an unclear short-term direction. Given the mixed indicators and lack of strong momentum in either direction, holding current positions is prudent until clearer directional signals emerge."
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-28T19:11:09.692930",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "Price is trading slightly above EMA(20) by approximately 0.02%, indicating minimal bullish momentum. RSI(7) at 53.61 is in neutral territory, showing neither overbought nor oversold conditions. MACD remains negative at -50.596, suggesting underlying bearish momentum persists despite the slight price premium. The conflicting signals - price above EMA but negative MACD with neutral RSI - create an unclear short-term direction. On a 3m timeframe, this warrants waiting for clearer momentum confirmation rather than entering a position.",
+          "raw_response": "SIGNAL: HOLD\nCONFIDENCE: 65%\nREASONING: Price is trading slightly above EMA(20) by approximately 0.02%, indicating minimal bullish momentum. RSI(7) at 53.61 is in neutral territory, showing neither overbought nor oversold conditions. MACD remains negative at -50.596, suggesting underlying bearish momentum persists despite the slight price premium. The conflicting signals - price above EMA but negative MACD with neutral RSI - create an unclear short-term direction. On a 3m timeframe, this warrants waiting for clearer momentum confirmation rather than entering a position."
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-28T19:14:15.785540",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing no strong overbought or oversold conditions. Given the mixed signals\u2014modest bullish price action versus bearish MACD\u2014and the absence of a clear directional trend, the prudent approach is to HOLD and wait for stronger confirmation from either a MACD crossover or a decisive RSI move outside the 30-70 range.",
+          "raw_response": "SIGNAL: HOLD  \nCONFIDENCE: 65%  \nREASONING: The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing no strong overbought or oversold conditions. Given the mixed signals\u2014modest bullish price action versus bearish MACD\u2014and the absence of a clear directional trend, the prudent approach is to HOLD and wait for stronger confirmation from either a MACD crossover or a decisive RSI move outside the 30-70 range."
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-28T19:17:20.934301",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing neither overbought nor oversold conditions. Given the conflicting signals\u2014modest bullish price action versus a bearish MACD\u2014and the absence of a strong directional trend, a HOLD position is prudent until clearer momentum emerges.",
+          "raw_response": "SIGNAL: HOLD  \nCONFIDENCE: 65%  \nREASONING: The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing neither overbought nor oversold conditions. Given the conflicting signals\u2014modest bullish price action versus a bearish MACD\u2014and the absence of a strong directional trend, a HOLD position is prudent until clearer momentum emerges."
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 0,
+      "reasoning": "No models available",
+      "timestamp": "2025-10-28T20:48:07.758521",
+      "individual_decisions": {}
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 0,
+      "reasoning": "No models available",
+      "timestamp": "2025-10-29T00:13:08.726261",
+      "individual_decisions": {}
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 0,
+      "reasoning": "No models available",
+      "timestamp": "2025-10-29T01:26:04.797360",
+      "individual_decisions": {}
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 0,
+      "reasoning": "No models available",
+      "timestamp": "2025-10-29T04:41:24.043694",
+      "individual_decisions": {}
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 0,
+      "reasoning": "No models available",
+      "timestamp": "2025-10-29T06:28:46.177883",
+      "individual_decisions": {}
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 60,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-29T06:31:53.901648",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 60,
+          "reasoning": "The price is trading slightly above the EMA(20), indicating a neutral to slightly bullish short-term trend. The RSI(7) at 53.61 is in a balanced zone, showing neither overbought nor oversold conditions. However, the MACD is negative at -50.596, suggesting underlying bearish momentum. Given the conflicting signals\u2014modest bullish price action versus bearish MACD\u2014and the absence of a strong directional bias, the prudent approach is to hold and wait for clearer momentum or a breakout.",
+          "raw_response": "SIGNAL: HOLD  \nCONFIDENCE: 60%  \nREASONING: The price is trading slightly above the EMA(20), indicating a neutral to slightly bullish short-term trend. The RSI(7) at 53.61 is in a balanced zone, showing neither overbought nor oversold conditions. However, the MACD is negative at -50.596, suggesting underlying bearish momentum. Given the conflicting signals\u2014modest bullish price action versus bearish MACD\u2014and the absence of a strong directional bias, the prudent approach is to hold and wait for clearer momentum or a breakout."
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 60,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-29T06:35:00.801558",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 60,
+          "reasoning": "The price is trading slightly above the EMA(20), indicating a neutral to mildly bullish short-term trend. The RSI(7) at 53.61 is in a neutral zone, showing no strong momentum in either direction. The MACD is negative (-50.596), suggesting some underlying bearish pressure, but the divergence is not extreme enough to signal a strong sell. Given the mixed signals and lack of clear directional momentum, holding is the most prudent approach to wait for a more defined trend or catalyst.",
+          "raw_response": "SIGNAL: HOLD  \nCONFIDENCE: 60%  \nREASONING: The price is trading slightly above the EMA(20), indicating a neutral to mildly bullish short-term trend. The RSI(7) at 53.61 is in a neutral zone, showing no strong momentum in either direction. The MACD is negative (-50.596), suggesting some underlying bearish pressure, but the divergence is not extreme enough to signal a strong sell. Given the mixed signals and lack of clear directional momentum, holding is the most prudent approach to wait for a more defined trend or catalyst."
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 60,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-29T06:38:07.827207",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 60,
+          "reasoning": "The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing no strong overbought or oversold conditions. Given conflicting signals\u2014modest bullish price action versus bearish MACD\u2014and the absence of a clear trend, the best approach is to wait for stronger directional confirmation before entering a position.",
+          "raw_response": "SIGNAL: HOLD  \nCONFIDENCE: 60%  \nREASONING: The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing no strong overbought or oversold conditions. Given conflicting signals\u2014modest bullish price action versus bearish MACD\u2014and the absence of a clear trend, the best approach is to wait for stronger directional confirmation before entering a position."
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-29T06:41:15.406460",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing no strong overbought or oversold conditions. Given the conflicting signals\u2014modest price strength versus MACD bearishness\u2014and the absence of a clear trend breakout, the prudent action is to hold and await further confirmation from either a MACD crossover or a decisive RSI move outside the 30-70 range.",
+          "raw_response": "SIGNAL: HOLD  \nCONFIDENCE: 65%  \nREASONING: The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing no strong overbought or oversold conditions. Given the conflicting signals\u2014modest price strength versus MACD bearishness\u2014and the absence of a clear trend breakout, the prudent action is to hold and await further confirmation from either a MACD crossover or a decisive RSI move outside the 30-70 range."
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-29T06:44:21.573660",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing no strong overbought or oversold conditions. Given the conflicting signals\u2014price above EMA but negative MACD\u2014and the absence of a clear trend, a cautious HOLD is appropriate until a stronger directional signal emerges.",
+          "raw_response": "SIGNAL: HOLD  \nCONFIDENCE: 65%  \nREASONING: The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing no strong overbought or oversold conditions. Given the conflicting signals\u2014price above EMA but negative MACD\u2014and the absence of a clear trend, a cautious HOLD is appropriate until a stronger directional signal emerges."
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-29T06:47:28.965021",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing no strong overbought or oversold conditions. Given the conflicting signals\u2014modest bullish price action versus bearish MACD\u2014and the absence of a decisive trend, the optimal approach is to wait for clearer momentum before entering a position.",
+          "raw_response": "SIGNAL: HOLD  \nCONFIDENCE: 65%  \nREASONING: The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing no strong overbought or oversold conditions. Given the conflicting signals\u2014modest bullish price action versus bearish MACD\u2014and the absence of a decisive trend, the optimal approach is to wait for clearer momentum before entering a position."
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-29T06:50:36.031689",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing no strong overbought or oversold conditions. Given the conflicting signals\u2014modest price strength versus a negative MACD\u2014the market lacks a clear directional bias on the 3m timeframe. A HOLD is prudent until either MACD turns positive or RSI provides a stronger momentum signal.",
+          "raw_response": "SIGNAL: HOLD  \nCONFIDENCE: 65%  \nREASONING: The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing no strong overbought or oversold conditions. Given the conflicting signals\u2014modest price strength versus a negative MACD\u2014the market lacks a clear directional bias on the 3m timeframe. A HOLD is prudent until either MACD turns positive or RSI provides a stronger momentum signal."
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-29T06:53:43.197997",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing neither overbought nor oversold conditions. Given the conflicting signals\u2014modest price strength versus a negative MACD\u2014the market lacks a clear directional bias. A HOLD position is prudent until either the MACD turns positive or the RSI moves decisively away from the midpoint.",
+          "raw_response": "SIGNAL: HOLD  \nCONFIDENCE: 65%  \nREASONING: The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing neither overbought nor oversold conditions. Given the conflicting signals\u2014modest price strength versus a negative MACD\u2014the market lacks a clear directional bias. A HOLD position is prudent until either the MACD turns positive or the RSI moves decisively away from the midpoint."
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 60,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-29T06:56:49.313357",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 60,
+          "reasoning": "Price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. RSI(7) at 53.61 is neutral, showing no strong overbought or oversold conditions. Given conflicting signals\u2014modest price strength versus a negative MACD\u2014a cautious hold is appropriate until clearer directional momentum emerges.",
+          "raw_response": "SIGNAL: HOLD  \nCONFIDENCE: 60%  \nREASONING: Price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. RSI(7) at 53.61 is neutral, showing no strong overbought or oversold conditions. Given conflicting signals\u2014modest price strength versus a negative MACD\u2014a cautious hold is appropriate until clearer directional momentum emerges."
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-29T06:59:55.975198",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing no strong overbought or oversold conditions. Given the conflicting signals\u2014modest bullish price action versus bearish MACD\u2014and the absence of a clear trend, the best course is to wait for stronger directional confirmation before entering a position.",
+          "raw_response": "SIGNAL: HOLD  \nCONFIDENCE: 65%  \nREASONING: The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing no strong overbought or oversold conditions. Given the conflicting signals\u2014modest bullish price action versus bearish MACD\u2014and the absence of a clear trend, the best course is to wait for stronger directional confirmation before entering a position."
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 60,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-29T07:03:02.776765",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 60,
+          "reasoning": "The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing no strong overbought or oversold conditions. Given the conflicting signals\u2014modest bullish price action versus bearish MACD\u2014and the absence of a clear directional trend, a hold position is appropriate to await further confirmation.",
+          "raw_response": "SIGNAL: HOLD  \nCONFIDENCE: 60%  \nREASONING: The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing no strong overbought or oversold conditions. Given the conflicting signals\u2014modest bullish price action versus bearish MACD\u2014and the absence of a clear directional trend, a hold position is appropriate to await further confirmation."
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-29T07:06:10.140819",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "The price is trading slightly above the EMA(20), indicating a neutral to slightly bullish bias, but the momentum is weak. The RSI(7) at 53.61 is in neutral territory, showing no strong overbought or oversold conditions. The MACD is negative (-50.596), suggesting underlying bearish momentum, though the divergence is not extreme. Given the mixed signals\u2014modest price strength above the EMA but negative MACD\u2014there is insufficient evidence for a decisive BUY or SELL. A HOLD is prudent until clearer momentum or trend confirmation emerges.",
+          "raw_response": "SIGNAL: HOLD  \nCONFIDENCE: 65%  \nREASONING: The price is trading slightly above the EMA(20), indicating a neutral to slightly bullish bias, but the momentum is weak. The RSI(7) at 53.61 is in neutral territory, showing no strong overbought or oversold conditions. The MACD is negative (-50.596), suggesting underlying bearish momentum, though the divergence is not extreme. Given the mixed signals\u2014modest price strength above the EMA but negative MACD\u2014there is insufficient evidence for a decisive BUY or SELL. A HOLD is prudent until clearer momentum or trend confirmation emerges."
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 60,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-29T07:09:16.689232",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 60,
+          "reasoning": "The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing neither overbought nor oversold conditions. With conflicting signals between the EMA and MACD, and no strong directional bias from the RSI, the market appears to be in a consolidation phase. A HOLD position is prudent until clearer momentum emerges.",
+          "raw_response": "SIGNAL: HOLD  \nCONFIDENCE: 60%  \nREASONING: The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing neither overbought nor oversold conditions. With conflicting signals between the EMA and MACD, and no strong directional bias from the RSI, the market appears to be in a consolidation phase. A HOLD position is prudent until clearer momentum emerges."
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-29T07:12:25.112603",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "The current price is slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing no strong overbought or oversold conditions. Given the mixed signals\u2014modest bullish price action versus bearish MACD\u2014and the absence of a clear directional trend, the prudent approach is to hold and wait for stronger confirmation before entering a position.",
+          "raw_response": "SIGNAL: HOLD  \nCONFIDENCE: 65%  \nREASONING: The current price is slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing no strong overbought or oversold conditions. Given the mixed signals\u2014modest bullish price action versus bearish MACD\u2014and the absence of a clear directional trend, the prudent approach is to hold and wait for stronger confirmation before entering a position."
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-29T07:15:34.852516",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "Price is trading slightly above EMA(20) indicating mild bullish momentum, but RSI(7) at 53.61 is neutral and MACD remains negative at -50.596, suggesting underlying bearish pressure. The conflicting signals - price above EMA vs negative MACD - create uncertainty. Without clear directional conviction, holding avoids taking a position during this consolidation phase. Wait for either MACD to turn positive or RSI to show stronger momentum (above 60 or below 40) for clearer entry signals.",
+          "raw_response": "SIGNAL: HOLD\nCONFIDENCE: 65%\nREASONING: Price is trading slightly above EMA(20) indicating mild bullish momentum, but RSI(7) at 53.61 is neutral and MACD remains negative at -50.596, suggesting underlying bearish pressure. The conflicting signals - price above EMA vs negative MACD - create uncertainty. Without clear directional conviction, holding avoids taking a position during this consolidation phase. Wait for either MACD to turn positive or RSI to show stronger momentum (above 60 or below 40) for clearer entry signals."
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-29T07:18:42.452909",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing no strong overbought or oversold conditions. Given the conflicting signals\u2014modest bullish price action versus bearish MACD\u2014and the absence of a clear trend, the prudent approach is to wait for stronger confirmation before entering a position.",
+          "raw_response": "SIGNAL: HOLD  \nCONFIDENCE: 65%  \nREASONING: The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing no strong overbought or oversold conditions. Given the conflicting signals\u2014modest bullish price action versus bearish MACD\u2014and the absence of a clear trend, the prudent approach is to wait for stronger confirmation before entering a position."
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-29T07:21:49.577481",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "The price is trading slightly above the EMA(20), indicating a neutral to mildly bullish short-term trend. The RSI(7) at 53.61 is in neutral territory, showing no significant overbought or oversold conditions. However, the MACD is negative at -50.596, suggesting underlying bearish momentum despite the recent price stability. With mixed signals\u2014slight bullish price action vs. bearish MACD\u2014and no strong directional bias, the prudent approach is to hold and wait for clearer momentum or a breakout.",
+          "raw_response": "SIGNAL: HOLD  \nCONFIDENCE: 65%  \nREASONING: The price is trading slightly above the EMA(20), indicating a neutral to mildly bullish short-term trend. The RSI(7) at 53.61 is in neutral territory, showing no significant overbought or oversold conditions. However, the MACD is negative at -50.596, suggesting underlying bearish momentum despite the recent price stability. With mixed signals\u2014slight bullish price action vs. bearish MACD\u2014and no strong directional bias, the prudent approach is to hold and wait for clearer momentum or a breakout."
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-29T07:24:55.763105",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "Price is trading slightly above EMA(20) indicating mild bullish momentum, but RSI at 53.61 is neutral and MACD remains negative at -50.596, suggesting underlying bearish pressure. The conflicting signals between price position and momentum indicators create uncertainty. Without clear directional conviction, maintaining current position is prudent until either MACD shows signs of reversal or RSI moves decisively away from neutral territory.",
+          "raw_response": "SIGNAL: HOLD\nCONFIDENCE: 65%\nREASONING: Price is trading slightly above EMA(20) indicating mild bullish momentum, but RSI at 53.61 is neutral and MACD remains negative at -50.596, suggesting underlying bearish pressure. The conflicting signals between price position and momentum indicators create uncertainty. Without clear directional conviction, maintaining current position is prudent until either MACD shows signs of reversal or RSI moves decisively away from neutral territory."
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 60,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-29T07:28:02.871622",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 60,
+          "reasoning": "The price is trading slightly above the EMA(20), indicating a neutral to slightly bullish short-term trend. The RSI(7) at 53.61 is in a neutral zone, showing no significant overbought or oversold conditions. However, the MACD is negative at -50.596, suggesting underlying bearish momentum. With conflicting signals\u2014price above EMA but negative MACD\u2014and no strong directional bias, the prudent action is to hold and wait for clearer momentum or a breakout.",
+          "raw_response": "SIGNAL: HOLD  \nCONFIDENCE: 60%  \nREASONING: The price is trading slightly above the EMA(20), indicating a neutral to slightly bullish short-term trend. The RSI(7) at 53.61 is in a neutral zone, showing no significant overbought or oversold conditions. However, the MACD is negative at -50.596, suggesting underlying bearish momentum. With conflicting signals\u2014price above EMA but negative MACD\u2014and no strong directional bias, the prudent action is to hold and wait for clearer momentum or a breakout."
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 60,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-29T07:31:10.280162",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 60,
+          "reasoning": "The price is trading slightly above the EMA(20), indicating a neutral to slightly bullish short-term trend. The RSI(7) at 53.61 is in a neutral zone, showing no strong overbought or oversold conditions. The MACD is negative (-50.596), suggesting some underlying bearish momentum, but the divergence is not extreme. Given the mixed signals\u2014modest bullish price action relative to the EMA, neutral RSI, and bearish MACD\u2014there is insufficient conviction for a directional trade. A HOLD position is prudent until clearer momentum emerges.",
+          "raw_response": "SIGNAL: HOLD  \nCONFIDENCE: 60%  \nREASONING: The price is trading slightly above the EMA(20), indicating a neutral to slightly bullish short-term trend. The RSI(7) at 53.61 is in a neutral zone, showing no strong overbought or oversold conditions. The MACD is negative (-50.596), suggesting some underlying bearish momentum, but the divergence is not extreme. Given the mixed signals\u2014modest bullish price action relative to the EMA, neutral RSI, and bearish MACD\u2014there is insufficient conviction for a directional trade. A HOLD position is prudent until clearer momentum emerges."
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-29T07:34:16.998718",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "Price is trading slightly above EMA(20) indicating mild bullish momentum, but RSI at 53.61 is neutral and MACD remains negative at -50.596, suggesting underlying bearish pressure. The conflicting signals - price above EMA vs negative MACD - create uncertainty. Without clear directional conviction, holding avoids taking a position during this consolidation phase. Wait for either MACD to turn positive or RSI to move decisively away from the mid-point.",
+          "raw_response": "SIGNAL: HOLD\nCONFIDENCE: 65%\nREASONING: Price is trading slightly above EMA(20) indicating mild bullish momentum, but RSI at 53.61 is neutral and MACD remains negative at -50.596, suggesting underlying bearish pressure. The conflicting signals - price above EMA vs negative MACD - create uncertainty. Without clear directional conviction, holding avoids taking a position during this consolidation phase. Wait for either MACD to turn positive or RSI to move decisively away from the mid-point."
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-29T07:37:23.443967",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "The price is trading slightly above the EMA(20), indicating a neutral to mildly bullish short-term trend. The RSI(7) at 53.61 is in neutral territory, showing no significant overbought or oversold conditions. However, the MACD is negative (-50.596), suggesting underlying bearish momentum that may limit upside potential. Given the conflicting signals\u2014modest price strength versus bearish MACD\u2014a cautious HOLD is appropriate until clearer directional momentum emerges.",
+          "raw_response": "SIGNAL: HOLD  \nCONFIDENCE: 65%  \nREASONING: The price is trading slightly above the EMA(20), indicating a neutral to mildly bullish short-term trend. The RSI(7) at 53.61 is in neutral territory, showing no significant overbought or oversold conditions. However, the MACD is negative (-50.596), suggesting underlying bearish momentum that may limit upside potential. Given the conflicting signals\u2014modest price strength versus bearish MACD\u2014a cautious HOLD is appropriate until clearer directional momentum emerges."
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-29T07:40:31.893714",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "Price is trading very close to EMA(20) with only a 0.02% premium, indicating neutral momentum. RSI at 53.61 shows balanced conditions without overbought/oversold extremes. MACD remains negative at -50.596, suggesting underlying bearish momentum persists despite recent price stabilization. The convergence of price with EMA and neutral RSI creates a consolidation pattern where neither bulls nor bulls have clear dominance. Given the mixed signals and lack of strong directional bias, maintaining current positions while monitoring for a clearer breakout above EMA or MACD crossover is prudent.",
+          "raw_response": "SIGNAL: HOLD\nCONFIDENCE: 65%\nREASONING: Price is trading very close to EMA(20) with only a 0.02% premium, indicating neutral momentum. RSI at 53.61 shows balanced conditions without overbought/oversold extremes. MACD remains negative at -50.596, suggesting underlying bearish momentum persists despite recent price stabilization. The convergence of price with EMA and neutral RSI creates a consolidation pattern where neither bulls nor bulls have clear dominance. Given the mixed signals and lack of strong directional bias, maintaining current positions while monitoring for a clearer breakout above EMA or MACD crossover is prudent."
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-29T07:43:38.365550",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing neither overbought nor oversold conditions. Given the conflicting signals\u2014modest bullish price action versus bearish MACD\u2014and the absence of a strong directional trend, a HOLD position is prudent until clearer momentum emerges.",
+          "raw_response": "SIGNAL: HOLD  \nCONFIDENCE: 65%  \nREASONING: The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing neither overbought nor oversold conditions. Given the conflicting signals\u2014modest bullish price action versus bearish MACD\u2014and the absence of a strong directional trend, a HOLD position is prudent until clearer momentum emerges."
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-29T07:46:44.453219",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "Price is trading slightly above EMA(20) indicating mild bullish momentum, but RSI(7) at 53.61 is neutral and MACD remains negative at -50.596, suggesting underlying bearish pressure. The conflicting signals between price position and momentum indicators create uncertainty. Without clear directional conviction, maintaining current positions is prudent until either MACD shows signs of reversal or RSI moves decisively away from neutral territory.",
+          "raw_response": "SIGNAL: HOLD\nCONFIDENCE: 65%\nREASONING: Price is trading slightly above EMA(20) indicating mild bullish momentum, but RSI(7) at 53.61 is neutral and MACD remains negative at -50.596, suggesting underlying bearish pressure. The conflicting signals between price position and momentum indicators create uncertainty. Without clear directional conviction, maintaining current positions is prudent until either MACD shows signs of reversal or RSI moves decisively away from neutral territory."
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-29T07:49:51.872345",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "The price is trading slightly above the EMA(20), indicating a neutral to slightly bullish short-term trend. The RSI(7) at 53.61 is in neutral territory, showing no strong overbought or oversold conditions. However, the MACD is negative at -50.596, suggesting underlying bearish momentum that could limit upside potential. Given the mixed signals\u2014price above EMA but negative MACD\u2014and the absence of a clear directional bias, the prudent action is to hold and wait for stronger confirmation before entering a trade.",
+          "raw_response": "SIGNAL: HOLD  \nCONFIDENCE: 65%  \nREASONING: The price is trading slightly above the EMA(20), indicating a neutral to slightly bullish short-term trend. The RSI(7) at 53.61 is in neutral territory, showing no strong overbought or oversold conditions. However, the MACD is negative at -50.596, suggesting underlying bearish momentum that could limit upside potential. Given the mixed signals\u2014price above EMA but negative MACD\u2014and the absence of a clear directional bias, the prudent action is to hold and wait for stronger confirmation before entering a trade."
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-29T07:52:57.986350",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing no strong overbought or oversold conditions. Given conflicting signals\u2014modest bullish price action versus a negative MACD\u2014it's prudent to wait for clearer directional momentum before entering a position.",
+          "raw_response": "SIGNAL: HOLD  \nCONFIDENCE: 65%  \nREASONING: The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing no strong overbought or oversold conditions. Given conflicting signals\u2014modest bullish price action versus a negative MACD\u2014it's prudent to wait for clearer directional momentum before entering a position."
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-29T07:56:03.916288",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "Price is trading slightly above EMA(20) indicating mild bullish momentum, but RSI at 53.61 is neutral and MACD remains negative at -50.596 suggesting underlying bearish pressure. The conflicting signals between price position and momentum indicators create uncertainty. With no clear directional bias and mixed technical readings, maintaining current position is prudent until clearer momentum emerges.",
+          "raw_response": "SIGNAL: HOLD\nCONFIDENCE: 65%\nREASONING: Price is trading slightly above EMA(20) indicating mild bullish momentum, but RSI at 53.61 is neutral and MACD remains negative at -50.596 suggesting underlying bearish pressure. The conflicting signals between price position and momentum indicators create uncertainty. With no clear directional bias and mixed technical readings, maintaining current position is prudent until clearer momentum emerges."
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-29T07:59:10.323785",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing neither overbought nor oversold conditions. Given the conflicting signals\u2014modest bullish price action versus bearish MACD\u2014and the absence of a strong directional trend, a HOLD position is prudent until clearer momentum emerges.",
+          "raw_response": "SIGNAL: HOLD  \nCONFIDENCE: 65%  \nREASONING: The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing neither overbought nor oversold conditions. Given the conflicting signals\u2014modest bullish price action versus bearish MACD\u2014and the absence of a strong directional trend, a HOLD position is prudent until clearer momentum emerges."
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 60,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-29T08:02:16.783798",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 60,
+          "reasoning": "The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing no strong overbought or oversold conditions. Given the mixed signals\u2014modest bullish price action versus bearish MACD\u2014and the absence of a clear directional trend, a hold position is prudent until a stronger signal emerges.",
+          "raw_response": "SIGNAL: HOLD  \nCONFIDENCE: 60%  \nREASONING: The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing no strong overbought or oversold conditions. Given the mixed signals\u2014modest bullish price action versus bearish MACD\u2014and the absence of a clear directional trend, a hold position is prudent until a stronger signal emerges."
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-29T08:05:22.960040",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing no strong overbought or oversold conditions. Given the conflicting signals\u2014modest bullish price action versus bearish MACD\u2014and the absence of a clear directional trend, the best course is to hold and wait for stronger confirmation before entering a trade.",
+          "raw_response": "SIGNAL: HOLD  \nCONFIDENCE: 65%  \nREASONING: The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing no strong overbought or oversold conditions. Given the conflicting signals\u2014modest bullish price action versus bearish MACD\u2014and the absence of a clear directional trend, the best course is to hold and wait for stronger confirmation before entering a trade."
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-29T08:08:30.670615",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "Price is trading slightly above EMA(20) by approximately $26, indicating minimal bullish momentum. RSI at 53.61 is neutral, showing neither overbought nor oversold conditions. MACD remains negative at -50.596, suggesting underlying bearish pressure despite the slight price premium. The conflicting signals between price position and MACD, combined with neutral RSI, create an unclear short-term direction. Risk-reward appears balanced at current levels, warranting a hold position until clearer momentum emerges.",
+          "raw_response": "SIGNAL: HOLD\nCONFIDENCE: 65%\nREASONING: Price is trading slightly above EMA(20) by approximately $26, indicating minimal bullish momentum. RSI at 53.61 is neutral, showing neither overbought nor oversold conditions. MACD remains negative at -50.596, suggesting underlying bearish pressure despite the slight price premium. The conflicting signals between price position and MACD, combined with neutral RSI, create an unclear short-term direction. Risk-reward appears balanced at current levels, warranting a hold position until clearer momentum emerges."
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-29T08:11:38.781411",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing neither overbought nor oversold conditions. Given the conflicting signals\u2014modest bullish price action versus a negative MACD\u2014there is insufficient conviction for a directional trade. A HOLD is appropriate until clearer momentum emerges, such as a MACD crossover or a decisive RSI move.",
+          "raw_response": "SIGNAL: HOLD  \nCONFIDENCE: 65%  \nREASONING: The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing neither overbought nor oversold conditions. Given the conflicting signals\u2014modest bullish price action versus a negative MACD\u2014there is insufficient conviction for a directional trade. A HOLD is appropriate until clearer momentum emerges, such as a MACD crossover or a decisive RSI move."
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-29T08:14:45.666983",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing neither overbought nor oversold conditions. Given the mixed signals\u2014modest bullish price action versus a negative MACD\u2014there is insufficient conviction for a directional trade. Await clearer momentum or a MACD crossover for a higher-confidence signal.",
+          "raw_response": "SIGNAL: HOLD  \nCONFIDENCE: 65%  \nREASONING: The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing neither overbought nor oversold conditions. Given the mixed signals\u2014modest bullish price action versus a negative MACD\u2014there is insufficient conviction for a directional trade. Await clearer momentum or a MACD crossover for a higher-confidence signal."
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 60,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-29T08:17:52.832727",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 60,
+          "reasoning": "The price is trading slightly above the EMA(20), indicating a neutral to slightly bullish short-term trend. The RSI(7) at 53.61 is in a balanced zone, showing neither overbought nor oversold conditions. However, the MACD is negative at -50.596, suggesting underlying bearish momentum. Given the conflicting signals\u2014modest bullish price action versus bearish MACD\u2014and the absence of a strong directional bias, the prudent approach is to hold and wait for clearer momentum or a breakout above key resistance levels.",
+          "raw_response": "SIGNAL: HOLD  \nCONFIDENCE: 60%  \nREASONING: The price is trading slightly above the EMA(20), indicating a neutral to slightly bullish short-term trend. The RSI(7) at 53.61 is in a balanced zone, showing neither overbought nor oversold conditions. However, the MACD is negative at -50.596, suggesting underlying bearish momentum. Given the conflicting signals\u2014modest bullish price action versus bearish MACD\u2014and the absence of a strong directional bias, the prudent approach is to hold and wait for clearer momentum or a breakout above key resistance levels."
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 60,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-29T08:20:59.286029",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 60,
+          "reasoning": "The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing no strong overbought or oversold conditions. Given the conflicting signals\u2014modest bullish price action versus bearish MACD\u2014and the absence of a clear directional trend, the best course is to wait for stronger confirmation before entering a position.",
+          "raw_response": "SIGNAL: HOLD  \nCONFIDENCE: 60%  \nREASONING: The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing no strong overbought or oversold conditions. Given the conflicting signals\u2014modest bullish price action versus bearish MACD\u2014and the absence of a clear directional trend, the best course is to wait for stronger confirmation before entering a position."
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-29T08:24:06.656626",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "The price is trading slightly above the EMA(20), indicating a neutral to slightly bullish short-term trend. The RSI(7) at 53.61 is in neutral territory, showing no significant overbought or oversold conditions. However, the MACD is negative at -50.596, suggesting underlying bearish momentum despite the price holding above the EMA. Given the conflicting signals\u2014price above EMA but negative MACD\u2014and the absence of strong directional momentum, the prudent action is to hold and wait for clearer confirmation from either a MACD reversal or a decisive price move relative to the EMA.",
+          "raw_response": "SIGNAL: HOLD  \nCONFIDENCE: 65%  \nREASONING: The price is trading slightly above the EMA(20), indicating a neutral to slightly bullish short-term trend. The RSI(7) at 53.61 is in neutral territory, showing no significant overbought or oversold conditions. However, the MACD is negative at -50.596, suggesting underlying bearish momentum despite the price holding above the EMA. Given the conflicting signals\u2014price above EMA but negative MACD\u2014and the absence of strong directional momentum, the prudent action is to hold and wait for clearer confirmation from either a MACD reversal or a decisive price move relative to the EMA."
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 60,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-29T08:27:14.041151",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 60,
+          "reasoning": "The price is trading slightly above the EMA(20), indicating a neutral to slightly bullish short-term trend. The RSI(7) at 53.61 is in neutral territory, showing no strong overbought or oversold conditions. The MACD is negative (-50.596), suggesting some underlying bearish momentum, but the divergence is not extreme. Given the mixed signals\u2014modest bullish price action relative to the EMA, neutral RSI, and bearish MACD\u2014there is insufficient conviction for a directional trade. A HOLD position is prudent until clearer momentum emerges.",
+          "raw_response": "SIGNAL: HOLD  \nCONFIDENCE: 60%  \nREASONING: The price is trading slightly above the EMA(20), indicating a neutral to slightly bullish short-term trend. The RSI(7) at 53.61 is in neutral territory, showing no strong overbought or oversold conditions. The MACD is negative (-50.596), suggesting some underlying bearish momentum, but the divergence is not extreme. Given the mixed signals\u2014modest bullish price action relative to the EMA, neutral RSI, and bearish MACD\u2014there is insufficient conviction for a directional trade. A HOLD position is prudent until clearer momentum emerges."
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-29T08:30:21.377913",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing neither overbought nor oversold conditions. With conflicting signals between the EMA and MACD, and no strong directional bias from RSI, the market appears to be in a consolidation phase. A HOLD signal is appropriate until clearer momentum emerges.",
+          "raw_response": "SIGNAL: HOLD  \nCONFIDENCE: 65%  \nREASONING: The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing neither overbought nor oversold conditions. With conflicting signals between the EMA and MACD, and no strong directional bias from RSI, the market appears to be in a consolidation phase. A HOLD signal is appropriate until clearer momentum emerges."
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-29T08:33:28.042376",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing neither overbought nor oversold conditions. Given the conflicting signals\u2014modest bullish price action versus bearish MACD\u2014and the absence of a strong directional trend, the prudent approach is to wait for clearer momentum before entering a position.",
+          "raw_response": "SIGNAL: HOLD  \nCONFIDENCE: 65%  \nREASONING: The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing neither overbought nor oversold conditions. Given the conflicting signals\u2014modest bullish price action versus bearish MACD\u2014and the absence of a strong directional trend, the prudent approach is to wait for clearer momentum before entering a position."
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-29T08:36:35.123850",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "The price is trading slightly above the EMA(20), indicating a neutral to mildly bullish bias, but the MACD remains negative at -50.596, suggesting underlying bearish momentum. The RSI(7) at 53.61 is neutral, showing no strong overbought or oversold conditions. Given conflicting signals\u2014price above EMA but negative MACD\u2014and the absence of a clear trend, the prudent action is to hold and wait for stronger directional confirmation.",
+          "raw_response": "SIGNAL: HOLD  \nCONFIDENCE: 65%  \nREASONING: The price is trading slightly above the EMA(20), indicating a neutral to mildly bullish bias, but the MACD remains negative at -50.596, suggesting underlying bearish momentum. The RSI(7) at 53.61 is neutral, showing no strong overbought or oversold conditions. Given conflicting signals\u2014price above EMA but negative MACD\u2014and the absence of a clear trend, the prudent action is to hold and wait for stronger directional confirmation."
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-29T08:39:42.385589",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing neither overbought nor oversold conditions. Given the conflicting signals\u2014modest bullish price action versus a negative MACD\u2014and the absence of a strong directional trend, the prudent approach is to wait for clearer momentum before entering a position.",
+          "raw_response": "SIGNAL: HOLD  \nCONFIDENCE: 65%  \nREASONING: The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing neither overbought nor oversold conditions. Given the conflicting signals\u2014modest bullish price action versus a negative MACD\u2014and the absence of a strong directional trend, the prudent approach is to wait for clearer momentum before entering a position."
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-29T08:42:49.464386",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "Price is trading slightly above EMA(20) by approximately $26, indicating minimal bullish momentum. RSI at 53.61 is neutral, showing neither overbought nor oversold conditions. MACD remains negative at -50.596, suggesting underlying bearish pressure despite the slight price premium. The convergence of neutral RSI, negative MACD, and minimal EMA deviation creates a mixed signal with no clear directional bias. Given the conflicting indicators and absence of strong momentum, maintaining current positions is prudent until clearer trend signals emerge.",
+          "raw_response": "SIGNAL: HOLD\nCONFIDENCE: 65%\nREASONING: Price is trading slightly above EMA(20) by approximately $26, indicating minimal bullish momentum. RSI at 53.61 is neutral, showing neither overbought nor oversold conditions. MACD remains negative at -50.596, suggesting underlying bearish pressure despite the slight price premium. The convergence of neutral RSI, negative MACD, and minimal EMA deviation creates a mixed signal with no clear directional bias. Given the conflicting indicators and absence of strong momentum, maintaining current positions is prudent until clearer trend signals emerge."
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-29T08:45:56.119129",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing no strong overbought or oversold conditions. Given the mixed signals\u2014modest bullish price action versus bearish MACD\u2014and the absence of a clear trend, a hold position is prudent until stronger directional momentum emerges.",
+          "raw_response": "SIGNAL: HOLD  \nCONFIDENCE: 65%  \nREASONING: The price is trading slightly above the EMA(20), indicating mild bullish momentum, but the MACD remains negative at -50.596, suggesting underlying bearish pressure. The RSI(7) at 53.61 is neutral, showing no strong overbought or oversold conditions. Given the mixed signals\u2014modest bullish price action versus bearish MACD\u2014and the absence of a clear trend, a hold position is prudent until stronger directional momentum emerges."
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+STRATEGY_NAME: DivergenceCatalyst
+
+STRATEGY_DETAILS:
+This strategy combines RSI divergence patterns with MACD confirmation signals on Bitcoin's daily timeframe to identify high-probability reversal opportunities.
+
+KEY COMPONENTS:
+1. RSI (Relative Strength Index) - Set to 14 periods
+2. MACD (Moving Average Convergence Divergence) - Standard settings (12,26,9)
+3. Price action analysis for divergence detection
+4. Daily timeframe for reliable signals
+
+ENTRY RULES:
+LONG ENTRY:
+- RSI shows BULLISH DIVERGENCE (price makes lower low, RSI makes higher low)
+- MACD histogram shows upward momentum (rising bars above zero line)
+- MACD line crosses above signal line OR shows bullish crossover confirmation
+- Enter on next candle open after all conditions are met
+
+SHORT ENTRY:
+- RSI shows BEARISH DIVERGENCE (price makes higher high, RSI makes lower high)
+- MACD histogram shows downward momentum (falling bars below zero line)
+- MACD line crosses below signal line OR shows bearish crossover confirmation
+- Enter on next candle open after all conditions are met
+
+EXIT RULES:
+- Take Profit: 2:1 risk-reward ratio minimum
+- Stop Loss: Place below recent swing low (long) or above recent swing high (short)
+- Alternative Exit: When MACD shows opposite signal (crossover against position)
+- Time-based Exit: Consider exiting after 7-10 days if target not reached
+
+RISK MANAGEMENT:
+- Maximum risk per trade: 1-2% of capital
+- Position sizing based on stop loss distance
+- No new entries if 3 consecutive losing trades
+- Wait for clear, well-defined divergence patterns only
+- Avoid trading during major news events or extreme volatility
+
+REQUIRED INDICATORS:
+- RSI (14 periods) - for divergence detection
+- MACD (12,26,9) - for momentum confirmation
+- Price chart with visible swing highs/lows
+
+ADDITIONAL NOTES:
+- Divergence must be clear and significant (not minor wiggles)
+- Multiple timeframe confirmation (check 4H for additional context) recommended
+- Volume confirmation adds extra reliability to signals
+- Strategy works best in ranging or transitioning markets, less effective in strong trends
+- Backtest thoroughly on historical BTC data before live implementation

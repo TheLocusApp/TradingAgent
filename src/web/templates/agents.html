@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Agents - Moon Dev</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='modern-style.css') }}">
+</head>
+<body>
+    <!-- Top Navigation -->
+    <div class="top-nav">
+        <div class="nav-links">
+            <a href="/">LIVE</a>
+            <a href="/strategy-analyzer">ANALYZER</a>
+            <a href="/rbi">RBI LAB</a>
+            <a href="/agents" class="active">AGENTS</a>
+            <button class="settings-btn" onclick="window.location.href='/'">
+                <i class="fas fa-cog"></i> Settings
+            </button>
+        </div>
+    </div>
+    
+    <div class="container">
+        <!-- Header -->
+        <div style="margin: 40px 0 30px 0;">
+            <h1 style="font-size: 32px; font-weight: 700; color: #fff; margin-bottom: 12px;">
+                <i class="fas fa-robot"></i> AI Agents
+            </h1>
+            <p style="color: #9ca3af; font-size: 16px;">
+                Explore and manage all available AI trading and analysis agents
+            </p>
+        </div>
+        
+        <!-- Agents Grid -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 24px;">
+            
+            <!-- Trading Agent -->
+            <div class="chart-section">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
+                    <div>
+                        <h3 style="font-size: 18px; font-weight: 600; color: #fff; margin-bottom: 8px;">
+                            <i class="fas fa-chart-line" style="color: #6366f1;"></i> Universal Trading Agent
+                        </h3>
+                        <span style="background: rgba(34, 197, 94, 0.15); color: #22c55e; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">ACTIVE</span>
+                    </div>
+                </div>
+                <p style="color: #9ca3af; font-size: 14px; line-height: 1.6; margin-bottom: 16px;">
+                    Multi-model AI trading agent supporting stocks and crypto. Real-time decision making with configurable timeframes and risk management.
+                </p>
+                <div style="display: flex; gap: 12px;">
+                    <button onclick="window.location.href='/'" style="flex: 1; background: #6366f1; color: #fff; padding: 10px; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;">
+                        <i class="fas fa-play"></i> Open Dashboard
+                    </button>
+                </div>
+            </div>
+            
+            <!-- RBI Agent -->
+            <div class="chart-section">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
+                    <div>
+                        <h3 style="font-size: 18px; font-weight: 600; color: #fff; margin-bottom: 8px;">
+                            <i class="fas fa-flask" style="color: #8b5cf6;"></i> RBI Agent
+                        </h3>
+                        <span style="background: rgba(34, 197, 94, 0.15); color: #22c55e; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">ACTIVE</span>
+                    </div>
+                </div>
+                <p style="color: #9ca3af; font-size: 14px; line-height: 1.6; margin-bottom: 16px;">
+                    Research-Backtest-Iterate workflow. Analyzes trading ideas, generates backtest code, and optimizes strategies automatically.
+                </p>
+                <div style="display: flex; gap: 12px;">
+                    <button onclick="window.location.href='/rbi'" style="flex: 1; background: #8b5cf6; color: #fff; padding: 10px; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;">
+                        <i class="fas fa-flask"></i> Open Lab
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Sentiment Agent -->
+            <div class="chart-section">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
+                    <div>
+                        <h3 style="font-size: 18px; font-weight: 600; color: #fff; margin-bottom: 8px;">
+                            <i class="fab fa-twitter" style="color: #1da1f2;"></i> Sentiment Agent
+                        </h3>
+                        <span style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">COMING SOON</span>
+                    </div>
+                </div>
+                <p style="color: #9ca3af; font-size: 14px; line-height: 1.6; margin-bottom: 16px;">
+                    Monitors Twitter sentiment for crypto tokens using HuggingFace models. Tracks mentions and sentiment scores over time.
+                </p>
+                <div style="display: flex; gap: 12px;">
+                    <button disabled style="flex: 1; background: #1f1f2e; color: #6b7280; padding: 10px; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: not-allowed;">
+                        <i class="fas fa-lock"></i> Coming Soon
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Polymarket Agent -->
+            <div class="chart-section">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
+                    <div>
+                        <h3 style="font-size: 18px; font-weight: 600; color: #fff; margin-bottom: 8px;">
+                            <i class="fas fa-poll" style="color: #10b981;"></i> Polymarket Agent
+                        </h3>
+                        <span style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">COMING SOON</span>
+                    </div>
+                </div>
+                <p style="color: #9ca3af; font-size: 14px; line-height: 1.6; margin-bottom: 16px;">
+                    Scans Polymarket prediction markets and uses AI to make predictions. Tracks market trends and analyzes outcomes.
+                </p>
+                <div style="display: flex; gap: 12px;">
+                    <button disabled style="flex: 1; background: #1f1f2e; color: #6b7280; padding: 10px; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: not-allowed;">
+                        <i class="fas fa-lock"></i> Coming Soon
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Risk Agent -->
+            <div class="chart-section">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
+                    <div>
+                        <h3 style="font-size: 18px; font-weight: 600; color: #fff; margin-bottom: 8px;">
+                            <i class="fas fa-shield-alt" style="color: #ef4444;"></i> Risk Agent
+                        </h3>
+                        <span style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">COMING SOON</span>
+                    </div>
+                </div>
+                <p style="color: #9ca3af; font-size: 14px; line-height: 1.6; margin-bottom: 16px;">
+                    Portfolio risk analysis and management. Calculates position sizing, drawdown limits, and risk-adjusted returns.
+                </p>
+                <div style="display: flex; gap: 12px;">
+                    <button disabled style="flex: 1; background: #1f1f2e; color: #6b7280; padding: 10px; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: not-allowed;">
+                        <i class="fas fa-lock"></i> Coming Soon
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Research Agent -->
+            <div class="chart-section">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
+                    <div>
+                        <h3 style="font-size: 18px; font-weight: 600; color: #fff; margin-bottom: 8px;">
+                            <i class="fas fa-search" style="color: #f59e0b;"></i> Research Agent
+                        </h3>
+                        <span style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">COMING SOON</span>
+                    </div>
+                </div>
+                <p style="color: #9ca3af; font-size: 14px; line-height: 1.6; margin-bottom: 16px;">
+                    Automated market research and analysis. Gathers data from multiple sources and generates comprehensive reports.
+                </p>
+                <div style="display: flex; gap: 12px;">
+                    <button disabled style="flex: 1; background: #1f1f2e; color: #6b7280; padding: 10px; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: not-allowed;">
+                        <i class="fas fa-lock"></i> Coming Soon
+                    </button>
+                </div>
+            </div>
+            
+        </div>
+        
+        <!-- Info Section -->
+        <div style="margin-top: 40px; padding: 24px; background: #12121a; border: 1px solid #1f1f2e; border-radius: 12px;">
+            <h3 style="color: #fff; font-size: 18px; margin-bottom: 16px;">
+                <i class="fas fa-info-circle"></i> About AI Agents
+            </h3>
+            <div style="color: #9ca3af; line-height: 1.8; font-size: 14px;">
+                <p style="margin-bottom: 12px;">
+                    Moon Dev's AI Agents are specialized tools designed to automate different aspects of trading and market analysis. Each agent uses advanced AI models to perform specific tasks.
+                </p>
+                <p style="margin-bottom: 12px;">
+                    <strong>Active Agents</strong> are fully functional and ready to use. <strong>Coming Soon</strong> agents are in development and will be available in future updates.
+                </p>
+                <p style="color: #6b7280; font-size: 12px; margin-top: 16px;">
+                    <i class="fas fa-code"></i> All agents are located in: <code>src/agents/</code>
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

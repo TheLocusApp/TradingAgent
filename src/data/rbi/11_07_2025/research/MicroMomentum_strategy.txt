@@ -1,0 +1,51 @@
+STRATEGY_NAME: MicroMomentum
+
+STRATEGY_DETAILS:
+This is a high-frequency intraday strategy specifically designed for 0DTE (zero days to expiration) options trading on QQQ, utilizing ultra-short-term exponential moving averages to capture micro-momentum moves.
+
+KEY STRATEGY COMPONENTS:
+- Primary Instrument: QQQ (Nasdaq 100 ETF)
+- Timeframe: 2-minute charts exclusively
+- Trading Window: Market hours only (9:30 AM - 4:00 PM EST)
+- Instrument Focus: 0DTE options only (expiring same day)
+- Core Indicator: 2-period Exponential Moving Average (EMA)
+
+ENTRY RULES:
+LONG ENTRY:
+1. Price must cross ABOVE the 2m EMA
+2. Wait for confirmation candle to close above the EMA
+3. Entry on next candle open
+4. Only trade during active market hours (avoid first/last 30 minutes)
+
+SHORT ENTRY:
+1. Price must cross BELOW the 2m EMA
+2. Wait for confirmation candle to close below the EMA
+3. Entry on next candle open
+4. Only trade during active market hours
+
+EXIT RULES:
+- Exit when price crosses back through the 2m EMA in opposite direction
+- Wait for confirmation candle close through the EMA
+- Exit on next candle open
+- Mandatory exit by 3:45 PM EST regardless of position
+
+RISK MANAGEMENT:
+- Position sizing: Maximum 2% of account per trade
+- Stop loss: 0.5% below entry price for longs, 0.5% above for shorts
+- Maximum 3 concurrent positions
+- No trading during major economic announcements
+- Daily loss limit: 5% of account value
+
+REQUIRED INDICATORS:
+- 2-period Exponential Moving Average (EMA) - primary signal
+- Volume confirmation (optional but recommended)
+- No additional indicators to maintain strategy purity
+
+SPECIAL CONSIDERATIONS:
+- This strategy requires constant monitoring due to 2m timeframe
+- 0DTE options are extremely time-sensitive - avoid holding through midday lulls
+- Focus on high-volatility periods (10AM-2PM EST typically best)
+- Be prepared for rapid position changes - this is a scalping strategy
+- Consider using bracket orders for automated entry/exit execution
+
+The strategy capitalizes on the high sensitivity of the 2m EMA to capture quick momentum shifts in QQQ, leveraging the amplified moves of 0DTE options while minimizing overnight risk through same-day expiration.

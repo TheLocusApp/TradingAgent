@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moon Dev - AI Trading</title>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='modern-style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+</head>
+<body>
+    <!-- Top Navigation -->
+    <div class="top-nav">
+        <div class="nav-links">
+            <a href="/" class="active">LIVE TRADING</a>
+            <a href="/screener">SCREENER</a>
+            <a href="/portfolio">PORTFOLIO</a>
+            <a href="/strategy-lab">STRATEGY LAB</a>
+        </div>
+    </div>
+    
+    <!-- Ticker Bar -->
+    <div class="container">
+        <div class="ticker-bar">
+            <div class="ticker-item">
+                <span class="ticker-symbol">🪙 BTC</span>
+                <span class="ticker-price" id="btc-price">$0</span>
+                <span class="ticker-change" id="btc-change">+0%</span>
+            </div>
+            <div class="ticker-item">
+                <span class="ticker-symbol">📊 QQQ</span>
+                <span class="ticker-price" id="qqq-price">$0</span>
+                <span class="ticker-change" id="qqq-change">+0%</span>
+            </div>
+            <div class="ticker-item">
+                <span class="ticker-symbol">📈 SPY</span>
+                <span class="ticker-price" id="spy-price">$0</span>
+                <span class="ticker-change" id="spy-change">+0%</span>
+            </div>
+        </div>
+        
+        <!-- Main Grid -->
+        <div class="main-grid">
+            <!-- Chart Section -->
+            <div class="chart-section">
+                <div class="chart-header">
+                    <div class="chart-title">TOTAL ACCOUNT VALUE</div>
+                </div>
+                <div id="accountChart" style="height: 400px;"></div>
+                
+                <!-- Metrics Grid -->
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-label">Total PnL</div>
+                        <div class="metric-value" id="total-pnl">$0.00</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Win Rate</div>
+                        <div class="metric-value" id="win-rate">0%</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Total Trades</div>
+                        <div class="metric-value" id="total-trades">0</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Win/Loss Ratio</div>
+                        <div class="metric-value" id="win-loss-ratio">0.00</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Max Drawdown</div>
+                        <div class="metric-value negative" id="max-drawdown">0%</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Sharpe Ratio</div>
+                        <div class="metric-value" id="sharpe-ratio">0.00</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Sortino Ratio</div>
+                        <div class="metric-value" id="sortino-ratio">0.00</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Sidebar -->
+            <div>
+                <!-- Agent Status Card -->
+                <div class="status-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <div class="status-badge" id="status-badge">STOPPED</div>
+                        <div style="font-size: 12px;" id="session-info">No session</div>
+                    </div>
+                    <div style="font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 8px;" id="agent-name">Agent 1</div>
+                    <div style="font-size: 12px; color: #9ca3af; margin-bottom: 16px;" id="agent-strategy">No strategy loaded</div>
+                    <div style="display: flex; gap: 12px;">
+                        <button class="btn btn-primary" id="startBtn" onclick="startAgent()">
+                            <i class="fas fa-play"></i> Start
+                        </button>
+                        <button class="btn btn-secondary" id="stopBtn" onclick="stopAgent()" disabled>
+                            <i class="fas fa-stop"></i> Stop
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Account, Portfolio, Performance -->
+                <div style="margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
+                    <!-- Account -->
+                    <div class="intel-widget-inline">
+                        <h4><i class="fas fa-wallet"></i> Account</h4>
+                        <div id="account-widget">
+                            <div class="metric">
+                                <span class="label">Balance:</span>
+                                <span class="value" id="balance-value">$10,000</span>
+                            </div>
+                            <div class="metric">
+                                <span class="label">Free:</span>
+                                <span class="value" id="free-capital-value">$10,000</span>
+                            </div>
+                            <div class="metric">
+                                <span class="label">Allocated:</span>
+                                <span class="value" id="allocated-capital-value">$0</span>
+                            </div>
+                            <div class="metric">
+                                <span class="label">Positions:</span>
+                                <span class="value" id="positions-count">0/3</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Portfolio -->
+                    <div class="intel-widget-inline">
+                        <h4><i class="fas fa-briefcase"></i> Portfolio</h4>
+                        <div id="portfolio-widget">
+                            <div style="text-align: center; color: #6b7280; padding: 12px 0; font-size: 12px;">
+                                No positions
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Performance -->
+                    <div class="intel-widget-inline">
+                        <h4><i class="fas fa-chart-line"></i> Performance</h4>
+                        <div id="performance-widget">
+                            <div class="metric">
+                                <span class="label">Total PnL:</span>
+                                <span class="value" id="total-pnl">$0.00</span>
+                            </div>
+                            <div class="metric">
+                                <span class="label">Win Rate:</span>
+                                <span class="value" id="win-rate-value">0%</span>
+                            </div>
+                            <div class="metric">
+                                <span class="label">Sharpe:</span>
+                                <span class="value" id="sharpe-value">0.00</span>
+                            </div>
+                            <div class="metric">
+                                <span class="label">Max DD:</span>
+                                <span class="value negative" id="max-dd-value">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Live Decisions Feed -->
+                <div class="trades-feed" style="margin-top: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <div style="font-size: 16px; font-weight: 600; color: #fff;">Live Decisions</div>
+                        <div style="background: #1f1f2e; padding: 6px 12px; border-radius: 6px; font-size: 12px; color: #9ca3af;">Last 10</div>
+                    </div>
+                    <div id="decisions-feed">
+                        <div style="text-align: center; color: #6b7280; padding: 40px 0;">
+                            <i class="fas fa-robot" style="font-size: 32px; margin-bottom: 12px;"></i>
+                            <div>No decisions yet</div>
+                            <div style="font-size: 12px; margin-top: 8px;">Start the agent to see live trading decisions</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Leaderboard Section -->
+        <div class="chart-section" style="margin-top: 24px;">
+            <h2 style="font-size: 20px; font-weight: 600; color: #fff; margin-bottom: 20px;">
+                <i class="fas fa-trophy"></i> Model Leaderboard
+            </h2>
+            <div id="leaderboard" style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="border-bottom: 1px solid #1f1f2e;">
+                            <th style="text-align: left; padding: 12px; color: #9ca3af; font-size: 13px; font-weight: 600;">Rank</th>
+                            <th style="text-align: left; padding: 12px; color: #9ca3af; font-size: 13px; font-weight: 600;">Model</th>
+                            <th style="text-align: right; padding: 12px; color: #9ca3af; font-size: 13px; font-weight: 600;">PnL</th>
+                            <th style="text-align: right; padding: 12px; color: #9ca3af; font-size: 13px; font-weight: 600;">Win Rate</th>
+                            <th style="text-align: right; padding: 12px; color: #9ca3af; font-size: 13px; font-weight: 600;">Trades</th>
+                            <th style="text-align: right; padding: 12px; color: #9ca3af; font-size: 13px; font-weight: 600;">Sharpe</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard-body">
+                        <tr>
+                            <td colspan="6" style="text-align: center; padding: 40px; color: #6b7280;">
+                                <i class="fas fa-trophy" style="font-size: 32px; margin-bottom: 12px; opacity: 0.5;"></i>
+                                <div>No model data yet</div>
+                                <div style="font-size: 12px; margin-top: 8px;">Start trading with multiple models to see rankings</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tweet Feed Modal -->
+    <div id="tweet-modal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 700px; max-height: 80vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 24px; border-bottom: 1px solid #1f1f2e;">
+                <h2 style="margin: 0; font-size: 20px; font-weight: 600; color: #fff;">
+                    <i class="fas fa-twitter" style="color: #1DA1F2;"></i> Social Feed
+                </h2>
+                <button onclick="closeTweetFeed()" style="background: none; border: none; color: #9ca3af; font-size: 24px; cursor: pointer;">&times;</button>
+            </div>
+            <div id="tweet-feed-content" style="padding: 24px;">
+                <div class="loading">Loading tweets...</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div style="font-size: 20px; font-weight: 700; color: #fff;">⚙️ Trading Settings</div>
+                <button style="background: none; border: none; color: #9ca3af; font-size: 24px; cursor: pointer;" onclick="closeSettings()">×</button>
+            </div>
+            <div style="padding: 24px;">
+                <!-- Model Settings -->
+                <div style="margin-bottom: 32px;">
+                    <div style="font-size: 16px; font-weight: 600; color: #fff; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #1f1f2e;">AI Models</div>
+                    <div class="form-group">
+                        <label class="form-label">Select Models</label>
+                        <select id="models" class="form-select" multiple></select>
+                        <div style="font-size: 12px; color: #6b7280; margin-top: 6px;">Choose one or more AI models</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Temperature</label>
+                        <input type="number" id="temperature" class="form-input" step="0.1" min="0" max="2" value="0.7">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Max Tokens</label>
+                        <input type="number" id="maxTokens" class="form-input" value="1024">
+                    </div>
+                </div>
+                
+                <!-- System Prompt -->
+                <div style="margin-bottom: 32px;">
+                    <div style="font-size: 16px; font-weight: 600; color: #fff; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #1f1f2e;">System Prompt</div>
+                    <div class="form-group">
+                        <label class="form-label">Custom System Prompt</label>
+                        <textarea id="systemPrompt" class="form-textarea" placeholder="Leave empty to use default prompt..."></textarea>
+                        <div style="font-size: 12px; color: #6b7280; margin-top: 6px;">Customize how the AI analyzes market data</div>
+                    </div>
+                </div>
+                
+                <!-- Trading Settings -->
+                <div style="margin-bottom: 32px;">
+                    <div style="font-size: 16px; font-weight: 600; color: #fff; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #1f1f2e;">Trading Configuration</div>
+                    <div class="form-group">
+                        <label class="form-label">Asset Type</label>
+                        <select id="assetType" class="form-select">
+                            <option value="crypto">Cryptocurrency</option>
+                            <option value="stock">Stock</option>
+                            <option value="options">Options (0DTE)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Ticker (type any symbol)</label>
+                        <select id="ticker" class="form-select" style="width: 100%;"></select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Timeframe</label>
+                        <select id="timeframe" class="form-select"></select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Cycle Interval (seconds)</label>
+                        <input type="number" id="cycleInterval" class="form-input" value="180">
+                    </div>
+                </div>
+                
+                <!-- Simulation -->
+                <div style="margin-bottom: 32px;">
+                    <div style="font-size: 16px; font-weight: 600; color: #fff; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #1f1f2e;">Simulation</div>
+                    <div class="form-group">
+                        <label class="form-label">Initial Balance</label>
+                        <input type="number" id="initialBalance" class="form-input" value="10000">
+                    </div>
+                </div>
+            </div>
+            <div style="padding: 24px; border-top: 1px solid #1f1f2e; display: flex; justify-content: flex-end; gap: 12px;">
+                <button style="background: #1f1f2e; color: #9ca3af; padding: 12px 24px; border: 1px solid #2d2d3d; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;" onclick="closeSettings()">Cancel</button>
+                <button style="background: #6366f1; color: #fff; padding: 12px 24px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;" onclick="saveSettings()">Save Configuration</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+    
+    <script>
+    // Market Intel Updates
+    let marketIntelInterval;
+    
+    function startMarketIntel() {
+        updateMarketIntel();
+        marketIntelInterval = setInterval(updateMarketIntel, 30000); // Update every 30 seconds
+    }
+    
+    function stopMarketIntel() {
+        if (marketIntelInterval) {
+            clearInterval(marketIntelInterval);
+        }
+    }
+    
+    async function updatePortfolioWidgets() {
+        try {
+            const statusRes = await fetch('/api/status');
+            const statusData = await statusRes.json();
+            
+            if (statusData.running) {
+                // Update Account widget
+                document.getElementById('balance-value').textContent = `$${statusData.current_balance.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                document.getElementById('free-capital-value').textContent = `$${statusData.free_capital.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                document.getElementById('allocated-capital-value').textContent = `$${statusData.allocated_capital.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                document.getElementById('positions-count').textContent = `${statusData.position_count}/${statusData.max_positions}`;
+                
+                // Update Performance widget
+                const pnlElement = document.getElementById('total-pnl');
+                const pnl = statusData.total_pnl || 0;
+                pnlElement.textContent = `${pnl >= 0 ? '+' : ''}$${pnl.toFixed(2)} (${statusData.total_pnl_pct.toFixed(2)}%)`;
+                pnlElement.className = pnl >= 0 ? 'value positive' : 'value negative';
+                
+                document.getElementById('win-rate-value').textContent = `${statusData.win_rate.toFixed(1)}%`;
+                document.getElementById('sharpe-value').textContent = statusData.sharpe_ratio.toFixed(2);
+                document.getElementById('max-dd-value').textContent = `${statusData.max_drawdown.toFixed(2)}%`;
+                
+                // Update agent name and strategy
+                if (statusData.config) {
+                    document.getElementById('agent-name').textContent = statusData.config.agent_name || 'Agent 1';
+                    document.getElementById('agent-strategy').textContent = statusData.config.agent_strategy || 'No strategy loaded';
+                }
+            }
+            
+            // Get portfolio details
+            const portfolioRes = await fetch('/api/portfolio');
+            const portfolioData = await portfolioRes.json();
+            
+            if (portfolioData && portfolioData.positions && Object.keys(portfolioData.positions).length > 0) {
+                let html = '';
+                for (const [asset, pos] of Object.entries(portfolioData.positions)) {
+                    const pnlClass = pos.pnl >= 0 ? 'positive' : 'negative';
+                    const pnlSign = pos.pnl >= 0 ? '+' : '';
+                    html += `
+                        <div class="metric">
+                            <span class="label">${asset}:</span>
+                            <span class="value ${pnlClass}">${pnlSign}${pos.pnl_pct.toFixed(2)}%</span>
+                        </div>
+                    `;
+                }
+                document.getElementById('portfolio-widget').innerHTML = html;
+            } else {
+                document.getElementById('portfolio-widget').innerHTML = '<div style="text-align: center; color: #6b7280; padding: 12px 0; font-size: 12px;">No positions</div>';
+            }
+            
+        } catch (e) {
+            console.error('Portfolio update error:', e);
+        }
+    }
+    
+    function updateLiquidationsWidget(data) {
+        const longsMil = (data.long_liquidations / 1000000).toFixed(2);
+        const shortsMil = (data.short_liquidations / 1000000).toFixed(2);
+        
+        let html = `
+            <div class="metric">
+                <span class="label">Longs:</span>
+                <span class="value">$${longsMil}M</span>
+            </div>
+            <div class="metric">
+                <span class="label">Shorts:</span>
+                <span class="value">$${shortsMil}M</span>
+            </div>
+            <div class="metric">
+                <span class="label">Change:</span>
+                <span class="value ${data.pct_change > 0 ? 'positive' : 'negative'}">
+                    ${data.pct_change > 0 ? '+' : ''}${data.pct_change.toFixed(1)}%
+                </span>
+            </div>
+        `;
+        
+        if (data.spike_detected) {
+            html += '<div class="alert">⚠️ Liquidation Spike Detected!</div>';
+        }
+        
+        if (!data.is_live) {
+            html += '<div style="font-size: 10px; color: #6b7280; margin-top: 6px; text-align: center;">Sample Data</div>';
+        }
+        
+        document.getElementById('liquidations-widget').innerHTML = html;
+    }
+    
+    function updateWhaleAlertsWidget(data) {
+        let html = '';
+        
+        if (data.alerts && data.alerts.length > 0) {
+            // Show last 3 alerts
+            data.alerts.slice(0, 3).forEach(alert => {
+                const changeColor = alert.change_pct > 0 ? 'positive' : 'negative';
+                const icon = alert.type === 'large_increase' ? '📈' : '📉';
+                
+                html += `
+                    <div style="background: #2d2d3d; padding: 8px; border-radius: 4px; margin-bottom: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                            <span style="font-weight: 600; color: #fff;">${icon} ${alert.symbol}</span>
+                            <span class="value ${changeColor}">${alert.change_pct > 0 ? '+' : ''}${alert.change_pct.toFixed(1)}%</span>
+                        </div>
+                        <div style="font-size: 11px; color: #9ca3af;">
+                            OI: $${(alert.oi / 1000000).toFixed(2)}M | ${alert.timeframe}
+                        </div>
+                    </div>
+                `;
+            });
+        } else {
+            html = '<div style="text-align: center; color: #6b7280; padding: 12px 0; font-size: 12px;">No whale activity detected</div>';
+        }
+        
+        if (!data.is_live) {
+            html += '<div style="font-size: 10px; color: #6b7280; margin-top: 6px; text-align: center;">Sample Data</div>';
+        }
+        
+        document.getElementById('whale-alerts-widget').innerHTML = html;
+    }
+    
+    function updateRiskWidget(data) {
+        const gradeClass = `risk-grade-${data.grade.toLowerCase()}`;
+        const asset = data.current_asset || 'BTC';
+        
+        let html = `
+            <div style="text-align: center; margin-bottom: 8px;">
+                <span style="background: #2d2d3d; padding: 4px 10px; border-radius: 4px; font-size: 11px; color: #9ca3af;">
+                    ${asset}
+                </span>
+            </div>
+            <div class="risk-grade-display">
+                <div class="risk-grade-circle ${gradeClass}">
+                    ${data.grade}
+                </div>
+            </div>
+            <div class="metric">
+                <span class="label">Position Size:</span>
+                <span class="value">${data.position_pct}%</span>
+            </div>
+            <div class="metric">
+                <span class="label">Stop Loss:</span>
+                <span class="value negative">${data.stop_loss}%</span>
+            </div>
+            <div class="metric">
+                <span class="label">Risk/Reward:</span>
+                <span class="value">1:${data.risk_reward}</span>
+            </div>
+        `;
+        
+        document.getElementById('risk-widget').innerHTML = html;
+    }
+    
+    function updateSentimentWidget(data) {
+        let html = '';
+        
+        // Display sentiment for each asset (BTC, ETH, SPY, QQQ)
+        const assets = ['BTC', 'ETH', 'SPY', 'QQQ'];
+        assets.forEach(asset => {
+            const sentiment = data[asset];
+            if (sentiment) {
+                html += `
+                    <div class="metric">
+                        <span class="label">${asset}:</span>
+                        <span class="value" style="color: ${sentiment.color};">
+                            ${sentiment.emoji} ${sentiment.label}
+                        </span>
+                    </div>
+                `;
+            }
+        });
+        
+        if (!data.is_live) {
+            html += '<div style="font-size: 10px; color: #6b7280; margin-top: 6px; text-align: center;">Not Available</div>';
+        }
+        
+        // Add "View Tweets" button if data is live
+        if (data.is_live && data.has_tweets) {
+            html += `
+                <div style="margin-top: 12px; text-align: center;">
+                    <button onclick="showTweetFeed()" style="background: #6366f1; color: #fff; padding: 6px 12px; border: none; border-radius: 4px; font-size: 11px; cursor: pointer;">
+                        <i class="fas fa-twitter"></i> View Recent Tweets
+                    </button>
+                </div>
+            `;
+        }
+        
+        document.getElementById('sentiment-widget').innerHTML = html;
+    }
+    
+    function updateChartWidget(data) {
+        let html = '';
+        
+        if (data.chart_url) {
+            html = `
+                <div style="text-align: center;">
+                    <img src="${data.chart_url}" alt="Chart" style="width: 100%; border-radius: 4px; margin-bottom: 8px;">
+                    <div style="font-size: 11px; color: #9ca3af; margin-bottom: 8px;">
+                        ${data.symbol} | ${data.timeframe} | ${data.timestamp}
+                    </div>
+                </div>
+            `;
+            
+            if (data.ai_analysis) {
+                html += `
+                    <div style="background: #2d2d3d; padding: 10px; border-radius: 4px; font-size: 12px; color: #e5e7eb; line-height: 1.5;">
+                        <div style="font-weight: 600; margin-bottom: 6px; color: #fff;">
+                            <i class="fas fa-brain"></i> AI Analysis:
+                        </div>
+                        ${data.ai_analysis}
+                    </div>
+                `;
+            }
+            
+            if (data.patterns && data.patterns.length > 0) {
+                html += `
+                    <div style="margin-top: 8px; font-size: 11px;">
+                        <div style="font-weight: 600; color: #fff; margin-bottom: 4px;">Patterns Detected:</div>
+                        ${data.patterns.map(p => `<span style="background: #6366f1; color: #fff; padding: 2px 6px; border-radius: 3px; margin-right: 4px; display: inline-block; margin-bottom: 4px;">${p}</span>`).join('')}
+                    </div>
+                `;
+            }
+        } else {
+            html = '<div style="text-align: center; color: #6b7280; padding: 12px 0; font-size: 12px;">Chart generation in progress...</div>';
+        }
+        
+        document.getElementById('chart-analysis-widget').innerHTML = html;
+    }
+    
+    // Start portfolio updates on page load
+    let portfolioInterval;
+    
+    $(document).ready(function() {
+        updatePortfolioWidgets();
+        portfolioInterval = setInterval(updatePortfolioWidgets, 5000); // Update every 5 seconds
+    });
+    
+    // Stop on page unload
+    $(window).on('beforeunload', function() {
+        if (portfolioInterval) {
+            clearInterval(portfolioInterval);
+        }
+    });
+    
+    // Tweet Feed Functions
+    async function showTweetFeed() {
+        document.getElementById('tweet-modal').style.display = 'flex';
+        
+        try {
+            const statusRes = await fetch('/api/status');
+            const statusData = await statusRes.json();
+            let symbol = 'BTC';
+            if (statusData.config && statusData.config.ticker) {
+                symbol = statusData.config.ticker;
+            }
+            
+            const response = await fetch(`/api/social-feed?symbol=${symbol}`);
+            const data = await response.json();
+            
+            let html = '';
+            
+            if (data.tweets && data.tweets.length > 0) {
+                data.tweets.forEach(tweet => {
+                    const sentimentColor = tweet.sentiment > 0.2 ? '#22c55e' : tweet.sentiment < -0.2 ? '#ef4444' : '#eab308';
+                    const sentimentLabel = tweet.sentiment > 0.2 ? 'Bullish' : tweet.sentiment < -0.2 ? 'Bearish' : 'Neutral';
+                    
+                    html += `
+                        <div style="background: #1a1a24; border: 1px solid #2d2d3d; border-radius: 8px; padding: 16px; margin-bottom: 12px;">
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                                <div style="font-weight: 600; color: #fff;">@${tweet.author}</div>
+                                <div style="font-size: 11px; color: #9ca3af;">${tweet.timestamp}</div>
+                            </div>
+                            <div style="color: #e5e7eb; margin-bottom: 12px; line-height: 1.5;">${tweet.text}</div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div style="display: flex; gap: 16px; font-size: 12px; color: #9ca3af;">
+                                    <span><i class="fas fa-heart"></i> ${tweet.likes || 0}</span>
+                                    <span><i class="fas fa-retweet"></i> ${tweet.retweets || 0}</span>
+                                </div>
+                                <div style="background: ${sentimentColor}; color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">
+                                    ${sentimentLabel}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            } else {
+                html = '<div style="text-align: center; color: #6b7280; padding: 40px 0;">No recent tweets found</div>';
+            }
+            
+            document.getElementById('tweet-feed-content').innerHTML = html;
+        } catch (e) {
+            console.error('Tweet feed error:', e);
+            document.getElementById('tweet-feed-content').innerHTML = '<div style="text-align: center; color: #ef4444; padding: 40px 0;">Error loading tweets</div>';
+        }
+    }
+    
+    function closeTweetFeed() {
+        document.getElementById('tweet-modal').style.display = 'none';
+    }
+    </script>
+</body>
+</html>

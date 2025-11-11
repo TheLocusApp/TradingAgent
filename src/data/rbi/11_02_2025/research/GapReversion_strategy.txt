@@ -1,0 +1,40 @@
+STRATEGY_NAME: GapReversion
+
+STRATEGY_DETAILS:
+
+KEY STRATEGY COMPONENTS:
+This strategy focuses on identifying and trading price gaps in TSLA daily charts, operating on the principle that gaps tend to get filled over time. The strategy specifically targets TSLA's well-documented tendency for gap reversions, leveraging the stock's high volatility and frequent gap behavior.
+
+REQUIRED INDICATORS:
+- Daily candlestick charts for TSLA
+- Volume confirmation
+- Gap size measurement (percentage or dollar amount)
+- Previous day's high/low levels
+
+ENTRY RULES:
+1. Identify a significant gap (minimum 2% gap from previous close)
+2. For gap-up openings: Enter SHORT when price shows rejection at resistance levels or when RSI exceeds 70
+3. For gap-down openings: Enter LONG when price shows support bounce or when RSI falls below 30
+4. Confirm with volume - higher than average volume validates the gap significance
+5. Entry should occur within the first 2 hours of trading to capture early gap fill momentum
+
+EXIT RULES:
+1. Primary target: Complete gap fill (price returns to previous day's closing level)
+2. Partial profit taking at 50% gap fill level
+3. Stop loss placement:
+   - For long positions: Below the gap-down low by 1-2%
+   - For short positions: Above the gap-up high by 1-2%
+4. Time-based exit: Close position if gap not filled within 3 trading days
+
+RISK MANAGEMENT:
+1. Position sizing: Maximum 2% of capital per trade
+2. Risk-reward ratio: Minimum 1:2 required
+3. Gap size filter: Only trade gaps larger than 2% but smaller than 10% (avoid extreme gaps)
+4. Market context: Avoid trading gap fills during major earnings announcements or significant news events
+5. Sector correlation: Monitor overall market and EV sector sentiment for confirmation
+
+SPECIAL CONSIDERATIONS FOR TSLA:
+- TSLA gaps often exhibit strong momentum - wait for confirmation before entering
+- Be aware of Elon Musk's Twitter activity and its potential impact on gap behavior
+- Monitor pre-market and after-hours trading levels for additional context
+- Consider TSLA's high beta nature when setting position sizes and stop losses

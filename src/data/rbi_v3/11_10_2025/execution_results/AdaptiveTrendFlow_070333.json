@@ -1,0 +1,8 @@
+{
+  "success": false,
+  "return_code": 1,
+  "stdout": "",
+  "stderr": "\nBacktest.run:   0%|          | 0/474 [00:00<?, ?bar/s]\n                                                      \nTraceback (most recent call last):\n  File \"C:\\Users\\ahmed\\CascadeProjects\\moon-dev-ai-agents\\src\\data\\rbi_v3\\11_10_2025\\backtests_optimized\\AdaptiveTrendFlow_OPT_v1.py\", line 193, in <module>\n    stats = bt.run()\n            ^^^^^^^^\n  File \"C:\\Users\\ahmed\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\backtesting\\backtesting.py\", line 1339, in run\n    strategy.next()\n  File \"C:\\Users\\ahmed\\CascadeProjects\\moon-dev-ai-agents\\src\\data\\rbi_v3\\11_10_2025\\backtests_optimized\\AdaptiveTrendFlow_OPT_v1.py\", line 131, in next\n    position_size = int(round(risk_amount / max_loss_per_share))\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nTypeError: type _Indicator doesn't define __round__ method\n",
+  "execution_time": 4.647564,
+  "timestamp": "2025-11-10T07:03:33.051005"
+}

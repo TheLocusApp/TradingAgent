@@ -1,0 +1,23 @@
+{
+  "holdings": [
+    {
+      "symbol": "AAPL",
+      "sector": "Technology",
+      "weight": 20.0,
+      "added_date": "2025-11-02T12:01:40.785601"
+    },
+    {
+      "symbol": "MSFT",
+      "sector": "Technology",
+      "weight": 10.0,
+      "added_date": "2025-11-02T12:02:09.020317"
+    },
+    {
+      "symbol": "UNH",
+      "sector": "Healthcare",
+      "weight": 5.0,
+      "added_date": "2025-11-02T12:02:10.868371"
+    }
+  ],
+  "last_updated": "2025-11-02T14:40:03.783398"
+}

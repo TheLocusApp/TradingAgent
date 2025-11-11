@@ -1,0 +1,144 @@
+{
+  "session_id": "20251030_103025",
+  "config": {
+    "models": [
+      "deepseek"
+    ],
+    "model_temperature": 0.7,
+    "model_max_tokens": 1024,
+    "system_prompt": "",
+    "asset_type": "crypto",
+    "ticker": "BTC",
+    "timeframe": "1m",
+    "cycle_interval": 180,
+    "use_simulation": true,
+    "initial_balance": 10000,
+    "position_size_percentage": 0.9,
+    "save_decisions": true,
+    "decisions_dir": "src/data/trading_decisions",
+    "use_live_data": false
+  },
+  "session_start": "2025-10-30T10:30:25.312841",
+  "decisions_count": 7,
+  "decisions": [
+    {
+      "signal": "SELL",
+      "confidence": 78,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-30T10:30:48.688659",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "SELL",
+          "confidence": 78,
+          "reasoning": "The current RSI(7) at 97.22 indicates extreme overbought conditions on the 1m timeframe, suggesting an imminent pullback. While price has been trending upward in the short term (current price $110,076 above EMA20 $110,062), the MACD remains negative at -36.351 despite improving from deeper negatives. The 4h timeframe shows bearish momentum with MACD declining from 744 to -502 and RSI(14) at 30.6, indicating underlying weakness. The current price is approaching resistance near recent highs, and the extreme RSI reading on the 1m chart presents a high-probability mean reversion opportunity. Volume is significantly elevated versus average, which could indicate exhaustion near local tops.",
+          "raw_response": "SIGNAL: SELL\nCONFIDENCE: 78%\nREASONING: The current RSI(7) at 97.22 indicates extreme overbought conditions on the 1m timeframe, suggesting an imminent pullback. While price has been trending upward in the short term (current price $110,076 above EMA20 $110,062), the MACD remains negative at -36.351 despite improving from deeper negatives. The 4h timeframe shows bearish momentum with MACD declining from 744 to -502 and RSI(14) at 30.6, indicating underlying weakness. The current price is approaching resistance near recent highs, and the extreme RSI reading on the 1m chart presents a high-probability mean reversion opportunity. Volume is significantly elevated versus average, which could indicate exhaustion near local tops.",
+          "prompt": "It has been 0 minutes since you started trading. The current time is 2025-10-30 10:30:35.600720 and you've been invoked 1 times. Below, we are providing you with a variety of state data, price data, and predictive signals so you can discover alpha. Below that is your current account information, value, performance, positions, etc.\n\nALL OF THE PRICE OR SIGNAL DATA BELOW IS ORDERED: OLDEST \u2192 NEWEST\n\nTimeframes note: Unless stated otherwise in a section title, intraday series are provided at 1m intervals.\n\nCURRENT MARKET STATE FOR BTC\n\nALL BTC DATA\ncurrent_price = 110076.35, current_ema20 = 110062.13, current_macd = -36.351, current_rsi (7 period) = 97.22\n\nIntraday series (by 1m, oldest \u2192 latest):\nMid prices: [109939.922, 109964.844, 109968.078, 110001.625, 110032.234, 110045.172, 110044.953, 110069.281, 110066.312, 110076.352]\nEMA indicators (20\u2011period): [110095.401, 110082.967, 110072.026, 110065.321, 110062.170, 110060.551, 110059.065, 110060.038, 110060.636, 110062.133]\nMACD indicators: [-79.731, -80.334, -79.632, -75.499, -68.959, -62.017, -55.889, -48.510, -42.412, -36.351]\nRSI indicators (7\u2011Period): [19.260, 26.974, 31.477, 39.467, 47.852, 53.359, 99.862, 99.831, 97.044, 97.220]\nRSI indicators (14\u2011Period): [36.574, 41.567, 44.780, 50.667, 47.507, 35.984, 32.940, 45.110, 46.036, 51.726]\n\nLonger\u2011term context (4\u2011hour timeframe):\n20\u2011Period EMA: 112190.196 vs. 50\u2011Period EMA: 112005.186\n3\u2011Period ATR: 2062.30 vs. 14\u2011Period ATR: 1543.847\nCurrent Volume: 30709735424.000 vs. Average Volume: 3207183322.711\nMACD indicators: [744.384, 579.273, 523.759, 444.967, 247.825, 24.330, -200.842, -330.752, -372.076, -502.468]\nRSI indicators (14\u2011Period): [44.214, 42.253, 43.250, 36.468, 23.463, 21.564, 21.051, 26.136, 34.393, 30.619]\n",
+          "system_prompt": "You are an expert crypto trading AI.\n\nYour role is to analyze real-time market data for BTC/USD and make trading decisions on 1m candles.\n\nOBJECTIVE: Maximize risk-adjusted returns on 1m timeframe.\n\nProvide your response in this format:\nSIGNAL: [BUY/SELL/HOLD]\nCONFIDENCE: [0-100]%\nREASONING: [your analysis]\n"
+        }
+      }
+    },
+    {
+      "signal": "SELL",
+      "confidence": 72,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-30T10:34:05.125686",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "SELL",
+          "confidence": 72,
+          "reasoning": "The current RSI(7) at 71.17 is approaching overbought territory, suggesting potential near-term exhaustion. While the MACD is improving (rising from -75.5 to -23.9), it remains negative, indicating underlying bearish momentum. The price has rallied from 110001 to 110084 over the last 10 minutes, creating a potential short-term overextension. The 4-hour trend context shows declining MACD and weak RSI around 30, suggesting broader bearish pressure. The current price at 110084 is above the EMA20 at 110064, but the convergence suggests weakening upward momentum. Given the overbought RSI on 1m timeframe and bearish 4h context, a short-term pullback appears likely.",
+          "raw_response": "SIGNAL: SELL\nCONFIDENCE: 72%\nREASONING: The current RSI(7) at 71.17 is approaching overbought territory, suggesting potential near-term exhaustion. While the MACD is improving (rising from -75.5 to -23.9), it remains negative, indicating underlying bearish momentum. The price has rallied from 110001 to 110084 over the last 10 minutes, creating a potential short-term overextension. The 4-hour trend context shows declining MACD and weak RSI around 30, suggesting broader bearish pressure. The current price at 110084 is above the EMA20 at 110064, but the convergence suggests weakening upward momentum. Given the overbought RSI on 1m timeframe and bearish 4h context, a short-term pullback appears likely.",
+          "prompt": "It has been 3 minutes since you started trading. The current time is 2025-10-30 10:33:56.500848 and you've been invoked 2 times. Below, we are providing you with a variety of state data, price data, and predictive signals so you can discover alpha. Below that is your current account information, value, performance, positions, etc.\n\nALL OF THE PRICE OR SIGNAL DATA BELOW IS ORDERED: OLDEST \u2192 NEWEST\n\nTimeframes note: Unless stated otherwise in a section title, intraday series are provided at 1m intervals.\n\nCURRENT MARKET STATE FOR BTC\n\nALL BTC DATA\ncurrent_price = 110084.15, current_ema20 = 110064.44, current_macd = -23.914, current_rsi (7 period) = 71.17\n\nIntraday series (by 1m, oldest \u2192 latest):\nMid prices: [110001.625, 110032.234, 110045.172, 110044.953, 110069.281, 110066.312, 110076.352, 110075.000, 110052.992, 110084.148]\nEMA indicators (20\u2011period): [110065.321, 110062.170, 110060.551, 110059.065, 110060.038, 110060.636, 110062.133, 110063.358, 110062.371, 110064.445]\nMACD indicators: [-75.499, -68.959, -62.017, -55.889, -48.510, -42.412, -36.351, -31.296, -28.734, -23.914]\nRSI indicators (7\u2011Period): [39.467, 47.852, 53.359, 99.862, 99.831, 97.044, 97.220, 94.495, 64.054, 71.167]\nRSI indicators (14\u2011Period): [50.667, 47.507, 35.984, 32.940, 45.110, 46.036, 51.726, 51.635, 51.023, 57.579]\n\nLonger\u2011term context (4\u2011hour timeframe):\n20\u2011Period EMA: 112191.324 vs. 50\u2011Period EMA: 112005.651\n3\u2011Period ATR: 2062.30 vs. 14\u2011Period ATR: 1543.847\nCurrent Volume: 31367094272.000 vs. Average Volume: 3209024664.022\nMACD indicators: [744.384, 579.273, 523.759, 444.967, 247.825, 24.330, -200.842, -330.752, -372.076, -501.522]\nRSI indicators (14\u2011Period): [44.214, 42.253, 43.250, 36.468, 23.463, 21.564, 21.051, 26.136, 34.393, 30.656]\n",
+          "system_prompt": "You are an expert crypto trading AI.\n\nYour role is to analyze real-time market data for BTC/USD and make trading decisions on 1m candles.\n\nOBJECTIVE: Maximize risk-adjusted returns on 1m timeframe.\n\nProvide your response in this format:\nSIGNAL: [BUY/SELL/HOLD]\nCONFIDENCE: [0-100]%\nREASONING: [your analysis]\n"
+        }
+      }
+    },
+    {
+      "signal": "SELL",
+      "confidence": 75,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-30T10:37:19.688519",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "SELL",
+          "confidence": 75,
+          "reasoning": "The current RSI(7) of 82.81 indicates severely overbought conditions on the 1m timeframe, suggesting a high probability of a near-term pullback. While the MACD is improving (rising from -55.89 to -6.69), it remains negative and momentum is still bearish. The price has rallied sharply from 110,044 to 110,155 in the last 10 minutes, creating an exhaustion gap. The 4h timeframe shows bearish momentum with MACD deeply negative at -493 and RSI at 30.97, indicating the longer-term trend remains down. Current price of 110,155 is above the 1m EMA20 of 110,078, but this appears to be a temporary overshoot in an overbought environment. The risk-reward favors a short position here for a quick mean reversion play.",
+          "raw_response": "SIGNAL: SELL\nCONFIDENCE: 75%\nREASONING: The current RSI(7) of 82.81 indicates severely overbought conditions on the 1m timeframe, suggesting a high probability of a near-term pullback. While the MACD is improving (rising from -55.89 to -6.69), it remains negative and momentum is still bearish. The price has rallied sharply from 110,044 to 110,155 in the last 10 minutes, creating an exhaustion gap. The 4h timeframe shows bearish momentum with MACD deeply negative at -493 and RSI at 30.97, indicating the longer-term trend remains down. Current price of 110,155 is above the 1m EMA20 of 110,078, but this appears to be a temporary overshoot in an overbought environment. The risk-reward favors a short position here for a quick mean reversion play.",
+          "prompt": "It has been 6 minutes since you started trading. The current time is 2025-10-30 10:37:08.716933 and you've been invoked 3 times. Below, we are providing you with a variety of state data, price data, and predictive signals so you can discover alpha. Below that is your current account information, value, performance, positions, etc.\n\nALL OF THE PRICE OR SIGNAL DATA BELOW IS ORDERED: OLDEST \u2192 NEWEST\n\nTimeframes note: Unless stated otherwise in a section title, intraday series are provided at 1m intervals.\n\nCURRENT MARKET STATE FOR BTC\n\nALL BTC DATA\ncurrent_price = 110155.49, current_ema20 = 110078.11, current_macd = -6.693, current_rsi (7 period) = 82.81\n\nIntraday series (by 1m, oldest \u2192 latest):\nMid prices: [110044.953, 110069.281, 110066.312, 110076.352, 110075.000, 110052.992, 110084.148, 110086.852, 110102.109, 110155.492]\nEMA indicators (20\u2011period): [110059.065, 110060.038, 110060.636, 110062.133, 110063.358, 110062.371, 110064.445, 110066.579, 110069.963, 110078.108]\nMACD indicators: [-55.889, -48.510, -42.412, -36.351, -31.296, -28.734, -23.914, -19.650, -14.868, -6.693]\nRSI indicators (7\u2011Period): [99.862, 99.831, 97.044, 97.220, 94.495, 64.054, 71.167, 72.156, 69.201, 82.811]\nRSI indicators (14\u2011Period): [32.940, 45.110, 46.036, 51.726, 51.635, 51.023, 57.579, 89.505, 87.669, 89.109]\n\nLonger\u2011term context (4\u2011hour timeframe):\n20\u2011Period EMA: 112200.957 vs. 50\u2011Period EMA: 112009.617\n3\u2011Period ATR: 2062.30 vs. 14\u2011Period ATR: 1543.847\nCurrent Volume: 32172990464.000 vs. Average Volume: 3211282076.325\nMACD indicators: [744.384, 579.273, 523.759, 444.967, 247.825, 24.330, -200.842, -330.752, -372.076, -493.454]\nRSI indicators (14\u2011Period): [44.214, 42.253, 43.250, 36.468, 23.463, 21.564, 21.051, 26.136, 34.393, 30.971]\n",
+          "system_prompt": "You are an expert crypto trading AI.\n\nYour role is to analyze real-time market data for BTC/USD and make trading decisions on 1m candles.\n\nOBJECTIVE: Maximize risk-adjusted returns on 1m timeframe.\n\nProvide your response in this format:\nSIGNAL: [BUY/SELL/HOLD]\nCONFIDENCE: [0-100]%\nREASONING: [your analysis]\n"
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-30T10:40:35.155025",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "While the MACD has turned positive (from -6.693 to 13.127) indicating bullish momentum on the 1m timeframe, the current RSI at 74.49 is approaching overbought territory. Price is trading above the EMA20 (110152.78 vs 110104.70) showing short-term strength, but the 4h timeframe reveals a bearish context with MACD declining and price below both 20 and 50-period EMAs. The high RSI (7-period) has cooled from extreme levels (97.22 to 74.49) but still suggests limited upside. Volume is significantly elevated vs average, indicating potential volatility. Given mixed signals between short-term bullish momentum and longer-term bearish context, holding is prudent until clearer direction emerges.",
+          "raw_response": "SIGNAL: HOLD\nCONFIDENCE: 65%\nREASONING: While the MACD has turned positive (from -6.693 to 13.127) indicating bullish momentum on the 1m timeframe, the current RSI at 74.49 is approaching overbought territory. Price is trading above the EMA20 (110152.78 vs 110104.70) showing short-term strength, but the 4h timeframe reveals a bearish context with MACD declining and price below both 20 and 50-period EMAs. The high RSI (7-period) has cooled from extreme levels (97.22 to 74.49) but still suggests limited upside. Volume is significantly elevated vs average, indicating potential volatility. Given mixed signals between short-term bullish momentum and longer-term bearish context, holding is prudent until clearer direction emerges.",
+          "prompt": "It has been 10 minutes since you started trading. The current time is 2025-10-30 10:40:25.927379 and you've been invoked 4 times. Below, we are providing you with a variety of state data, price data, and predictive signals so you can discover alpha. Below that is your current account information, value, performance, positions, etc.\n\nALL OF THE PRICE OR SIGNAL DATA BELOW IS ORDERED: OLDEST \u2192 NEWEST\n\nTimeframes note: Unless stated otherwise in a section title, intraday series are provided at 1m intervals.\n\nCURRENT MARKET STATE FOR BTC\n\nALL BTC DATA\ncurrent_price = 110152.78, current_ema20 = 110104.70, current_macd = 13.127, current_rsi (7 period) = 74.49\n\nIntraday series (by 1m, oldest \u2192 latest):\nMid prices: [110076.352, 110075.000, 110052.992, 110084.148, 110086.852, 110102.109, 110155.492, 110187.992, 110204.773, 110152.781]\nEMA indicators (20\u2011period): [110062.133, 110063.358, 110062.371, 110064.445, 110066.579, 110069.963, 110078.108, 110088.573, 110099.640, 110104.701]\nMACD indicators: [-36.351, -31.296, -28.734, -23.914, -19.650, -14.868, -6.693, 2.380, 10.801, 13.127]\nRSI indicators (7\u2011Period): [97.220, 94.495, 64.054, 71.167, 72.156, 69.201, 82.811, 85.249, 87.336, 74.485]\nRSI indicators (14\u2011Period): [51.726, 51.635, 51.023, 57.579, 89.505, 87.669, 89.109, 90.276, 89.640, 71.710]\n\nLonger\u2011term context (4\u2011hour timeframe):\n20\u2011Period EMA: 112192.934 vs. 50\u2011Period EMA: 112006.314\n3\u2011Period ATR: 2062.30 vs. 14\u2011Period ATR: 1543.847\nCurrent Volume: 32233644032.000 vs. Average Volume: 3211451974.275\nMACD indicators: [744.384, 579.273, 523.759, 444.967, 247.825, 24.330, -200.842, -330.752, -372.076, -500.174]\nRSI indicators (14\u2011Period): [44.214, 42.253, 43.250, 36.468, 23.463, 21.564, 21.051, 26.136, 34.393, 30.708]\n",
+          "system_prompt": "You are an expert crypto trading AI.\n\nYour role is to analyze real-time market data for BTC/USD and make trading decisions on 1m candles.\n\nOBJECTIVE: Maximize risk-adjusted returns on 1m timeframe.\n\nProvide your response in this format:\nSIGNAL: [BUY/SELL/HOLD]\nCONFIDENCE: [0-100]%\nREASONING: [your analysis]\n"
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-30T10:43:50.099722",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "The current price (110085.33) is slightly below the EMA20 (110100.14), indicating mild bearish momentum on the 1m timeframe. MACD has been declining from a peak of 13.127 to 3.122, showing weakening bullish momentum. The 7-period RSI at 33.88 is approaching oversold territory but hasn't reached extreme levels yet. The 14-period RSI at 52.69 suggests the longer-term momentum is still neutral. The 4h timeframe shows a bearish MACD trend and RSI around 30, indicating broader weakness. While short-term oversold conditions might suggest a potential bounce, the declining MACD and price below EMA20 warrant caution. Waiting for clearer momentum reversal signals before entering a position.",
+          "raw_response": "SIGNAL: HOLD\nCONFIDENCE: 65%\nREASONING: The current price (110085.33) is slightly below the EMA20 (110100.14), indicating mild bearish momentum on the 1m timeframe. MACD has been declining from a peak of 13.127 to 3.122, showing weakening bullish momentum. The 7-period RSI at 33.88 is approaching oversold territory but hasn't reached extreme levels yet. The 14-period RSI at 52.69 suggests the longer-term momentum is still neutral. The 4h timeframe shows a bearish MACD trend and RSI around 30, indicating broader weakness. While short-term oversold conditions might suggest a potential bounce, the declining MACD and price below EMA20 warrant caution. Waiting for clearer momentum reversal signals before entering a position.",
+          "prompt": "It has been 13 minutes since you started trading. The current time is 2025-10-30 10:43:40.290689 and you've been invoked 5 times. Below, we are providing you with a variety of state data, price data, and predictive signals so you can discover alpha. Below that is your current account information, value, performance, positions, etc.\n\nALL OF THE PRICE OR SIGNAL DATA BELOW IS ORDERED: OLDEST \u2192 NEWEST\n\nTimeframes note: Unless stated otherwise in a section title, intraday series are provided at 1m intervals.\n\nCURRENT MARKET STATE FOR BTC\n\nALL BTC DATA\ncurrent_price = 110085.33, current_ema20 = 110100.14, current_macd = 3.122, current_rsi (7 period) = 33.88\n\nIntraday series (by 1m, oldest \u2192 latest):\nMid prices: [110086.852, 110102.109, 110155.492, 110187.992, 110204.773, 110152.781, 110103.750, 110075.711, 110100.172, 110085.328]\nEMA indicators (20\u2011period): [110066.579, 110069.963, 110078.108, 110088.573, 110099.640, 110104.701, 110104.611, 110101.858, 110101.698, 110100.139]\nMACD indicators: [-19.650, -14.868, -6.693, 2.380, 10.801, 13.127, 10.889, 6.775, 5.425, 3.122]\nRSI indicators (7\u2011Period): [72.156, 69.201, 82.811, 85.249, 87.336, 74.485, 54.422, 47.745, 49.622, 33.881]\nRSI indicators (14\u2011Period): [89.505, 87.669, 89.109, 90.276, 89.640, 71.710, 59.336, 54.503, 54.521, 52.689]\n\nLonger\u2011term context (4\u2011hour timeframe):\n20\u2011Period EMA: 112190.844 vs. 50\u2011Period EMA: 112005.453\n3\u2011Period ATR: 2062.30 vs. 14\u2011Period ATR: 1543.847\nCurrent Volume: 32310681600.000 vs. Average Volume: 3211667765.782\nMACD indicators: [744.384, 579.273, 523.759, 444.967, 247.825, 24.330, -200.842, -330.752, -372.076, -501.925]\nRSI indicators (14\u2011Period): [44.214, 42.253, 43.250, 36.468, 23.463, 21.564, 21.051, 26.136, 34.393, 30.640]\n",
+          "system_prompt": "You are an expert crypto trading AI.\n\nYour role is to analyze real-time market data for BTC/USD and make trading decisions on 1m candles.\n\nOBJECTIVE: Maximize risk-adjusted returns on 1m timeframe.\n\nProvide your response in this format:\nSIGNAL: [BUY/SELL/HOLD]\nCONFIDENCE: [0-100]%\nREASONING: [your analysis]\n"
+        }
+      }
+    },
+    {
+      "signal": "BUY",
+      "confidence": 78,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-30T10:47:04.193645",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "BUY",
+          "confidence": 78,
+          "reasoning": "Current RSI(7) at 19.68 indicates extreme oversold conditions on the 1m timeframe, presenting a potential bounce opportunity. Price has declined from 110204 to current 110093 but appears to be stabilizing near the EMA20 (110097.92), with the most recent candle showing a slight recovery. MACD, while positive at 0.258, has been declining from recent highs but the momentum slowdown suggests selling pressure may be exhausting. The 4h timeframe shows a strong bullish divergence with MACD improving from -507 to -372 despite lower prices, indicating underlying strength. Volume spike suggests capitulation may be occurring. The convergence of oversold RSI, support near EMA20, and bullish divergence on higher timeframe supports a tactical long position for a short-term bounce.",
+          "raw_response": "SIGNAL: BUY\nCONFIDENCE: 78%\nREASONING: Current RSI(7) at 19.68 indicates extreme oversold conditions on the 1m timeframe, presenting a potential bounce opportunity. Price has declined from 110204 to current 110093 but appears to be stabilizing near the EMA20 (110097.92), with the most recent candle showing a slight recovery. MACD, while positive at 0.258, has been declining from recent highs but the momentum slowdown suggests selling pressure may be exhausting. The 4h timeframe shows a strong bullish divergence with MACD improving from -507 to -372 despite lower prices, indicating underlying strength. Volume spike suggests capitulation may be occurring. The convergence of oversold RSI, support near EMA20, and bullish divergence on higher timeframe supports a tactical long position for a short-term bounce.",
+          "prompt": "It has been 16 minutes since you started trading. The current time is 2025-10-30 10:46:54.122741 and you've been invoked 6 times. Below, we are providing you with a variety of state data, price data, and predictive signals so you can discover alpha. Below that is your current account information, value, performance, positions, etc.\n\nALL OF THE PRICE OR SIGNAL DATA BELOW IS ORDERED: OLDEST \u2192 NEWEST\n\nTimeframes note: Unless stated otherwise in a section title, intraday series are provided at 1m intervals.\n\nCURRENT MARKET STATE FOR BTC\n\nALL BTC DATA\ncurrent_price = 110093.47, current_ema20 = 110097.92, current_macd = 0.258, current_rsi (7 period) = 19.68\n\nIntraday series (by 1m, oldest \u2192 latest):\nMid prices: [110155.492, 110187.992, 110204.773, 110152.781, 110103.750, 110075.711, 110100.172, 110085.328, 110081.805, 110093.469]\nEMA indicators (20\u2011period): [110078.108, 110088.573, 110099.640, 110104.701, 110104.611, 110101.858, 110101.698, 110100.139, 110098.393, 110097.924]\nMACD indicators: [-6.693, 2.380, 10.801, 13.127, 10.889, 6.775, 5.425, 3.122, 1.001, 0.258]\nRSI indicators (7\u2011Period): [82.811, 85.249, 87.336, 74.485, 54.422, 47.745, 49.622, 33.881, 21.859, 19.681]\nRSI indicators (14\u2011Period): [89.109, 90.276, 89.640, 71.710, 59.336, 54.503, 54.521, 52.689, 50.786, 52.584]\n\nLonger\u2011term context (4\u2011hour timeframe):\n20\u2011Period EMA: 112183.811 vs. 50\u2011Period EMA: 112002.557\n3\u2011Period ATR: 2062.30 vs. 14\u2011Period ATR: 1543.847\nCurrent Volume: 32315727872.000 vs. Average Volume: 3211681900.997\nMACD indicators: [744.384, 579.273, 523.759, 444.967, 247.825, 24.330, -200.842, -330.752, -372.076, -507.815]\nRSI indicators (14\u2011Period): [44.214, 42.253, 43.250, 36.468, 23.463, 21.564, 21.051, 26.136, 34.393, 30.414]\n",
+          "system_prompt": "You are an expert crypto trading AI.\n\nYour role is to analyze real-time market data for BTC/USD and make trading decisions on 1m candles.\n\nOBJECTIVE: Maximize risk-adjusted returns on 1m timeframe.\n\nProvide your response in this format:\nSIGNAL: [BUY/SELL/HOLD]\nCONFIDENCE: [0-100]%\nREASONING: [your analysis]\n"
+        }
+      }
+    },
+    {
+      "signal": "BUY",
+      "confidence": 78,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-30T10:50:14.647005",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "BUY",
+          "confidence": 78,
+          "reasoning": "Price has declined significantly from 110152 to 109965, creating a potential oversold bounce opportunity. Current RSI(7) at 22.30 indicates extreme oversold conditions on the 1m timeframe. The price is now trading below the EMA20 (109965 vs 110071), suggesting potential mean reversion. MACD remains negative but the sharp decline may be overextended. Volume spike (33316077568 vs average 3214484000) suggests capitulation, often preceding reversals. The 4h MACD shows continued bearish momentum, but for a 1m scalp, the oversold RSI and price deviation from EMA present a favorable risk/reward for a bounce trade.",
+          "raw_response": "SIGNAL: BUY\nCONFIDENCE: 78%\nREASONING: Price has declined significantly from 110152 to 109965, creating a potential oversold bounce opportunity. Current RSI(7) at 22.30 indicates extreme oversold conditions on the 1m timeframe. The price is now trading below the EMA20 (109965 vs 110071), suggesting potential mean reversion. MACD remains negative but the sharp decline may be overextended. Volume spike (33316077568 vs average 3214484000) suggests capitulation, often preceding reversals. The 4h MACD shows continued bearish momentum, but for a 1m scalp, the oversold RSI and price deviation from EMA present a favorable risk/reward for a bounce trade.",
+          "prompt": "It has been 19 minutes since you started trading. The current time is 2025-10-30 10:50:05.561461 and you've been invoked 7 times. Below, we are providing you with a variety of state data, price data, and predictive signals so you can discover alpha. Below that is your current account information, value, performance, positions, etc.\n\nALL OF THE PRICE OR SIGNAL DATA BELOW IS ORDERED: OLDEST \u2192 NEWEST\n\nTimeframes note: Unless stated otherwise in a section title, intraday series are provided at 1m intervals.\n\nCURRENT MARKET STATE FOR BTC\n\nALL BTC DATA\ncurrent_price = 109965.79, current_ema20 = 110071.27, current_macd = -20.069, current_rsi (7 period) = 22.30\n\nIntraday series (by 1m, oldest \u2192 latest):\nMid prices: [110152.781, 110103.750, 110075.711, 110100.172, 110085.328, 110081.805, 110093.469, 110007.961, 110016.070, 109965.789]\nEMA indicators (20\u2011period): [110104.701, 110104.611, 110101.858, 110101.698, 110100.139, 110098.393, 110097.924, 110089.356, 110082.376, 110071.273]\nMACD indicators: [13.127, 10.889, 6.775, 5.425, 3.122, 1.001, 0.258, -7.148, -12.222, -20.069]\nRSI indicators (7\u2011Period): [74.485, 54.422, 47.745, 49.622, 33.881, 21.859, 19.681, 16.642, 25.112, 22.297]\nRSI indicators (14\u2011Period): [71.710, 59.336, 54.503, 54.521, 52.689, 50.786, 52.584, 44.650, 41.443, 36.409]\n\nLonger\u2011term context (4\u2011hour timeframe):\n20\u2011Period EMA: 112182.430 vs. 50\u2011Period EMA: 112001.989\n3\u2011Period ATR: 2062.30 vs. 14\u2011Period ATR: 1543.847\nCurrent Volume: 33316077568.000 vs. Average Volume: 3214484000.986\nMACD indicators: [744.384, 579.273, 523.759, 444.967, 247.825, 24.330, -200.842, -330.752, -372.076, -508.972]\nRSI indicators (14\u2011Period): [44.214, 42.253, 43.250, 36.468, 23.463, 21.564, 21.051, 26.136, 34.393, 30.370]\n",
+          "system_prompt": "You are an expert crypto trading AI.\n\nYour role is to analyze real-time market data for BTC/USD and make trading decisions on 1m candles.\n\nOBJECTIVE: Maximize risk-adjusted returns on 1m timeframe.\n\nProvide your response in this format:\nSIGNAL: [BUY/SELL/HOLD]\nCONFIDENCE: [0-100]%\nREASONING: [your analysis]\n"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+STRATEGY_NAME: QuantumCrossover
+
+STRATEGY_DETAILS:
+This strategy employs a precise dual-exponential moving average crossover system specifically designed for the QQQ ETF on 5-minute timeframes, focusing on capturing short-term momentum shifts with rapid execution.
+
+KEY STRATEGY COMPONENTS:
+- Primary Instrument: QQQ (Invesco QQQ Trust ETF)
+- Timeframe: 5-minute charts exclusively
+- Core Indicators: 8-period EMA and 13-period EMA
+- Trading Style: Short-term momentum-based swing trading
+- Market Focus: NASDAQ 100 technology-heavy index tracking
+
+ENTRY RULES:
+LONG ENTRY:
+1. Wait for the 8-period EMA to cross ABOVE the 13-period EMA
+2. Confirm bullish crossover with current price trading above both EMAs
+3. Enter long position on the next candle following confirmed crossover
+
+SHORT ENTRY:
+1. Wait for the 8-period EMA to cross BELOW the 13-period EMA
+2. Confirm bearish crossover with current price trading below both EMAs
+3. Enter short position on the next candle following confirmed crossover
+
+EXIT RULES:
+LONG EXIT:
+1. Close position when 8-period EMA crosses below 13-period EMA
+2. Alternative exit: Set trailing stop at recent swing low or use fixed 0.5-1% stop
+
+SHORT EXIT:
+1. Close position when 8-period EMA crosses above 13-period EMA
+2. Alternative exit: Set trailing stop at recent swing high or use fixed 0.5-1% stop
+
+RISK MANAGEMENT:
+- Position sizing: Risk no more than 1-2% of capital per trade
+- Stop-loss placement: 0.5-1% below entry for longs, above entry for shorts
+- Maximum daily loss limit: 3% of account equity
+- Avoid trading during first/last 30 minutes of market hours due to volatility
+- Filter out low-volume periods (lunch hours, pre-market, after-hours)
+
+REQUIRED INDICATORS:
+1. 8-period Exponential Moving Average (EMA)
+2. 13-period Exponential Moving Average (EMA)
+3. Volume indicator (for confirmation)
+4. Optional: RSI (14-period) for overbought/oversold filtering
+
+ADDITIONAL FILTERS:
+- Only trade during high-volume periods (9:30 AM - 11:30 AM and 2:00 PM - 4:00 PM ET)
+- Avoid trading during major economic announcements
+- Confirm crossover with price action and volume increase
+- Consider market context (overall trend on higher timeframes)
+
+This strategy excels in capturing quick momentum shifts in the highly liquid QQQ, leveraging the sensitivity of the 8/13 EMA combination on 5-minute charts for rapid signal generation while maintaining disciplined risk parameters.

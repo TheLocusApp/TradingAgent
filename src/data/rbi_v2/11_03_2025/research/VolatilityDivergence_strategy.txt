@@ -1,0 +1,50 @@
+STRATEGY_NAME: Volatility Divergence
+
+STRATEGY_DETAILS:
+This strategy combines volatility analysis with divergence detection to identify potential trend reversals during periods of high market volatility.
+
+KEY STRATEGY COMPONENTS:
+1. Volatility Measurement: Uses Bollinger Bands (20-period, 2 standard deviations) to gauge market volatility
+2. Divergence Detection: Compares price action with momentum oscillator (RSI 14-period)
+3. Volatility Threshold: Requires Bollinger Band width expansion above historical average
+4. Multi-timeframe Confirmation: Analyzes both primary and higher timeframe for alignment
+
+REQUIRED INDICATORS:
+- Bollinger Bands (20,2)
+- RSI (14-period)
+- Volume indicator
+- ATR (14-period) for volatility confirmation
+
+ENTRY RULES (Long Position):
+1. Bollinger Band width must be 20% above 50-period average (high volatility condition)
+2. Price makes lower low while RSI makes higher low (bullish divergence)
+3. Divergence occurs near lower Bollinger Band
+4. Volume increases during divergence formation
+5. Price closes above the 20-period SMA for confirmation
+6. Higher timeframe shows similar bullish structure
+
+ENTRY RULES (Short Position):
+1. Bollinger Band width must be 20% above 50-period average (high volatility condition)
+2. Price makes higher high while RSI makes lower high (bearish divergence)
+3. Divergence occurs near upper Bollinger Band
+4. Volume increases during divergence formation
+5. Price closes below the 20-period SMA for confirmation
+6. Higher timeframe shows similar bearish structure
+
+EXIT RULES:
+- Take Profit: Previous swing high/low or opposite Bollinger Band
+- Stop Loss: 1.5x ATR beyond entry candle extreme
+- Time-based exit if target not reached within 5 periods
+
+RISK MANAGEMENT:
+- Maximum 2% risk per trade
+- Position size based on ATR stop distance
+- No new entries during low volatility periods (Bollinger Band width below average)
+- Daily loss limit of 5% total account
+- Correlation check with major indices before entry
+
+SPECIAL CONDITIONS:
+- Strategy works best during earnings seasons, economic announcements, or market uncertainty
+- Avoid trading during overnight gaps or illiquid periods
+- Requires minimum 1:2 risk-reward ratio
+- Divergence must be clear and not minor fluctuations

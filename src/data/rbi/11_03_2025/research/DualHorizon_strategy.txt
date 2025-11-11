@@ -1,0 +1,49 @@
+STRATEGY_NAME: DualHorizon
+
+STRATEGY_DETAILS:
+This strategy employs a dual exponential moving average crossover system on SPY hourly charts, focusing on the interaction between short-term and long-term trend dynamics.
+
+KEY STRATEGY COMPONENTS:
+- Primary Instruments: SPY (SPDR S&P 500 ETF Trust)
+- Timeframe: Hourly charts exclusively
+- Core Indicators: 48-period EMA and 200-period EMA
+- Signal Generation: Crossover events between the two EMAs
+
+ENTRY RULES:
+LONG ENTRY:
+- Trigger when 48 EMA crosses ABOVE 200 EMA
+- Confirm bullish momentum with price trading above both EMAs
+- Enter on the next hourly candle after crossover confirmation
+
+SHORT ENTRY:
+- Trigger when 48 EMA crosses BELOW 200 EMA
+- Confirm bearish momentum with price trading below both EMAs
+- Enter on the next hourly candle after crossover confirmation
+
+EXIT RULES:
+LONG EXIT:
+- When 48 EMA crosses below 200 EMA (reverse signal)
+- Or implement trailing stop of 2-3% below recent swing low
+
+SHORT EXIT:
+- When 48 EMA crosses above 200 EMA (reverse signal)
+- Or implement trailing stop of 2-3% above recent swing high
+
+RISK MANAGEMENT:
+- Position sizing: Risk no more than 1-2% of capital per trade
+- Stop loss: Place 2-3% below entry for longs, 2-3% above entry for shorts
+- Maximum concurrent positions: 1-2 to avoid overexposure
+- Time-based exit: Consider exiting if no significant movement occurs within 5-10 periods
+
+REQUIRED INDICATORS:
+1. 48-period Exponential Moving Average (EMA)
+2. 200-period Exponential Moving Average (EMA)
+3. Price action confirmation (candlestick patterns)
+4. Optional: Volume confirmation for crossover validity
+
+ADDITIONAL CONSIDERATIONS:
+- The 48/200 EMA combination provides medium-term trend identification
+- Hourly timeframe balances noise reduction with timely signals
+- Watch for false breakouts during low volatility periods
+- Consider market context (overall S&P 500 trend) for higher probability trades
+- Backtest specific to SPY's characteristic movements for optimal parameters

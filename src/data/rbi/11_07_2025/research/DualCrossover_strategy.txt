@@ -1,0 +1,50 @@
+STRATEGY_NAME: DualCrossover
+
+STRATEGY_DETAILS:
+This is a short-term momentum trading strategy based on Exponential Moving Average (EMA) crossovers specifically designed for QQQ ETF on 5-minute timeframes.
+
+KEY STRATEGY COMPONENTS:
+- Instrument: QQQ (Invesco QQQ Trust tracking NASDAQ-100)
+- Timeframe: 5-minute charts exclusively
+- Primary Indicators: 8-period EMA and 13-period EMA
+- Core Concept: Capturing short-term momentum shifts through EMA crossovers
+
+REQUIRED INDICATORS:
+1. 8-period Exponential Moving Average (EMA)
+2. 13-period Exponential Moving Average (EMA)
+3. Volume confirmation (recommended but not required)
+
+ENTRY RULES:
+LONG ENTRY:
+- When the 8-period EMA crosses ABOVE the 13-period EMA
+- Enter on the close of the candle where crossover occurs
+- Confirm with bullish price action (closing above crossover point)
+
+SHORT ENTRY:
+- When the 8-period EMA crosses BELOW the 13-period EMA
+- Enter on the close of the candle where crossover occurs
+- Confirm with bearish price action (closing below crossover point)
+
+EXIT RULES:
+LONG POSITION EXIT:
+- When the 8-period EMA crosses below the 13-period EMA
+- Exit on the close of the crossover candle
+
+SHORT POSITION EXIT:
+- When the 8-period EMA crosses above the 13-period EMA
+- Exit on the close of the crossover candle
+
+RISK MANAGEMENT:
+- Position sizing: Risk no more than 1-2% of account per trade
+- Stop loss: Place 0.5-1% below/above recent swing low/high
+- Time-based exit: Consider exiting if no significant movement occurs within 3-5 candles
+- Avoid trading during first/last 30 minutes of market hours due to volatility
+- Filter out low-volume periods (lunch hours, pre-market, after-hours)
+
+STRATEGY ENHANCEMENTS:
+- Add volume confirmation: Higher volume on crossover increases signal reliability
+- Consider 20-period SMA as trend filter (only trade in direction of 20 SMA)
+- Avoid trading during major economic news releases
+- Monitor overall market sentiment and NASDAQ direction for confirmation
+
+This strategy works best in trending markets and may produce whipsaws during ranging or choppy conditions. Regular monitoring and discipline in following crossover signals are essential for success.

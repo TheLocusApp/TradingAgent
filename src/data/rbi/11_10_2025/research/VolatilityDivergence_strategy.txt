@@ -1,0 +1,37 @@
+STRATEGY_NAME: VolatilityDivergence
+
+STRATEGY_DETAILS:
+This is a sophisticated trend-following strategy that combines multiple technical indicators to identify high-probability bullish entries during periods of market volatility expansion.
+
+KEY STRATEGY COMPONENTS:
+1. Bullish Divergence Detection: Identifies when price makes lower lows while momentum indicator (typically RSI or MACD) makes higher lows
+2. Keltner Channel Breakout: Uses the upper Keltner Channel as a dynamic resistance level
+3. Bollinger Bands Volatility Expansion: Confirms increased market volatility through expanded Bollinger Bands
+4. Multi-confirmation entry system requiring all three conditions to align
+
+REQUIRED INDICATORS:
+- Keltner Channel (20-period EMA with 2x ATR bands)
+- Bollinger Bands (20-period, 2 standard deviations)
+- Momentum oscillator (RSI 14-period recommended for divergence detection)
+
+ENTRY RULES:
+1. Identify bullish divergence between price and momentum oscillator (price makes lower low, oscillator makes higher low)
+2. Confirm Bollinger Bands are expanding (width increasing, indicating volatility expansion)
+3. Wait for price to break above the upper Keltner Channel
+4. Enter long position when ALL THREE conditions are met simultaneously
+
+EXIT RULES:
+- Exit long position when price closes below the Keltner Channel (middle line/20-period EMA)
+- Alternative exit: Set trailing stop based on recent swing low or use ATR-based stop loss
+
+RISK MANAGEMENT:
+- Position sizing based on volatility (use ATR for stop loss calculation)
+- Initial stop loss placed below recent swing low or using 2x ATR below entry
+- Risk per trade should not exceed 1-2% of account capital
+- Monitor Bollinger Band contraction as potential warning signal for trend weakness
+
+ADDITIONAL CONSIDERATIONS:
+- Strategy performs best in trending markets with periodic volatility expansions
+- Avoid trading during sideways/consolidation periods with contracting Bollinger Bands
+- Higher timeframe confirmation (daily/weekly) can improve signal reliability
+- Consider volume confirmation for stronger breakout validation

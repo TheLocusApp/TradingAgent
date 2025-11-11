@@ -1,0 +1,53 @@
+STRATEGY_NAME: DivergenceConfirm
+
+STRATEGY_DETAILS:
+This strategy combines RSI divergence patterns with MACD confirmation signals to identify high-probability reversal opportunities in trending markets.
+
+KEY COMPONENTS:
+1. RSI (Relative Strength Index) - Primary divergence detector
+2. MACD (Moving Average Convergence Divergence) - Confirmation filter
+3. Price action analysis for validation
+
+REQUIRED INDICATORS:
+- RSI (14-period standard setting)
+- MACD (12,26,9 standard setting)
+- Price chart with clear swing highs/lows
+
+ENTRY RULES:
+
+BULLISH DIVERGENCE SETUP:
+1. Price forms LOWER LOW while RSI forms HIGHER LOW
+2. MACD histogram shows bullish momentum (rising bars above zero line)
+3. MACD line crosses above signal line OR shows positive divergence
+4. Enter LONG when price breaks above the most recent swing high
+
+BEARISH DIVERGENCE SETUP:
+1. Price forms HIGHER HIGH while RSI forms LOWER HIGH
+2. MACD histogram shows bearish momentum (falling bars below zero line)
+3. MACD line crosses below signal line OR shows negative divergence
+4. Enter SHORT when price breaks below the most recent swing low
+
+CONFIRMATION CRITERIA:
+- RSI divergence must be clear and significant (minimum 4-6 bars between peaks/troughs)
+- MACD must confirm the momentum shift within 1-3 bars of the divergence signal
+- Volume should support the reversal (increasing on breakout)
+
+EXIT RULES:
+- Take profit at previous significant support/resistance level
+- OR when opposite divergence signal appears
+- Stop loss placed below/above the divergence swing point
+- Trail stop using MACD zero line cross as exit signal
+
+RISK MANAGEMENT:
+- Position size: 1-2% risk per trade
+- Stop loss: 1.5-2x ATR from entry point
+- Risk-reward ratio: Minimum 1:2
+- Maximum 3 concurrent divergence trades
+
+FILTERING FALSE SIGNALS:
+- Avoid trading during low volatility periods (ATR < recent average)
+- Confirm with higher timeframe alignment
+- Wait for price confirmation beyond divergence swing points
+- Avoid trading during major economic news events
+
+This strategy excels in ranging or slowing trending markets where momentum shifts provide reliable reversal opportunities with clear risk parameters.

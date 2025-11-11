@@ -1,0 +1,8 @@
+{
+  "success": false,
+  "return_code": 1,
+  "stdout": "\ud83c\udf19 MOON DEV BACKTEST INITIALIZING... \ud83d\ude80\n\ud83c\udf19 MOON DEV DATA LOADED! Columns: ['Open', 'High', 'Low', 'Close', 'adj close', 'Volume']\n\ud83d\udcca Data shape: (0, 6)\n",
+  "stderr": "$BTC-USD: possibly delisted; no price data found  (period=2y)\nTraceback (most recent call last):\n  File \"C:\\Users\\ahmed\\CascadeProjects\\moon-dev-ai-agents\\src\\data\\rbi_v2\\11_03_2025\\backtests_final\\BandShiftReversion_BTFinal_v1.py\", line 125, in <module>\n    bt = Backtest(data, BandShiftReversion, cash=1000000, commission=.002)\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\ahmed\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\backtesting\\backtesting.py\", line 1223, in __init__\n    raise ValueError('OHLC `data` is empty')\nValueError: OHLC `data` is empty\n",
+  "execution_time": 27.275948,
+  "timestamp": "2025-11-03T08:27:13.370215"
+}

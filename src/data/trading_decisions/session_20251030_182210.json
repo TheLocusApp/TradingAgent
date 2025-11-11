@@ -1,0 +1,206 @@
+{
+  "session_id": "20251030_182210",
+  "config": {
+    "models": [
+      "deepseek"
+    ],
+    "model_temperature": 0.7,
+    "model_max_tokens": 1024,
+    "system_prompt": "",
+    "asset_type": "crypto",
+    "ticker": "BTC",
+    "timeframe": "3m",
+    "cycle_interval": 180,
+    "use_simulation": true,
+    "initial_balance": 10000,
+    "position_size_percentage": 0.1,
+    "max_positions": 3,
+    "risk_per_trade": 0.02,
+    "monitored_assets": [
+      "BTC",
+      "ETH",
+      "SOL",
+      "DOGE",
+      "XRP"
+    ],
+    "agent_name": "Crypto Trader 1",
+    "agent_strategy": "",
+    "save_decisions": true,
+    "decisions_dir": "src/data/trading_decisions",
+    "use_live_data": false
+  },
+  "session_start": "2025-10-30T18:22:10.268507",
+  "decisions_count": 10,
+  "decisions": [
+    {
+      "signal": "HOLD",
+      "confidence": 0,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-30T18:22:27.293672",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 0,
+          "reasoning": "The current BTC market data shows no intraday price information - all 3-minute series (mid prices, EMA20, MACD, RSI) are empty arrays with current_price = 0.00. This indicates either a data feed failure or market closure. The longer-term 4h data shows bearish momentum with MACD declining from 523 to -1040 and RSI deeply oversold around 21-43, suggesting significant downward pressure. However, without any current price data or intraday signals, I cannot make an informed trading decision. The risk of trading with incomplete data is extremely high. I must wait for valid price information before considering any position.",
+          "raw_response": "SIGNAL: HOLD\nCONFIDENCE: 0%\nREASONING: The current BTC market data shows no intraday price information - all 3-minute series (mid prices, EMA20, MACD, RSI) are empty arrays with current_price = 0.00. This indicates either a data feed failure or market closure. The longer-term 4h data shows bearish momentum with MACD declining from 523 to -1040 and RSI deeply oversold around 21-43, suggesting significant downward pressure. However, without any current price data or intraday signals, I cannot make an informed trading decision. The risk of trading with incomplete data is extremely high. I must wait for valid price information before considering any position.",
+          "prompt": "You are an expert trader with deep knowledge of technical analysis, risk management, and market dynamics.\n\nIt has been 0 minutes since you started trading. The current time is 2025-10-30 18:22:19.386311 and you've been invoked 1 times. Below, we are providing you with a variety of state data, price data, and predictive signals so you can discover alpha. Below that is your current account information, value, performance, positions, etc.\n\nALL OF THE PRICE OR SIGNAL DATA BELOW IS ORDERED: OLDEST \u2192 NEWEST\n\nTimeframes note: Unless stated otherwise in a section title, intraday series are provided at 3-minute intervals.\n\nYOUR ACCOUNT STATUS:\n- Total Capital: $10,000.00\n- Free Capital: $10,000.00\n- Allocated Capital: $0.00\n- Open Positions: 0/3\n- Position Size: 10.0% per trade\n- Risk Per Trade: 2.0%\n\nCURRENT POSITIONS:\nNo open positions\n\nMONITORED ASSETS: BTC, ETH, SOL, DOGE, XRP\n\nCURRENT MARKET STATE FOR BTC\n\nALL BTC DATA\ncurrent_price = 0.00, current_ema20 = 0.00, current_macd = 0.000, current_rsi (7 period) = 50.00\n\nIntraday series (by 3m, oldest \u2192 latest):\nMid prices: []\nEMA indicators (20\u2011period): []\nMACD indicators: []\nRSI indicators (7\u2011Period): []\nRSI indicators (14\u2011Period): []\n\nLonger\u2011term context (4\u2011hour timeframe):\n20\u2011Period EMA: 111326.068 vs. 50\u2011Period EMA: 111652.696\n3\u2011Period ATR: 1773.59 vs. 14\u2011Period ATR: 1733.967\nCurrent Volume: 1523736576.000 vs. Average Volume: 3131470035.075\nMACD indicators: [523.759, 444.967, 247.825, 24.330, -200.842, -330.752, -372.076, -524.686, -801.614, -1040.213]\nRSI indicators (14\u2011Period): [43.250, 36.468, 23.463, 21.564, 21.051, 26.136, 34.393, 29.786, 23.054, 21.500]\n",
+          "system_prompt": "You are an expert crypto trading AI.\n\nYour role is to analyze real-time market data for BTC/USD and make trading decisions on 3m candles.\n\nOBJECTIVE: Maximize risk-adjusted returns on 3m timeframe.\n\nProvide your response in this format:\nSIGNAL: [BUY/SELL/HOLD]\nCONFIDENCE: [0-100]%\nREASONING: [your analysis]\n"
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 0,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-30T18:25:35.535818",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 0,
+          "reasoning": "The provided BTC market data appears to be corrupted or incomplete. The current price, EMA20, MACD, and RSI all show values of 0.00, and all intraday series (mid prices, EMA indicators, MACD indicators, RSI indicators) are empty arrays. While the 4-hour timeframe data shows some bearish momentum (MACD declining from positive to deeply negative territory and RSI in oversold territory around 21-43), I cannot make any trading decision without valid current price data. The absence of intraday data makes technical analysis impossible on the 3-minute timeframe. I must wait for proper market data before considering any position.",
+          "raw_response": "SIGNAL: HOLD\nCONFIDENCE: 0%\nREASONING: The provided BTC market data appears to be corrupted or incomplete. The current price, EMA20, MACD, and RSI all show values of 0.00, and all intraday series (mid prices, EMA indicators, MACD indicators, RSI indicators) are empty arrays. While the 4-hour timeframe data shows some bearish momentum (MACD declining from positive to deeply negative territory and RSI in oversold territory around 21-43), I cannot make any trading decision without valid current price data. The absence of intraday data makes technical analysis impossible on the 3-minute timeframe. I must wait for proper market data before considering any position.",
+          "prompt": "You are an expert trader with deep knowledge of technical analysis, risk management, and market dynamics.\n\nIt has been 3 minutes since you started trading. The current time is 2025-10-30 18:25:28.518436 and you've been invoked 2 times. Below, we are providing you with a variety of state data, price data, and predictive signals so you can discover alpha. Below that is your current account information, value, performance, positions, etc.\n\nALL OF THE PRICE OR SIGNAL DATA BELOW IS ORDERED: OLDEST \u2192 NEWEST\n\nTimeframes note: Unless stated otherwise in a section title, intraday series are provided at 3-minute intervals.\n\nYOUR ACCOUNT STATUS:\n- Total Capital: $10,000.00\n- Free Capital: $10,000.00\n- Allocated Capital: $0.00\n- Open Positions: 0/3\n- Position Size: 10.0% per trade\n- Risk Per Trade: 2.0%\n\nCURRENT POSITIONS:\nNo open positions\n\nMONITORED ASSETS: BTC, ETH, SOL, DOGE, XRP\n\nCURRENT MARKET STATE FOR BTC\n\nALL BTC DATA\ncurrent_price = 0.00, current_ema20 = 0.00, current_macd = 0.000, current_rsi (7 period) = 50.00\n\nIntraday series (by 3m, oldest \u2192 latest):\nMid prices: []\nEMA indicators (20\u2011period): []\nMACD indicators: []\nRSI indicators (7\u2011Period): []\nRSI indicators (14\u2011Period): []\n\nLonger\u2011term context (4\u2011hour timeframe):\n20\u2011Period EMA: 111318.665 vs. 50\u2011Period EMA: 111649.648\n3\u2011Period ATR: 1773.59 vs. 14\u2011Period ATR: 1733.967\nCurrent Volume: 2347081728.000 vs. Average Volume: 3133763475.610\nMACD indicators: [523.759, 444.967, 247.825, 24.330, -200.842, -330.752, -372.076, -524.686, -801.614, -1046.414]\nRSI indicators (14\u2011Period): [43.250, 36.468, 23.463, 21.564, 21.051, 26.136, 34.393, 29.786, 23.054, 21.364]\n",
+          "system_prompt": "You are an expert crypto trading AI.\n\nYour role is to analyze real-time market data for BTC/USD and make trading decisions on 3m candles.\n\nOBJECTIVE: Maximize risk-adjusted returns on 3m timeframe.\n\nProvide your response in this format:\nSIGNAL: [BUY/SELL/HOLD]\nCONFIDENCE: [0-100]%\nREASONING: [your analysis]\n"
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-30T18:28:44.735734",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "The intraday 3m data is completely empty (no price data, indicators), making short-term technical analysis impossible. However, the 4h timeframe shows bearish momentum with MACD declining from 523 to -1042 and RSI deeply oversold around 21-43. The 20-EMA is below 50-EMA confirming the downtrend. While this suggests potential for a bounce from oversold conditions, the complete lack of intraday data means I cannot time an entry effectively. The high ATR (~1773) indicates significant volatility, but without current price context, the risk of entering blindly is too high. Waiting for proper intraday data to establish before making trading decisions.",
+          "raw_response": "SIGNAL: HOLD\nCONFIDENCE: 65%\nREASONING: The intraday 3m data is completely empty (no price data, indicators), making short-term technical analysis impossible. However, the 4h timeframe shows bearish momentum with MACD declining from 523 to -1042 and RSI deeply oversold around 21-43. The 20-EMA is below 50-EMA confirming the downtrend. While this suggests potential for a bounce from oversold conditions, the complete lack of intraday data means I cannot time an entry effectively. The high ATR (~1773) indicates significant volatility, but without current price context, the risk of entering blindly is too high. Waiting for proper intraday data to establish before making trading decisions.",
+          "prompt": "You are an expert trader with deep knowledge of technical analysis, risk management, and market dynamics.\n\nIt has been 6 minutes since you started trading. The current time is 2025-10-30 18:28:37.481789 and you've been invoked 3 times. Below, we are providing you with a variety of state data, price data, and predictive signals so you can discover alpha. Below that is your current account information, value, performance, positions, etc.\n\nALL OF THE PRICE OR SIGNAL DATA BELOW IS ORDERED: OLDEST \u2192 NEWEST\n\nTimeframes note: Unless stated otherwise in a section title, intraday series are provided at 3-minute intervals.\n\nYOUR ACCOUNT STATUS:\n- Total Capital: $10,000.00\n- Free Capital: $10,000.00\n- Allocated Capital: $0.00\n- Open Positions: 0/3\n- Position Size: 10.0% per trade\n- Risk Per Trade: 2.0%\n\nCURRENT POSITIONS:\nNo open positions\n\nMONITORED ASSETS: BTC, ETH, SOL, DOGE, XRP\n\nCURRENT MARKET STATE FOR BTC\n\nALL BTC DATA\ncurrent_price = 0.00, current_ema20 = 0.00, current_macd = 0.000, current_rsi (7 period) = 50.00\n\nIntraday series (by 3m, oldest \u2192 latest):\nMid prices: []\nEMA indicators (20\u2011period): []\nMACD indicators: []\nRSI indicators (7\u2011Period): []\nRSI indicators (14\u2011Period): []\n\nLonger\u2011term context (4\u2011hour timeframe):\n20\u2011Period EMA: 111322.931 vs. 50\u2011Period EMA: 111651.404\n3\u2011Period ATR: 1773.59 vs. 14\u2011Period ATR: 1733.967\nCurrent Volume: 3126231040.000 vs. Average Volume: 3135933807.955\nMACD indicators: [523.759, 444.967, 247.825, 24.330, -200.842, -330.752, -372.076, -524.686, -801.614, -1042.841]\nRSI indicators (14\u2011Period): [43.250, 36.468, 23.463, 21.564, 21.051, 26.136, 34.393, 29.786, 23.054, 21.442]\n",
+          "system_prompt": "You are an expert crypto trading AI.\n\nYour role is to analyze real-time market data for BTC/USD and make trading decisions on 3m candles.\n\nOBJECTIVE: Maximize risk-adjusted returns on 3m timeframe.\n\nProvide your response in this format:\nSIGNAL: [BUY/SELL/HOLD]\nCONFIDENCE: [0-100]%\nREASONING: [your analysis]\n"
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 0,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-30T18:31:51.800711",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 0,
+          "reasoning": "The intraday 3-minute data for BTC is completely empty (no price, EMA, MACD, or RSI values), making any short-term technical analysis impossible. While the 4-hour data shows a bearish MACD trend and oversold RSI levels, this longer-term context cannot be reliably applied to 3-minute trading decisions without corresponding short-term data. With no actionable intraday signals and incomplete market data, I cannot make an informed trading decision.",
+          "raw_response": "SIGNAL: HOLD  \nCONFIDENCE: 0%  \nREASONING: The intraday 3-minute data for BTC is completely empty (no price, EMA, MACD, or RSI values), making any short-term technical analysis impossible. While the 4-hour data shows a bearish MACD trend and oversold RSI levels, this longer-term context cannot be reliably applied to 3-minute trading decisions without corresponding short-term data. With no actionable intraday signals and incomplete market data, I cannot make an informed trading decision.",
+          "prompt": "You are an expert trader with deep knowledge of technical analysis, risk management, and market dynamics.\n\nIt has been 9 minutes since you started trading. The current time is 2025-10-30 18:31:46.595642 and you've been invoked 4 times. Below, we are providing you with a variety of state data, price data, and predictive signals so you can discover alpha. Below that is your current account information, value, performance, positions, etc.\n\nALL OF THE PRICE OR SIGNAL DATA BELOW IS ORDERED: OLDEST \u2192 NEWEST\n\nTimeframes note: Unless stated otherwise in a section title, intraday series are provided at 3-minute intervals.\n\nYOUR ACCOUNT STATUS:\n- Total Capital: $10,000.00\n- Free Capital: $10,000.00\n- Allocated Capital: $0.00\n- Open Positions: 0/3\n- Position Size: 10.0% per trade\n- Risk Per Trade: 2.0%\n\nCURRENT POSITIONS:\nNo open positions\n\nMONITORED ASSETS: BTC, ETH, SOL, DOGE, XRP\n\nCURRENT MARKET STATE FOR BTC\n\nALL BTC DATA\ncurrent_price = 0.00, current_ema20 = 0.00, current_macd = 0.000, current_rsi (7 period) = 50.00\n\nIntraday series (by 3m, oldest \u2192 latest):\nMid prices: []\nEMA indicators (20\u2011period): []\nMACD indicators: []\nRSI indicators (7\u2011Period): []\nRSI indicators (14\u2011Period): []\n\nLonger\u2011term context (4\u2011hour timeframe):\n20\u2011Period EMA: 111323.831 vs. 50\u2011Period EMA: 111651.775\n3\u2011Period ATR: 1773.59 vs. 14\u2011Period ATR: 1733.967\nCurrent Volume: 4132864000.000 vs. Average Volume: 3138737799.487\nMACD indicators: [523.759, 444.967, 247.825, 24.330, -200.842, -330.752, -372.076, -524.686, -801.614, -1042.087]\nRSI indicators (14\u2011Period): [43.250, 36.468, 23.463, 21.564, 21.051, 26.136, 34.393, 29.786, 23.054, 21.459]\n",
+          "system_prompt": "You are an expert crypto trading AI.\n\nYour role is to analyze real-time market data for BTC/USD and make trading decisions on 3m candles.\n\nOBJECTIVE: Maximize risk-adjusted returns on 3m timeframe.\n\nProvide your response in this format:\nSIGNAL: [BUY/SELL/HOLD]\nCONFIDENCE: [0-100]%\nREASONING: [your analysis]\n"
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 0,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-30T18:34:59.566749",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 0,
+          "reasoning": "The provided BTC data shows current_price = 0.00 and all intraday series (3m timeframe) are empty arrays, indicating no valid real-time price data is available. Without current price information, EMA, MACD, or RSI signals on the 3m timeframe, I cannot make any informed trading decision. The longer-term 4h data shows bearish momentum with MACD declining and RSI in oversold territory (21.757), but this context alone is insufficient for 3m trading without current price action. Risk management dictates no position should be taken until reliable real-time data is available.",
+          "raw_response": "SIGNAL: HOLD\nCONFIDENCE: 0%\nREASONING: The provided BTC data shows current_price = 0.00 and all intraday series (3m timeframe) are empty arrays, indicating no valid real-time price data is available. Without current price information, EMA, MACD, or RSI signals on the 3m timeframe, I cannot make any informed trading decision. The longer-term 4h data shows bearish momentum with MACD declining and RSI in oversold territory (21.757), but this context alone is insufficient for 3m trading without current price action. Risk management dictates no position should be taken until reliable real-time data is available.",
+          "prompt": "You are an expert trader with deep knowledge of technical analysis, risk management, and market dynamics.\n\nIt has been 12 minutes since you started trading. The current time is 2025-10-30 18:34:52.849362 and you've been invoked 5 times. Below, we are providing you with a variety of state data, price data, and predictive signals so you can discover alpha. Below that is your current account information, value, performance, positions, etc.\n\nALL OF THE PRICE OR SIGNAL DATA BELOW IS ORDERED: OLDEST \u2192 NEWEST\n\nTimeframes note: Unless stated otherwise in a section title, intraday series are provided at 3-minute intervals.\n\nYOUR ACCOUNT STATUS:\n- Total Capital: $10,000.00\n- Free Capital: $10,000.00\n- Allocated Capital: $0.00\n- Open Positions: 0/3\n- Position Size: 10.0% per trade\n- Risk Per Trade: 2.0%\n\nCURRENT POSITIONS:\nNo open positions\n\nMONITORED ASSETS: BTC, ETH, SOL, DOGE, XRP\n\nCURRENT MARKET STATE FOR BTC\n\nALL BTC DATA\ncurrent_price = 0.00, current_ema20 = 0.00, current_macd = 0.000, current_rsi (7 period) = 50.00\n\nIntraday series (by 3m, oldest \u2192 latest):\nMid prices: []\nEMA indicators (20\u2011period): []\nMACD indicators: []\nRSI indicators (7\u2011Period): []\nRSI indicators (14\u2011Period): []\n\nLonger\u2011term context (4\u2011hour timeframe):\n20\u2011Period EMA: 111339.856 vs. 50\u2011Period EMA: 111658.374\n3\u2011Period ATR: 1773.59 vs. 14\u2011Period ATR: 1733.967\nCurrent Volume: 4948320256.000 vs. Average Volume: 3141009265.382\nMACD indicators: [523.759, 444.967, 247.825, 24.330, -200.842, -330.752, -372.076, -524.686, -801.614, -1028.664]\nRSI indicators (14\u2011Period): [43.250, 36.468, 23.463, 21.564, 21.051, 26.136, 34.393, 29.786, 23.054, 21.757]\n",
+          "system_prompt": "You are an expert crypto trading AI.\n\nYour role is to analyze real-time market data for BTC/USD and make trading decisions on 3m candles.\n\nOBJECTIVE: Maximize risk-adjusted returns on 3m timeframe.\n\nProvide your response in this format:\nSIGNAL: [BUY/SELL/HOLD]\nCONFIDENCE: [0-100]%\nREASONING: [your analysis]\n"
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 0,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-30T18:38:07.991705",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 0,
+          "reasoning": "All intraday price data and technical indicators for BTC are showing zeros and empty arrays, indicating either a data feed failure or initialization issue. Without valid 3-minute timeframe data (mid prices, EMA20, MACD, RSI-7), no reliable trading signal can be generated. The longer-term 4h context shows BTC in a bearish trend with MACD declining and RSI deeply oversold (21.178), but this lacks the necessary resolution for 3m trading decisions. Given the complete absence of actionable intraday data and the system showing current_price = 0.00, maintaining a HOLD position is the only prudent course until data integrity is restored.",
+          "raw_response": "SIGNAL: HOLD\nCONFIDENCE: 0%\nREASONING: All intraday price data and technical indicators for BTC are showing zeros and empty arrays, indicating either a data feed failure or initialization issue. Without valid 3-minute timeframe data (mid prices, EMA20, MACD, RSI-7), no reliable trading signal can be generated. The longer-term 4h context shows BTC in a bearish trend with MACD declining and RSI deeply oversold (21.178), but this lacks the necessary resolution for 3m trading decisions. Given the complete absence of actionable intraday data and the system showing current_price = 0.00, maintaining a HOLD position is the only prudent course until data integrity is restored.",
+          "prompt": "You are an expert trader with deep knowledge of technical analysis, risk management, and market dynamics.\n\nIt has been 15 minutes since you started trading. The current time is 2025-10-30 18:38:00.976225 and you've been invoked 6 times. Below, we are providing you with a variety of state data, price data, and predictive signals so you can discover alpha. Below that is your current account information, value, performance, positions, etc.\n\nALL OF THE PRICE OR SIGNAL DATA BELOW IS ORDERED: OLDEST \u2192 NEWEST\n\nTimeframes note: Unless stated otherwise in a section title, intraday series are provided at 3-minute intervals.\n\nYOUR ACCOUNT STATUS:\n- Total Capital: $10,000.00\n- Free Capital: $10,000.00\n- Allocated Capital: $0.00\n- Open Positions: 0/3\n- Position Size: 10.0% per trade\n- Risk Per Trade: 2.0%\n\nCURRENT POSITIONS:\nNo open positions\n\nMONITORED ASSETS: BTC, ETH, SOL, DOGE, XRP\n\nCURRENT MARKET STATE FOR BTC\n\nALL BTC DATA\ncurrent_price = 0.00, current_ema20 = 0.00, current_macd = 0.000, current_rsi (7 period) = 50.00\n\nIntraday series (by 3m, oldest \u2192 latest):\nMid prices: []\nEMA indicators (20\u2011period): []\nMACD indicators: []\nRSI indicators (7\u2011Period): []\nRSI indicators (14\u2011Period): []\n\nLonger\u2011term context (4\u2011hour timeframe):\n20\u2011Period EMA: 111308.353 vs. 50\u2011Period EMA: 111645.402\n3\u2011Period ATR: 1773.59 vs. 14\u2011Period ATR: 1733.967\nCurrent Volume: 5425455104.000 vs. Average Volume: 3142338331.811\nMACD indicators: [523.759, 444.967, 247.825, 24.330, -200.842, -330.752, -372.076, -524.686, -801.614, -1055.051]\nRSI indicators (14\u2011Period): [43.250, 36.468, 23.463, 21.564, 21.051, 26.136, 34.393, 29.786, 23.054, 21.178]\n",
+          "system_prompt": "You are an expert crypto trading AI.\n\nYour role is to analyze real-time market data for BTC/USD and make trading decisions on 3m candles.\n\nOBJECTIVE: Maximize risk-adjusted returns on 3m timeframe.\n\nProvide your response in this format:\nSIGNAL: [BUY/SELL/HOLD]\nCONFIDENCE: [0-100]%\nREASONING: [your analysis]\n"
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 0,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-30T18:41:16.587047",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 0,
+          "reasoning": "The provided intraday data for BTC is completely empty\u2014no mid prices, EMAs, MACD, or RSI values are available. Without any real-time 3-minute data, it is impossible to perform technical analysis or identify any actionable trading signals. The longer-term 4-hour data shows a bearish MACD trend and oversold RSI levels, but this lacks relevance for a 3-minute trading strategy. Given the total absence of current market data, no trade can be justified.",
+          "raw_response": "SIGNAL: HOLD  \nCONFIDENCE: 0%  \nREASONING: The provided intraday data for BTC is completely empty\u2014no mid prices, EMAs, MACD, or RSI values are available. Without any real-time 3-minute data, it is impossible to perform technical analysis or identify any actionable trading signals. The longer-term 4-hour data shows a bearish MACD trend and oversold RSI levels, but this lacks relevance for a 3-minute trading strategy. Given the total absence of current market data, no trade can be justified.",
+          "prompt": "You are an expert trader with deep knowledge of technical analysis, risk management, and market dynamics.\n\nIt has been 19 minutes since you started trading. The current time is 2025-10-30 18:41:10.970105 and you've been invoked 7 times. Below, we are providing you with a variety of state data, price data, and predictive signals so you can discover alpha. Below that is your current account information, value, performance, positions, etc.\n\nALL OF THE PRICE OR SIGNAL DATA BELOW IS ORDERED: OLDEST \u2192 NEWEST\n\nTimeframes note: Unless stated otherwise in a section title, intraday series are provided at 3-minute intervals.\n\nYOUR ACCOUNT STATUS:\n- Total Capital: $10,000.00\n- Free Capital: $10,000.00\n- Allocated Capital: $0.00\n- Open Positions: 0/3\n- Position Size: 10.0% per trade\n- Risk Per Trade: 2.0%\n\nCURRENT POSITIONS:\nNo open positions\n\nMONITORED ASSETS: BTC, ETH, SOL, DOGE, XRP\n\nCURRENT MARKET STATE FOR BTC\n\nALL BTC DATA\ncurrent_price = 0.00, current_ema20 = 0.00, current_macd = 0.000, current_rsi (7 period) = 50.00\n\nIntraday series (by 3m, oldest \u2192 latest):\nMid prices: []\nEMA indicators (20\u2011period): []\nMACD indicators: []\nRSI indicators (7\u2011Period): []\nRSI indicators (14\u2011Period): []\n\nLonger\u2011term context (4\u2011hour timeframe):\n20\u2011Period EMA: 111289.183 vs. 50\u2011Period EMA: 111637.508\n3\u2011Period ATR: 1773.59 vs. 14\u2011Period ATR: 1733.967\nCurrent Volume: 5817483264.000 vs. Average Volume: 3143430332.256\nMACD indicators: [523.759, 444.967, 247.825, 24.330, -200.842, -330.752, -372.076, -524.686, -801.614, -1071.108]\nRSI indicators (14\u2011Period): [43.250, 36.468, 23.463, 21.564, 21.051, 26.136, 34.393, 29.786, 23.054, 20.841]\n",
+          "system_prompt": "You are an expert crypto trading AI.\n\nYour role is to analyze real-time market data for BTC/USD and make trading decisions on 3m candles.\n\nOBJECTIVE: Maximize risk-adjusted returns on 3m timeframe.\n\nProvide your response in this format:\nSIGNAL: [BUY/SELL/HOLD]\nCONFIDENCE: [0-100]%\nREASONING: [your analysis]\n"
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 0,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-30T18:44:30.453185",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 0,
+          "reasoning": "The provided intraday data for BTC is entirely empty\u2014mid prices, EMAs, MACD, and RSI arrays are all blank, making any 3-minute timeframe analysis impossible. Without current price data or short-term indicators, I cannot assess momentum, trend, or entry/exit signals. The 4-hour data shows a bearish MACD trend (declining from 523 to -1065) and oversold RSI readings (~21\u201343), suggesting longer-term weakness, but this lacks confirmation on the 3-minute scale. Given the absence of actionable real-time data and no open positions, holding is the only prudent choice.",
+          "raw_response": "SIGNAL: HOLD  \nCONFIDENCE: 0%  \nREASONING: The provided intraday data for BTC is entirely empty\u2014mid prices, EMAs, MACD, and RSI arrays are all blank, making any 3-minute timeframe analysis impossible. Without current price data or short-term indicators, I cannot assess momentum, trend, or entry/exit signals. The 4-hour data shows a bearish MACD trend (declining from 523 to -1065) and oversold RSI readings (~21\u201343), suggesting longer-term weakness, but this lacks confirmation on the 3-minute scale. Given the absence of actionable real-time data and no open positions, holding is the only prudent choice.",
+          "prompt": "You are an expert trader with deep knowledge of technical analysis, risk management, and market dynamics.\n\nIt has been 22 minutes since you started trading. The current time is 2025-10-30 18:44:23.888270 and you've been invoked 8 times. Below, we are providing you with a variety of state data, price data, and predictive signals so you can discover alpha. Below that is your current account information, value, performance, positions, etc.\n\nALL OF THE PRICE OR SIGNAL DATA BELOW IS ORDERED: OLDEST \u2192 NEWEST\n\nTimeframes note: Unless stated otherwise in a section title, intraday series are provided at 3-minute intervals.\n\nYOUR ACCOUNT STATUS:\n- Total Capital: $10,000.00\n- Free Capital: $10,000.00\n- Allocated Capital: $0.00\n- Open Positions: 0/3\n- Position Size: 10.0% per trade\n- Risk Per Trade: 2.0%\n\nCURRENT POSITIONS:\nNo open positions\n\nMONITORED ASSETS: BTC, ETH, SOL, DOGE, XRP\n\nCURRENT MARKET STATE FOR BTC\n\nALL BTC DATA\ncurrent_price = 0.00, current_ema20 = 0.00, current_macd = 0.000, current_rsi (7 period) = 50.00\n\nIntraday series (by 3m, oldest \u2192 latest):\nMid prices: []\nEMA indicators (20\u2011period): []\nMACD indicators: []\nRSI indicators (7\u2011Period): []\nRSI indicators (14\u2011Period): []\n\nLonger\u2011term context (4\u2011hour timeframe):\n20\u2011Period EMA: 111296.090 vs. 50\u2011Period EMA: 111640.352\n3\u2011Period ATR: 1773.59 vs. 14\u2011Period ATR: 1733.967\nCurrent Volume: 5817483264.000 vs. Average Volume: 3143430332.256\nMACD indicators: [523.759, 444.967, 247.825, 24.330, -200.842, -330.752, -372.076, -524.686, -801.614, -1065.323]\nRSI indicators (14\u2011Period): [43.250, 36.468, 23.463, 21.564, 21.051, 26.136, 34.393, 29.786, 23.054, 20.961]\n",
+          "system_prompt": "You are an expert crypto trading AI.\n\nYour role is to analyze real-time market data for BTC/USD and make trading decisions on 3m candles.\n\nOBJECTIVE: Maximize risk-adjusted returns on 3m timeframe.\n\nProvide your response in this format:\nSIGNAL: [BUY/SELL/HOLD]\nCONFIDENCE: [0-100]%\nREASONING: [your analysis]\n"
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 0,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-30T18:47:38.273180",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 0,
+          "reasoning": "The intraday 3-minute data for BTC is completely empty (no mid prices, EMA, MACD, or RSI values), making any short-term technical analysis impossible. While the 4-hour data shows oversold conditions (RSI near 20) and MACD deeply negative, suggesting potential long-term reversal, the absence of real-time 3-minute data prevents confident entry timing. Without current price or momentum signals, I cannot justify a trade. Wait for live data to resume before taking any position.",
+          "raw_response": "SIGNAL: HOLD  \nCONFIDENCE: 0%  \nREASONING: The intraday 3-minute data for BTC is completely empty (no mid prices, EMA, MACD, or RSI values), making any short-term technical analysis impossible. While the 4-hour data shows oversold conditions (RSI near 20) and MACD deeply negative, suggesting potential long-term reversal, the absence of real-time 3-minute data prevents confident entry timing. Without current price or momentum signals, I cannot justify a trade. Wait for live data to resume before taking any position.",
+          "prompt": "You are an expert trader with deep knowledge of technical analysis, risk management, and market dynamics.\n\nIt has been 25 minutes since you started trading. The current time is 2025-10-30 18:47:32.222475 and you've been invoked 9 times. Below, we are providing you with a variety of state data, price data, and predictive signals so you can discover alpha. Below that is your current account information, value, performance, positions, etc.\n\nALL OF THE PRICE OR SIGNAL DATA BELOW IS ORDERED: OLDEST \u2192 NEWEST\n\nTimeframes note: Unless stated otherwise in a section title, intraday series are provided at 3-minute intervals.\n\nYOUR ACCOUNT STATUS:\n- Total Capital: $10,000.00\n- Free Capital: $10,000.00\n- Allocated Capital: $0.00\n- Open Positions: 0/3\n- Position Size: 10.0% per trade\n- Risk Per Trade: 2.0%\n\nCURRENT POSITIONS:\nNo open positions\n\nMONITORED ASSETS: BTC, ETH, SOL, DOGE, XRP\n\nCURRENT MARKET STATE FOR BTC\n\nALL BTC DATA\ncurrent_price = 0.00, current_ema20 = 0.00, current_macd = 0.000, current_rsi (7 period) = 50.00\n\nIntraday series (by 3m, oldest \u2192 latest):\nMid prices: []\nEMA indicators (20\u2011period): []\nMACD indicators: []\nRSI indicators (7\u2011Period): []\nRSI indicators (14\u2011Period): []\n\nLonger\u2011term context (4\u2011hour timeframe):\n20\u2011Period EMA: 111290.170 vs. 50\u2011Period EMA: 111637.915\n3\u2011Period ATR: 1773.59 vs. 14\u2011Period ATR: 1733.967\nCurrent Volume: 6502031360.000 vs. Average Volume: 3145337151.465\nMACD indicators: [523.759, 444.967, 247.825, 24.330, -200.842, -330.752, -372.076, -524.686, -801.614, -1070.282]\nRSI indicators (14\u2011Period): [43.250, 36.468, 23.463, 21.564, 21.051, 26.136, 34.393, 29.786, 23.054, 20.858]\n",
+          "system_prompt": "You are an expert crypto trading AI.\n\nYour role is to analyze real-time market data for BTC/USD and make trading decisions on 3m candles.\n\nOBJECTIVE: Maximize risk-adjusted returns on 3m timeframe.\n\nProvide your response in this format:\nSIGNAL: [BUY/SELL/HOLD]\nCONFIDENCE: [0-100]%\nREASONING: [your analysis]\n"
+        }
+      }
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 0,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-30T18:50:48.321156",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 0,
+          "reasoning": "The provided BTC market data is incomplete and unusable for analysis. The intraday series (3m timeframe) shows empty arrays for all indicators (mid prices, EMA20, MACD, RSI), and the current_price is listed as 0.00. While the 4-hour timeframe data shows some bearish momentum with MACD declining and RSI in oversold territory (21.195), this longer-term context cannot be reliably applied to 3-minute trading decisions without current intraday data. The volume spike suggests potential volatility, but without real-time price action and technical indicators, no informed trading decision can be made. Risk management dictates waiting for valid data before entering any position.",
+          "raw_response": "SIGNAL: HOLD\nCONFIDENCE: 0%\nREASONING: The provided BTC market data is incomplete and unusable for analysis. The intraday series (3m timeframe) shows empty arrays for all indicators (mid prices, EMA20, MACD, RSI), and the current_price is listed as 0.00. While the 4-hour timeframe data shows some bearish momentum with MACD declining and RSI in oversold territory (21.195), this longer-term context cannot be reliably applied to 3-minute trading decisions without current intraday data. The volume spike suggests potential volatility, but without real-time price action and technical indicators, no informed trading decision can be made. Risk management dictates waiting for valid data before entering any position.",
+          "prompt": "You are an expert trader with deep knowledge of technical analysis, risk management, and market dynamics.\n\nIt has been 28 minutes since you started trading. The current time is 2025-10-30 18:50:40.951183 and you've been invoked 10 times. Below, we are providing you with a variety of state data, price data, and predictive signals so you can discover alpha. Below that is your current account information, value, performance, positions, etc.\n\nALL OF THE PRICE OR SIGNAL DATA BELOW IS ORDERED: OLDEST \u2192 NEWEST\n\nTimeframes note: Unless stated otherwise in a section title, intraday series are provided at 3-minute intervals.\n\nYOUR ACCOUNT STATUS:\n- Total Capital: $10,000.00\n- Free Capital: $10,000.00\n- Allocated Capital: $0.00\n- Open Positions: 0/3\n- Position Size: 10.0% per trade\n- Risk Per Trade: 2.0%\n\nCURRENT POSITIONS:\nNo open positions\n\nMONITORED ASSETS: BTC, ETH, SOL, DOGE, XRP\n\nCURRENT MARKET STATE FOR BTC\n\nALL BTC DATA\ncurrent_price = 0.00, current_ema20 = 0.00, current_macd = 0.000, current_rsi (7 period) = 50.00\n\nIntraday series (by 3m, oldest \u2192 latest):\nMid prices: []\nEMA indicators (20\u2011period): []\nMACD indicators: []\nRSI indicators (7\u2011Period): []\nRSI indicators (14\u2011Period): []\n\nLonger\u2011term context (4\u2011hour timeframe):\n20\u2011Period EMA: 111309.319 vs. 50\u2011Period EMA: 111645.800\n3\u2011Period ATR: 1773.59 vs. 14\u2011Period ATR: 1733.967\nCurrent Volume: 6502031360.000 vs. Average Volume: 3145337151.465\nMACD indicators: [523.759, 444.967, 247.825, 24.330, -200.842, -330.752, -372.076, -524.686, -801.614, -1054.242]\nRSI indicators (14\u2011Period): [43.250, 36.468, 23.463, 21.564, 21.051, 26.136, 34.393, 29.786, 23.054, 21.195]\n",
+          "system_prompt": "You are an expert crypto trading AI.\n\nYour role is to analyze real-time market data for BTC/USD and make trading decisions on 3m candles.\n\nOBJECTIVE: Maximize risk-adjusted returns on 3m timeframe.\n\nProvide your response in this format:\nSIGNAL: [BUY/SELL/HOLD]\nCONFIDENCE: [0-100]%\nREASONING: [your analysis]\n"
+        }
+      }
+    }
+  ]
+}

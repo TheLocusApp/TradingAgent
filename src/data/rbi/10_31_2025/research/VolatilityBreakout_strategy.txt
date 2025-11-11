@@ -1,0 +1,39 @@
+STRATEGY_NAME: VolatilityBreakout
+
+STRATEGY_DETAILS:
+This strategy capitalizes on periods of low volatility followed by high-probability breakout moves using Bollinger Bands as the primary volatility and momentum indicator.
+
+KEY STRATEGY COMPONENTS:
+1. Volatility Squeeze Detection: Identifies periods of compressed volatility when Bollinger Bands contract significantly
+2. Breakout Confirmation: Waits for price to break outside the Bollinger Band boundaries with volume confirmation
+3. Momentum Validation: Uses additional indicators to confirm the strength and direction of the breakout move
+
+REQUIRED INDICATORS:
+- Bollinger Bands (20-period, 2 standard deviations)
+- Volume indicator (Volume SMA or OBV)
+- Optional: RSI (14-period) for momentum confirmation
+- Optional: MACD for trend direction confirmation
+
+ENTRY RULES:
+1. SQUEEZE CONDITION: Bollinger Band width must be at its lowest levels in recent periods (typically bottom 20% of recent width readings)
+2. BREAKOUT DIRECTION: Enter long when price closes ABOVE the upper Bollinger Band, or enter short when price closes BELOW the lower Bollinger Band
+3. VOLUME CONFIRMATION: Breakout must occur on above-average volume (volume > 20-period volume SMA)
+4. TIMING: Enter on the next candle's open after the breakout confirmation
+
+EXIT RULES:
+1. PROFIT TARGET: Take profit when price reaches the opposite Bollinger Band (for long: lower band, for short: upper band)
+2. TRAILING STOP: Use the middle Bollinger Band (20-period SMA) as a trailing stop - exit when price closes back inside the bands
+3. TIME-BASED EXIT: If no significant move occurs within 5-10 periods after entry, consider exiting to preserve capital
+4. REVERSAL SIGNAL: Exit if the opposite breakout signal occurs (long position gets short signal)
+
+RISK MANAGEMENT:
+1. POSITION SIZING: Risk no more than 1-2% of capital per trade
+2. STOP LOSS: Place initial stop loss at the middle Bollinger Band (20-period SMA)
+3. VOLATILITY ADJUSTMENT: Adjust position size based on current Bollinger Band width - smaller positions during high volatility periods
+4. MULTIPLE TIME FRAME: Confirm squeeze conditions on higher timeframes before trading on lower timeframes
+
+ADDITIONAL CONSIDERATIONS:
+- Avoid trading during major economic news events when false breakouts are common
+- Look for consecutive squeeze patterns for higher probability setups
+- Combine with market structure analysis (support/resistance levels) for better entry timing
+- The strategy works best in ranging markets transitioning to trending conditions

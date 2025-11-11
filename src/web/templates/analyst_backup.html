@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Market Analyst - Moon Dev Trading</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='modern-style.css') }}?v=2.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        .input-section {
+            background: #16162a;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #9ca3af;
+        }
+
+        .form-control {
+            background: #0f0f1e;
+            border: 1px solid #2d2d44;
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: #fff;
+            font-size: 14px;
+            transition: border-color 0.2s;
+            height: 46px;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #6366f1;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            height: 46px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .results-grid {
+            display: grid;
+            gap: 24px;
+        }
+
+        .analysis-card {
+            background: #16162a;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #1f1f2e;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #1f1f2e 0%, #16162a 100%);
+            padding: 20px 24px;
+            border-bottom: 1px solid #2d2d44;
+        }
+
+        .card-header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .ticker-info h3 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        .ticker-price {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .price-positive { color: #22c55e; }
+        .price-negative { color: #ef4444; }
+
+        .timeframe-badge {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-day { background: #fef3c7; color: #92400e; }
+        .badge-swing { background: #dbeafe; color: #1e40af; }
+        .badge-long { background: #dcfce7; color: #166534; }
+
+        .card-body {
+            padding: 24px;
+        }
+
+        .section {
+            margin-bottom: 24px;
+        }
+
+        .section:last-child {
+            margin-bottom: 0;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .case-container {
+            background: #0f0f1e;
+            border-radius: 8px;
+            padding: 16px;
+            border-left: 4px solid;
+        }
+
+        .bull-case {
+            border-left-color: #22c55e;
+        }
+
+        .bear-case {
+            border-left-color: #ef4444;
+        }
+
+        .case-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .case-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .probability {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .bull-case .probability { color: #22c55e; }
+        .bear-case .probability { color: #ef4444; }
+
+        .case-points {
+            list-style: none;
+            padding: 0;
+        }
+
+        .case-points li {
+            padding: 8px 0;
+            padding-left: 24px;
+            position: relative;
+            color: #d1d5db;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .case-points li:before {
+            content: "•";
+            position: absolute;
+            left: 8px;
+            font-weight: bold;
+        }
+
+        .bull-case .case-points li:before { color: #22c55e; }
+        .bear-case .case-points li:before { color: #ef4444; }
+
+        .conclusion-box {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            border-radius: 12px;
+            padding: 24px;
+            color: #fff;
+        }
+
+        .signal-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .signal-buy { background: #22c55e; }
+        .signal-sell { background: #ef4444; }
+        .signal-hold { background: #6b7280; }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin: 16px 0;
+        }
+
+        .metric {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-bottom: 4px;
+        }
+
+        .metric-value {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .reasoning {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .loading i {
+            font-size: 48px;
+            color: #6366f1;
+            margin-bottom: 16px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: #6b7280;
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 20px;
+            margin-bottom: 8px;
+            color: #9ca3af;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+        }
+
+        .technical-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .technical-item {
+            background: #0f0f1e;
+            padding: 12px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .technical-label {
+            font-size: 13px;
+            color: #9ca3af;
+        }
+
+        .technical-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="nav-links">
+                <a href="/">LIVE TRADING</a>
+                <a href="/screener">SCREENER</a>
+                <a href="/analyst" class="active">ANALYST</a>
+                <a href="/portfolio">PORTFOLIO</a>
+                <a href="/strategy-lab">STRATEGY LAB</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+
+        <div class="input-section">
+            <div style="display: flex; gap: 16px; align-items: center;">
+                <div class="form-group" style="flex: 1; margin: 0;">
+                    <label for="tickers" style="margin-bottom: 8px; display: block;">Ticker Symbols (1-5 max)</label>
+                    <input type="text" id="tickers" class="form-control" placeholder="BTC, ETH, AAPL, TSLA..." value="BTC">
+                </div>
+                <button id="analyze-btn" class="btn btn-primary" onclick="analyzeMarket()" style="margin-top: 28px; padding: 12px 20px;">
+                    <i class="fas fa-search"></i> Analyze
+                </button>
+            </div>
+        </div>
+
+        <div id="results-container">
+            <div class="empty-state">
+                <i class="fas fa-chart-bar"></i>
+                <h3>Ready to Analyze</h3>
+                <p>Enter ticker symbols above and click Analyze to get started</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isAnalyzing = false;
+
+        async function analyzeMarket() {
+            if (isAnalyzing) return;
+
+            const tickersInput = document.getElementById('tickers').value.trim();
+
+            if (!tickersInput) {
+                alert('Please enter at least one ticker symbol');
+                return;
+            }
+
+            // Parse tickers
+            const tickers = tickersInput.split(',').map(t => t.trim().toUpperCase()).filter(t => t);
+            
+            if (tickers.length === 0) {
+                alert('Please enter valid ticker symbols');
+                return;
+            }
+
+            if (tickers.length > 5) {
+                alert('Maximum 5 tickers allowed for quality analysis');
+                return;
+            }
+
+            // Show loading
+            isAnalyzing = true;
+            const btn = document.getElementById('analyze-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+
+            const resultsContainer = document.getElementById('results-container');
+            resultsContainer.innerHTML = `
+                <div class="loading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <h3 style="color: #fff; margin-bottom: 8px;">Analyzing ${tickers.join(', ')}...</h3>
+                    <p style="color: #9ca3af;">Gathering data, running analysis, generating recommendations...</p>
+                </div>
+            `;
+
+            try {
+                // Call API
+                const response = await fetch('/api/analyst/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ tickers })
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                // Display results
+                displayResults(data.results);
+
+            } catch (error) {
+                console.error('Analysis error:', error);
+                resultsContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i>
+                        <h3 style="color: #ef4444;">Analysis Failed</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            } finally {
+                isAnalyzing = false;
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-search"></i> Analyze';
+            }
+        }
+
+        function displayResults(results) {
+            const container = document.getElementById('results-container');
+            container.innerHTML = '<div class="results-grid"></div>';
+            const grid = container.querySelector('.results-grid');
+
+            results.forEach(result => {
+                if (result.error) {
+                    grid.innerHTML += createErrorCard(result);
+                } else {
+                    grid.innerHTML += createAnalysisCard(result);
+                }
+            });
+        }
+
+        function createAnalysisCard(data) {
+            const timeframeBadgeClass = {
+                'day': 'badge-day',
+                'swing': 'badge-swing',
+                'long': 'badge-long'
+            }[data.timeframe] || 'badge-swing';
+
+            const priceChange = data.market_data?.price_change_pct || 0;
+            const priceClass = priceChange >= 0 ? 'price-positive' : 'price-negative';
+            const priceSign = priceChange >= 0 ? '+' : '';
+
+            const signal = data.signal || data.conclusion?.signal || 'HOLD';
+            const confidence = data.confidence || data.conclusion?.confidence || 50;
+            const signalClass = signal === 'BUY' ? 'signal-buy' : signal === 'SELL' ? 'signal-sell' : 'signal-hold';
+
+            const bullPoints = data.bull_case?.points || [];
+            const bearPoints = data.bear_case?.points || [];
+            const bullProb = data.bull_case?.probability || 50;
+            const bearProb = data.bear_case?.probability || 50;
+
+            const reasoning = data.reasoning || data.conclusion?.reasoning || 'Analysis complete';
+            const entryRange = data.entry_range || data.conclusion?.entry_range;
+            const target = data.target || data.conclusion?.target;
+            const stopLoss = data.stop_loss || data.conclusion?.stop_loss;
+
+            return `
+                <div class="analysis-card">
+                    <div class="card-header">
+                        <div class="card-header-top">
+                            <div class="ticker-info">
+                                <h3>${data.symbol}</h3>
+                                <div class="ticker-price ${priceClass}">
+                                    $${(data.market_data?.current_price || 0).toLocaleString('en-US', {minimumFractionDigits: 2})}
+                                    <span style="font-size: 14px;">(${priceSign}${priceChange.toFixed(2)}%)</span>
+                                </div>
+                            </div>
+                            <div class="timeframe-badge ${timeframeBadgeClass}">
+                                ${data.timeframe} Trade
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <!-- Technical Overview -->
+                        <div class="section">
+                            <div class="section-title">
+                                <i class="fas fa-chart-bar"></i> Technical Overview
+                            </div>
+                            <div class="technical-grid">
+                                <div class="technical-item">
+                                    <span class="technical-label">RSI(7)</span>
+                                    <span class="technical-value">${(data.market_data?.rsi_7 || 0).toFixed(1)}</span>
+                                </div>
+                                <div class="technical-item">
+                                    <span class="technical-label">MACD</span>
+                                    <span class="technical-value">${(data.market_data?.macd || 0).toFixed(2)}</span>
+                                </div>
+                                <div class="technical-item">
+                                    <span class="technical-label">Pattern</span>
+                                    <span class="technical-value">${data.chart_analysis?.pattern || 'N/A'}</span>
+                                </div>
+                                <div class="technical-item">
+                                    <span class="technical-label">Trend</span>
+                                    <span class="technical-value">${data.chart_analysis?.trend || 'N/A'}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bull Case -->
+                        <div class="section">
+                            <div class="case-container bull-case">
+                                <div class="case-header">
+                                    <div class="case-title">🐂 BULL CASE</div>
+                                    <div class="probability">${bullProb}%</div>
+                                </div>
+                                <ul class="case-points">
+                                    ${bullPoints.map(point => `<li>${point}</li>`).join('')}
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Bear Case -->
+                        <div class="section">
+                            <div class="case-container bear-case">
+                                <div class="case-header">
+                                    <div class="case-title">🐻 BEAR CASE</div>
+                                    <div class="probability">${bearProb}%</div>
+                                </div>
+                                <ul class="case-points">
+                                    ${bearPoints.map(point => `<li>${point}</li>`).join('')}
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Conclusion -->
+                        <div class="section">
+                            <div class="conclusion-box">
+                                <div class="signal-badge ${signalClass}">
+                                    <i class="fas fa-${signal === 'BUY' ? 'arrow-up' : signal === 'SELL' ? 'arrow-down' : 'minus'}"></i>
+                                    ${signal}
+                                </div>
+                                <div class="metrics-grid">
+                                    <div class="metric">
+                                        <div class="metric-label">Confidence</div>
+                                        <div class="metric-value">${confidence}%</div>
+                                    </div>
+                                    ${entryRange ? `
+                                    <div class="metric">
+                                        <div class="metric-label">Entry Range</div>
+                                        <div class="metric-value">$${entryRange.low?.toLocaleString() || 'N/A'} - $${entryRange.high?.toLocaleString() || 'N/A'}</div>
+                                    </div>
+                                    ` : ''}
+                                    ${target ? `
+                                    <div class="metric">
+                                        <div class="metric-label">Target</div>
+                                        <div class="metric-value">$${target.toLocaleString()}</div>
+                                    </div>
+                                    ` : ''}
+                                    ${stopLoss ? `
+                                    <div class="metric">
+                                        <div class="metric-label">Stop Loss</div>
+                                        <div class="metric-value">$${stopLoss.toLocaleString()}</div>
+                                    </div>
+                                    ` : ''}
+                                </div>
+                                <div class="reasoning">
+                                    <strong>Reasoning:</strong> ${reasoning}
+                                </div>
+                                <div class="action-buttons">
+                                    <button class="btn btn-primary" onclick="createAgentFromAnalysis('${data.symbol}', '${signal}')">
+                                        <i class="fas fa-robot"></i> Create Agent
+                                    </button>
+                                    <button class="btn btn-secondary">
+                                        <i class="fas fa-bookmark"></i> Add to Watchlist
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createErrorCard(result) {
+            return `
+                <div class="analysis-card">
+                    <div class="card-body">
+                        <div class="empty-state">
+                            <i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i>
+                            <h3 style="color: #ef4444;">Error: ${result.symbol}</h3>
+                            <p>${result.error}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createAgentFromAnalysis(symbol, signal) {
+            // Redirect to main page with pre-filled agent creation
+            window.location.href = `/?create_agent=${symbol}&signal=${signal}`;
+        }
+
+        // Allow Enter key to trigger analysis
+        document.getElementById('tickers').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                analyzeMarket();
+            }
+        });
+    </script>
+</body>
+</html>

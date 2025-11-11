@@ -1,0 +1,55 @@
+STRATEGY_NAME: AdaptiveCrossover
+
+STRATEGY_DETAILS:
+This strategy utilizes a dual exponential moving average (EMA) crossover system on SPY hourly charts, combining trend identification with momentum confirmation for precise entry and exit timing.
+
+KEY STRATEGY COMPONENTS:
+- Primary Trend Indicator: 200-period EMA (long-term trend direction)
+- Signal Generator: 20-period EMA (short-term momentum)
+- Asset: SPY (SPDR S&P 500 ETF Trust)
+- Timeframe: 1-hour charts
+- Core Concept: Capitalize on significant trend changes while filtering out minor fluctuations
+
+ENTRY RULES:
+LONG ENTRY:
+1. Wait for 20-period EMA to cross ABOVE 200-period EMA
+2. Enter on the next candle after crossover confirmation
+3. Confirm bullish momentum with rising price action
+4. Optional: Wait for price to retest the 20 EMA as support after crossover
+
+SHORT ENTRY:
+1. Wait for 20-period EMA to cross BELOW 200-period EMA
+2. Enter on the next candle after crossover confirmation
+3. Confirm bearish momentum with declining price action
+4. Optional: Wait for price to retest the 20 EMA as resistance after crossover
+
+EXIT RULES:
+LONG POSITIONS:
+1. Exit when 20-period EMA crosses below 200-period EMA
+2. Alternative: Use trailing stop based on recent swing lows or ATR
+3. Consider partial profit-taking at key resistance levels
+
+SHORT POSITIONS:
+1. Exit when 20-period EMA crosses above 200-period EMA
+2. Alternative: Use trailing stop based on recent swing highs or ATR
+3. Consider partial profit-taking at key support levels
+
+RISK MANAGEMENT:
+- Position sizing: Risk 1-2% of capital per trade
+- Stop loss: Place below recent swing low (longs) or above recent swing high (shorts)
+- Maximum drawdown: Limit to 5-8% of total capital
+- Trade frequency: Avoid overtrading - wait for clear, confirmed crossovers
+- Market hours: Focus on regular trading hours for better liquidity and volume
+
+REQUIRED INDICATORS:
+1. 20-period Exponential Moving Average (EMA)
+2. 200-period Exponential Moving Average (EMA)
+3. Optional: Volume confirmation for crossover validity
+4. Optional: ATR (Average True Range) for stop loss placement
+
+ADDITIONAL CONSIDERATIONS:
+- Monitor overall market conditions and SPY volume
+- Be aware of economic events that may cause false signals
+- Consider using longer timeframes (daily) for trend confirmation
+- The strategy works best in trending markets, may underperform in ranging conditions
+- Backtest specific parameters for SPY's unique volatility characteristics

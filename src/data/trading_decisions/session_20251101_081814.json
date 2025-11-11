@@ -1,0 +1,56 @@
+{
+  "session_id": "20251101_081814",
+  "config": {
+    "models": [
+      "deepseek"
+    ],
+    "model_temperature": 0.7,
+    "model_max_tokens": 1024,
+    "system_prompt": "",
+    "asset_type": "crypto",
+    "ticker": "BTC",
+    "timeframe": "3m",
+    "cycle_interval": 180,
+    "use_simulation": true,
+    "initial_balance": 10000,
+    "position_size_percentage": 0.1,
+    "max_positions": 3,
+    "risk_per_trade": 0.02,
+    "monitored_assets": [
+      "ETH"
+    ],
+    "agent_name": "ETH SCALPER",
+    "agent_strategy": "You are an expert crypto day trader with deep knowledge of technical analysis, risk management, and market dynamics. Analyze real-time market data and make trading decisions based on technical indicators (EMA, MACD, RSI, ATR), price action, volume analysis, and risk management principles. Consider both intraday patterns and longer-term context. Maximize risk-adjusted returns while managing position sizing and drawdown.",
+    "save_decisions": true,
+    "decisions_dir": "src/data/trading_decisions",
+    "use_live_data": false
+  },
+  "session_start": "2025-11-01T08:18:14.687435",
+  "decisions_count": 3,
+  "decisions": [
+    {
+      "signal": "HOLD",
+      "confidence": 0,
+      "reasoning": "No models available",
+      "models_used": [],
+      "timestamp": "2025-11-01T08:18:22.030885",
+      "individual_decisions": {}
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 0,
+      "reasoning": "No models available",
+      "models_used": [],
+      "timestamp": "2025-11-01T08:21:22.995688",
+      "individual_decisions": {}
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 0,
+      "reasoning": "No models available",
+      "models_used": [],
+      "timestamp": "2025-11-01T08:24:24.020898",
+      "individual_decisions": {}
+    }
+  ]
+}

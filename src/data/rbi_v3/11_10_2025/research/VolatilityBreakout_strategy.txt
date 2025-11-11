@@ -1,0 +1,41 @@
+STRATEGY_NAME: VolatilityBreakout
+
+STRATEGY_DETAILS:
+This strategy capitalizes on periods of low volatility followed by high-momentum breakouts using Bollinger Bands on SPY 1-hour timeframe.
+
+KEY STRATEGY COMPONENTS:
+1. Bollinger Bands (20-period, 2 standard deviations) to identify volatility compression
+2. Volume confirmation for breakout validity
+3. Momentum confirmation using price action
+4. Time-based exit criteria
+
+REQUIRED INDICATORS:
+- Bollinger Bands (20,2)
+- Volume indicator
+- Simple Moving Average (50-period) for trend context
+
+ENTRY RULES:
+1. WAIT FOR SQUEEZE: Bollinger Band width must contract to less than 2% of the middle band (Band Width = (Upper Band - Lower Band) / Middle Band)
+2. CONFIRM BREAKOUT: Price must close above the upper Bollinger Band with above-average volume (volume > 20-period average)
+3. TREND CONFIRMATION: 50-period SMA should be sloping upward for long entries
+4. ENTER: Next candle open after breakout confirmation
+
+EXIT RULES:
+1. PROFIT TARGET: 2x the Bollinger Band width at time of entry
+2. STOP LOSS: Below the middle Bollinger Band (20-period SMA)
+3. TIME-BASED EXIT: Close position after 8 hours if profit target not reached
+4. TRAILING STOP: Move stop to breakeven once price reaches 1x Bollinger Band width profit
+
+RISK MANAGEMENT:
+- Position size: Maximum 2% of account per trade
+- Stop loss distance determines position size
+- Avoid trading during first/last hour of market session
+- Skip trades if market gap exceeds 0.5% from previous close
+
+ADDITIONAL FILTERS:
+- Only trade between 9:30 AM - 3:30 PM EST
+- Avoid trading on major economic announcement days
+- Require minimum 3 consecutive squeeze candles before breakout
+- Look for volume spike of at least 150% of 20-period average
+
+This strategy exploits the tendency for periods of low volatility to precede significant price movements, particularly effective in SPY due to its liquidity and tendency for mean reversion followed by momentum bursts.

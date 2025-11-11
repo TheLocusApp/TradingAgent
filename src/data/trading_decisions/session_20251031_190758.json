@@ -1,0 +1,52 @@
+{
+  "session_id": "20251031_190758",
+  "config": {
+    "models": [
+      "deepseek"
+    ],
+    "model_temperature": 0.7,
+    "model_max_tokens": 1024,
+    "system_prompt": "",
+    "asset_type": "crypto",
+    "ticker": "BTC",
+    "timeframe": "3m",
+    "cycle_interval": 180,
+    "use_simulation": true,
+    "initial_balance": 10000,
+    "position_size_percentage": 0.1,
+    "max_positions": 3,
+    "risk_per_trade": 0.02,
+    "monitored_assets": [
+      "BTC"
+    ],
+    "agent_name": "BTC Agent",
+    "agent_strategy": "You are an expert trader with deep knowledge of technical analysis, risk management, and market dynamics. Analyze real-time market data and make trading decisions based on technical indicators (EMA, MACD, RSI, ATR), price action, volume analysis, and risk management principles. Consider both intraday patterns and longer-term context. Maximize risk-adjusted returns while managing position sizing and drawdown.",
+    "save_decisions": true,
+    "decisions_dir": "src/data/trading_decisions",
+    "use_live_data": false
+  },
+  "session_start": "2025-10-31T19:07:58.670369",
+  "decisions_count": 1,
+  "decisions": [
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Price is currently trading slightly below the EMA20 (109121.72 vs 109283.50), indicating mild bearish momentum on the 3m timeframe. MACD remains negative at -62.17 but has shown improvement from earlier deeply negative levels, suggesting potential momentum shift. RSI at 57.05 is neutral, not indicating overbought or oversold conditions. The 4h timeframe shows price well below both EMAs (110451 and 111157) with negative MACD, confirming longer-term bearish bias. Volume spike suggests increased activity but direction is unclear. With mixed signals and no clear trend reversal confirmation, maintaining cash position to wait for stronger directional conviction is prudent. A break above EMA20 with MACD turning positive could signal buying opportunity, while failure to hold current levels may present short entry.",
+      "model_count": 1,
+      "prompt": "It has been 0 minutes since you started trading. The current time is 2025-10-31 19:08:12.437374 and you've been invoked 1 times. Below, we are providing you with a variety of state data, price data, and predictive signals so you can discover alpha. Below that is your current account information, value, performance, positions, etc.\nALL OF THE PRICE OR SIGNAL DATA BELOW IS ORDERED: OLDEST \u2192 NEWEST\nTimeframes note: Unless stated otherwise in a section title, intraday series are provided at 3\u2011minute intervals. If a coin uses a different interval, it is explicitly stated in that coin's section.\nCURRENT MARKET STATE FOR ALL COINS\nALL BTC DATA\ncurrent_price = 109121.72, current_ema20 = 109283.499, current_macd = -62.170, current_rsi (7 period) = 57.050\nIntraday series (3\u2011minute intervals, oldest \u2192 latest):\nMid prices: [109260.719, 109214.281, 109009.641, 109226.391, 109463.141, 109405.750, 109323.141, 109316.320, 109217.594, 109121.719]\nEMA indicators (20\u2011period): [109323.977, 109313.529, 109284.588, 109279.045, 109296.578, 109306.975, 109308.515, 109309.258, 109300.528, 109283.499]\nMACD indicators: [-110.522, -106.965, -119.284, -110.285, -83.092, -65.418, -57.416, -51.036, -53.331, -62.170]\nRSI indicators (7\u2011Period): [53.131, 39.865, 34.559, 41.860, 50.540, 51.752, 54.561, 53.265, 50.183, 57.050]\nRSI indicators (14\u2011Period): [58.797, 65.422, 55.169, 53.319, 63.363, 58.841, 55.537, 53.205, 46.030, 46.500]\nLonger\u2011term context (4\u2011hour timeframe):\n20\u2011Period EMA: 110451.755 vs. 50\u2011Period EMA: 111157.024\n3\u2011Period ATR: 1425.609 vs. 14\u2011Period ATR: 1834.257\nCurrent Volume: 34242023424.000 vs. Average Volume: 3240903209.359\nMACD indicators: [-372.076, -524.686, -801.614, -1112.828, -1196.580, -1174.885, -1125.595, -1003.156, -911.004, -911.287]\nRSI indicators (14\u2011Period): [34.393, 29.786, 23.054, 20.013, 28.131, 34.790, 37.551, 42.471, 37.650, 35.894]\nHERE IS YOUR ACCOUNT INFORMATION & PERFORMANCE\nCurrent Total Return (percent): 0.00%\nAvailable Cash: 10000.00\nCurrent Account Value: 10000.00\nCurrent live positions & performance: No open positions",
+      "response": "SIGNAL: HOLD\nCONFIDENCE: 65%\nREASONING: Price is currently trading slightly below the EMA20 (109121.72 vs 109283.50), indicating mild bearish momentum on the 3m timeframe. MACD remains negative at -62.17 but has shown improvement from earlier deeply negative levels, suggesting potential momentum shift. RSI at 57.05 is neutral, not indicating overbought or oversold conditions. The 4h timeframe shows price well below both EMAs (110451 and 111157) with negative MACD, confirming longer-term bearish bias. Volume spike suggests increased activity but direction is unclear. With mixed signals and no clear trend reversal confirmation, maintaining cash position to wait for stronger directional conviction is prudent. A break above EMA20 with MACD turning positive could signal buying opportunity, while failure to hold current levels may present short entry.",
+      "system_prompt": "You are an expert crypto trading AI.\n\nYour role is to analyze real-time market data for BTC/USD and make trading decisions on 3m candles.\n\nOBJECTIVE: Maximize risk-adjusted returns on 3m timeframe.\n\nProvide your response in this format:\nSIGNAL: [BUY/SELL/HOLD]\nCONFIDENCE: [0-100]%\nREASONING: [your analysis]\n",
+      "timestamp": "2025-10-31T19:08:21.220501",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "Price is currently trading slightly below the EMA20 (109121.72 vs 109283.50), indicating mild bearish momentum on the 3m timeframe. MACD remains negative at -62.17 but has shown improvement from earlier deeply negative levels, suggesting potential momentum shift. RSI at 57.05 is neutral, not indicating overbought or oversold conditions. The 4h timeframe shows price well below both EMAs (110451 and 111157) with negative MACD, confirming longer-term bearish bias. Volume spike suggests increased activity but direction is unclear. With mixed signals and no clear trend reversal confirmation, maintaining cash position to wait for stronger directional conviction is prudent. A break above EMA20 with MACD turning positive could signal buying opportunity, while failure to hold current levels may present short entry.",
+          "raw_response": "SIGNAL: HOLD\nCONFIDENCE: 65%\nREASONING: Price is currently trading slightly below the EMA20 (109121.72 vs 109283.50), indicating mild bearish momentum on the 3m timeframe. MACD remains negative at -62.17 but has shown improvement from earlier deeply negative levels, suggesting potential momentum shift. RSI at 57.05 is neutral, not indicating overbought or oversold conditions. The 4h timeframe shows price well below both EMAs (110451 and 111157) with negative MACD, confirming longer-term bearish bias. Volume spike suggests increased activity but direction is unclear. With mixed signals and no clear trend reversal confirmation, maintaining cash position to wait for stronger directional conviction is prudent. A break above EMA20 with MACD turning positive could signal buying opportunity, while failure to hold current levels may present short entry.",
+          "prompt": "It has been 0 minutes since you started trading. The current time is 2025-10-31 19:08:12.437374 and you've been invoked 1 times. Below, we are providing you with a variety of state data, price data, and predictive signals so you can discover alpha. Below that is your current account information, value, performance, positions, etc.\nALL OF THE PRICE OR SIGNAL DATA BELOW IS ORDERED: OLDEST \u2192 NEWEST\nTimeframes note: Unless stated otherwise in a section title, intraday series are provided at 3\u2011minute intervals. If a coin uses a different interval, it is explicitly stated in that coin's section.\nCURRENT MARKET STATE FOR ALL COINS\nALL BTC DATA\ncurrent_price = 109121.72, current_ema20 = 109283.499, current_macd = -62.170, current_rsi (7 period) = 57.050\nIntraday series (3\u2011minute intervals, oldest \u2192 latest):\nMid prices: [109260.719, 109214.281, 109009.641, 109226.391, 109463.141, 109405.750, 109323.141, 109316.320, 109217.594, 109121.719]\nEMA indicators (20\u2011period): [109323.977, 109313.529, 109284.588, 109279.045, 109296.578, 109306.975, 109308.515, 109309.258, 109300.528, 109283.499]\nMACD indicators: [-110.522, -106.965, -119.284, -110.285, -83.092, -65.418, -57.416, -51.036, -53.331, -62.170]\nRSI indicators (7\u2011Period): [53.131, 39.865, 34.559, 41.860, 50.540, 51.752, 54.561, 53.265, 50.183, 57.050]\nRSI indicators (14\u2011Period): [58.797, 65.422, 55.169, 53.319, 63.363, 58.841, 55.537, 53.205, 46.030, 46.500]\nLonger\u2011term context (4\u2011hour timeframe):\n20\u2011Period EMA: 110451.755 vs. 50\u2011Period EMA: 111157.024\n3\u2011Period ATR: 1425.609 vs. 14\u2011Period ATR: 1834.257\nCurrent Volume: 34242023424.000 vs. Average Volume: 3240903209.359\nMACD indicators: [-372.076, -524.686, -801.614, -1112.828, -1196.580, -1174.885, -1125.595, -1003.156, -911.004, -911.287]\nRSI indicators (14\u2011Period): [34.393, 29.786, 23.054, 20.013, 28.131, 34.790, 37.551, 42.471, 37.650, 35.894]\nHERE IS YOUR ACCOUNT INFORMATION & PERFORMANCE\nCurrent Total Return (percent): 0.00%\nAvailable Cash: 10000.00\nCurrent Account Value: 10000.00\nCurrent live positions & performance: No open positions",
+          "system_prompt": "You are an expert crypto trading AI.\n\nYour role is to analyze real-time market data for BTC/USD and make trading decisions on 3m candles.\n\nOBJECTIVE: Maximize risk-adjusted returns on 3m timeframe.\n\nProvide your response in this format:\nSIGNAL: [BUY/SELL/HOLD]\nCONFIDENCE: [0-100]%\nREASONING: [your analysis]\n"
+        }
+      }
+    }
+  ]
+}

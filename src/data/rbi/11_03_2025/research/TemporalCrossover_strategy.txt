@@ -1,0 +1,55 @@
+STRATEGY_NAME: TemporalCrossover
+
+STRATEGY_DETAILS:
+This strategy employs a dual-timeframe exponential moving average crossover system specifically designed for SPY hourly charts, focusing on the interaction between short-term and medium-term trend dynamics.
+
+KEY STRATEGY COMPONENTS:
+- Primary Instrument: SPY (SPDR S&P 500 ETF Trust)
+- Timeframe: Hourly charts exclusively
+- Core Indicators: 20-period EMA (short-term) and 100-period EMA (medium-term)
+- The 20 EMA represents recent price momentum and immediate trend direction
+- The 100 EMA captures the broader medium-term trend structure
+- Crossover events signal potential trend reversals or accelerations
+
+ENTRY RULES:
+LONG ENTRY:
+- Wait for the 20 EMA to cross ABOVE the 100 EMA
+- Enter on the next hourly candle following the confirmed crossover
+- Confirm bullish momentum with the crossover candle closing above the 20 EMA
+- Optional: Volume confirmation with above-average volume on crossover candle
+
+SHORT ENTRY:
+- Wait for the 20 EMA to cross BELOW the 100 EMA
+- Enter on the next hourly candle following the confirmed crossover
+- Confirm bearish momentum with the crossover candle closing below the 20 EMA
+- Optional: Volume confirmation with above-average volume on crossover candle
+
+EXIT RULES:
+LONG POSITION EXIT:
+- Exit when 20 EMA crosses below 100 EMA (reverse signal)
+- Alternative: Use trailing stop of 2-3% below recent swing low
+- Time-based exit after 5-7 days if no significant movement
+
+SHORT POSITION EXIT:
+- Exit when 20 EMA crosses above 100 EMA (reverse signal)
+- Alternative: Use trailing stop of 2-3% above recent swing high
+- Time-based exit after 5-7 days if no significant movement
+
+RISK MANAGEMENT:
+- Position sizing: Risk no more than 1-2% of capital per trade
+- Stop loss placement: 2-3% below entry for longs, 2-3% above entry for shorts
+- Maximum portfolio exposure: 5-10% across all positions
+- Avoid trading during major economic announcements or market holidays
+- Monitor for false breakouts by waiting for candle close confirmation
+
+REQUIRED INDICATORS:
+1. 20-period Exponential Moving Average (EMA)
+2. 100-period Exponential Moving Average (EMA)
+3. Optional: Volume indicator for confirmation
+4. Optional: ATR (Average True Range) for dynamic stop loss calculation
+
+ADDITIONAL CONSIDERATIONS:
+- This strategy works best in trending markets, may generate whipsaws in ranging conditions
+- Consider filtering trades with broader market context (daily chart trend direction)
+- Monitor for convergence/divergence between EMAs as early warning signals
+- Backtest specific to SPY's characteristic volatility patterns and trading hours

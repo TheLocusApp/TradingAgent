@@ -1,0 +1,68 @@
+STRATEGY_NAME: DualExponential Crossover
+
+STRATEGY_DETAILS:
+Overview
+- Instrument/timeframe: SPY, 60-minute candles (RTH 09:30–16:00 ET)
+- Core logic: Trade regime shifts when the 48 EMA crosses the 200 EMA, with slope and separation filters to reduce whipsaws
+
+Key Components
+- Trend MAs: EMA(48) signal line, EMA(200) regime line
+- Regime filter: 200 EMA slope must confirm trend direction
+- Separation filter: Require price and EMAs to be clearly ordered post-cross to avoid noise
+- Volatility and sizing: ATR-based stops and position sizing
+- Optional chop filter: ADX(14) threshold
+
+Entry Rules
+Long:
+1) Signal: EMA(48) crosses above EMA(200) on a closed hourly bar.
+2) Regime slope: EMA200_slope = EMA200(t) − EMA200(t−5) > 0 (or > +0.02% of price to normalize).
+3) Separation: Current close > EMA48 > EMA200 and EMA48 − EMA200 ≥ 0.05% of price.
+4) Optional chop filter: ADX(14) ≥ 18.
+5) Execution: Enter at next bar open or use MOC at signal close.
+
+Short (optional; consider inverse ETF if shorting restricted):
+1) Signal: EMA(48) crosses below EMA(200) on a closed hourly bar.
+2) Regime slope: EMA200_slope < 0 (or < −0.02% of price).
+3) Separation: Current close < EMA48 < EMA200 and EMA200 − EMA48 ≥ 0.05% of price.
+4) Optional: ADX(14) ≥ 18.
+5) Execution: Next bar open or MOC.
+
+Exit Rules
+- Hard exit on reverse cross: Close long when EMA48 crosses below EMA200 (and vice versa for shorts).
+- Trailing exit: Use Chandelier/ATR or EMA trail:
+  - Option A (ATR trail): For longs, trail stop at HighestClose(10) − 2.5 × ATR(14); for shorts, LowestClose(10) + 2.5 × ATR(14).
+  - Option B (EMA trail): For longs, exit if hourly close < EMA(48); for shorts, exit if hourly close > EMA(48).
+- Time stop: If after 20 bars unrealized P/L never reached +0.5R, exit at market.
+- Partial take-profit (optional): Take 50% at +1.5R; trail the rest per rules above.
+
+Risk Management
+- Risk per trade: 0.5–1.0% of account equity.
+- Initial stop (long): Place at the lower of
+  - Recent swing low (last 10 bars), or
+  - EMA(200) − 1.0 × ATR(14).
+  Short: Higher of swing high or EMA(200) + 1.0 × ATR(14).
+- Position sizing: Shares = floor((Risk_$) / (Entry − Stop)), where Risk_$ = Equity × Risk%.
+- Skip trades with excessive gap risk: If entry gap makes stop distance > 3 × ATR(14), reduce size or pass.
+- Max exposure: One open position (SPY only) to maintain clarity and regime purity.
+- Session controls: Avoid new entries in final hour Friday; no premarket/after-hours fills.
+- Event filter (optional): No new entries within 2 hours before/after FOMC rate decisions or CPI releases.
+
+Required Indicators and Settings
+- EMA(48) on hourly close
+- EMA(200) on hourly close
+- EMA200 slope: difference over last 5 bars (or use percent change to price)
+- ATR(14), hourly
+- Optional: ADX(14), hourly
+- Optional: HighestClose(10)/LowestClose(10) for Chandelier-style trailing
+
+Implementation Notes
+- Use bar close to confirm crosses; no intrabar peeking.
+- Enter on next bar open for realistic execution; if using MOC, specify broker support.
+- Slippage/commission: Include conservative assumptions in backtests (e.g., $0.01–$0.02/share slippage).
+
+Parameter Tuning (guardrails)
+- EMA pair fixed at 48/200 to capture intermediate trends within a long-term regime.
+- Reasonable ranges if testing: EMA_fast 34–60; EMA_slow 150–250; ATR multiple 2.0–3.0; ADX 15–25.
+- Keep out-of-sample validation to avoid curve fit.
+
+This defines a clean, rules-based EMA regime-crossover on SPY hourly with practical filters, ATR-based risk control, and unambiguous entries/exits.

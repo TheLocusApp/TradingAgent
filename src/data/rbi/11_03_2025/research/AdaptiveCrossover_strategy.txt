@@ -1,0 +1,48 @@
+STRATEGY_NAME: AdaptiveCrossover
+
+STRATEGY_DETAILS:
+
+KEY STRATEGY COMPONENTS:
+- Dual EMA crossover system using 20-period and 100-period exponential moving averages
+- Specifically designed for SPY (SPDR S&P 500 ETF) on hourly timeframe
+- Trend-following approach that captures medium-term momentum shifts
+- EMA selection provides balanced sensitivity (20-period) and trend confirmation (100-period)
+
+REQUIRED INDICATORS:
+- 20-period Exponential Moving Average (EMA)
+- 100-period Exponential Moving Average (EMA)
+- Price chart of SPY on 1-hour timeframe
+
+ENTRY RULES:
+LONG ENTRY:
+- When 20-period EMA crosses ABOVE the 100-period EMA
+- Enter on the close of the hourly candle where crossover occurs
+- Confirm crossover is sustained for at least 1-2 hours to avoid false signals
+
+SHORT ENTRY:
+- When 20-period EMA crosses BELOW the 100-period EMA  
+- Enter on the close of the hourly candle where crossover occurs
+- Confirm crossover is sustained for at least 1-2 hours to avoid false signals
+
+EXIT RULES:
+LONG POSITION EXIT:
+- When 20-period EMA crosses below 100-period EMA
+- Exit on the close of the hourly candle where reverse crossover occurs
+
+SHORT POSITION EXIT:
+- When 20-period EMA crosses above 100-period EMA
+- Exit on the close of the hourly candle where reverse crossover occurs
+
+RISK MANAGEMENT:
+- Position sizing: Risk no more than 1-2% of account per trade
+- Stop loss: Place 2-3% below entry for long positions, 2-3% above entry for short positions
+- Alternative stop: Use recent swing low/high as dynamic stop levels
+- Time-based exit: Consider exiting if position doesn't move in expected direction within 24-48 hours
+- Maximum concurrent positions: 1-2 to avoid overexposure to single asset
+
+ADDITIONAL CONSIDERATIONS:
+- Monitor overall market conditions and SPY volume for confirmation
+- Be aware of economic events and earnings periods that may cause false signals
+- Consider using this strategy during normal trading hours for optimal execution
+- Backtest on SPY historical data to validate performance across different market conditions
+- The 100-period EMA on hourly corresponds to approximately 4 trading days, providing meaningful trend context

@@ -1,0 +1,42 @@
+{
+  "session_id": "20251030_084736",
+  "config": {
+    "models": [
+      "deepseek"
+    ],
+    "model_temperature": 0.7,
+    "model_max_tokens": 1024,
+    "system_prompt": "",
+    "asset_type": "crypto",
+    "ticker": "BTC",
+    "timeframe": "1m",
+    "cycle_interval": 180,
+    "use_simulation": true,
+    "initial_balance": 10000,
+    "position_size_percentage": 0.9,
+    "save_decisions": true,
+    "decisions_dir": "src/data/trading_decisions",
+    "use_live_data": false
+  },
+  "session_start": "2025-10-30T08:47:36.035887",
+  "decisions_count": 1,
+  "decisions": [
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-30T08:47:52.732621",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "Price is trading slightly above EMA(20) by approximately $26, indicating minimal bullish momentum. RSI at 53.61 is neutral, showing neither overbought nor oversold conditions. MACD remains negative at -50.596, suggesting underlying bearish pressure despite the slight price premium. The conflicting signals between price position and MACD, combined with neutral RSI, warrant caution. No clear directional bias emerges for a 1m timeframe, making HOLD the prudent position until stronger momentum develops.",
+          "raw_response": "SIGNAL: HOLD\nCONFIDENCE: 65%\nREASONING: Price is trading slightly above EMA(20) by approximately $26, indicating minimal bullish momentum. RSI at 53.61 is neutral, showing neither overbought nor oversold conditions. MACD remains negative at -50.596, suggesting underlying bearish pressure despite the slight price premium. The conflicting signals between price position and MACD, combined with neutral RSI, warrant caution. No clear directional bias emerges for a 1m timeframe, making HOLD the prudent position until stronger momentum develops.",
+          "prompt": "\nMARKET DATA FOR BTC:\nPrice: $113,793.50\nEMA(20): $113,767.33\nRSI(7): 53.61\nMACD: -50.596\n\nAnalyze and provide trading signal.\n",
+          "system_prompt": "You are an expert crypto trading AI.\n\nYour role is to analyze real-time market data for BTC/USD and make trading decisions on 1m candles.\n\nOBJECTIVE: Maximize risk-adjusted returns on 1m timeframe.\n\nProvide your response in this format:\nSIGNAL: [BUY/SELL/HOLD]\nCONFIDENCE: [0-100]%\nREASONING: [your analysis]\n"
+        }
+      }
+    }
+  ]
+}

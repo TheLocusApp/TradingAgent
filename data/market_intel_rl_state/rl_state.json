@@ -1,0 +1,16 @@
+{
+  "chart_analyzer": {
+    "status": "training",
+    "analysis_type": "chart",
+    "analysis_count": 0,
+    "metrics": {},
+    "patterns": []
+  },
+  "sentiment_analyzer": {
+    "status": "training",
+    "analysis_type": "sentiment",
+    "analysis_count": 0,
+    "metrics": {},
+    "patterns": []
+  }
+}

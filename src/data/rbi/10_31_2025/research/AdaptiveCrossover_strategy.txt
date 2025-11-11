@@ -1,0 +1,59 @@
+STRATEGY_NAME: AdaptiveCrossover
+
+STRATEGY_DETAILS:
+This strategy implements an adaptive approach to moving average crossovers by combining short-term responsiveness with long-term trend confirmation on the 4-hour QQQ chart.
+
+KEY COMPONENTS:
+- Primary Instruments: QQQ (NASDAQ 100 ETF)
+- Timeframe: 4-hour chart exclusively
+- Core Indicators: 20-period SMA and 200-period SMA
+- Trend Filter: 200 SMA acts as primary trend direction indicator
+- Signal Confirmation: Requires sustained crossover momentum
+
+ENTRY RULES:
+LONG ENTRY:
+1. 20 SMA must cross ABOVE 200 SMA (bullish crossover)
+2. Price must close above both moving averages after crossover
+3. Wait for next 4-hour candle open after crossover confirmation
+4. Enter long position at market open of confirming candle
+
+SHORT ENTRY:
+1. 20 SMA must cross BELOW 200 SMA (bearish crossover)
+2. Price must close below both moving averages after crossover
+3. Wait for next 4-hour candle open after crossover confirmation
+4. Enter short position at market open of confirming candle
+
+EXIT RULES:
+LONG EXIT:
+1. 20 SMA crosses below 200 SMA (reverse signal)
+2. Price closes below 200 SMA (trend break)
+3. Whichever occurs first
+
+SHORT EXIT:
+1. 20 SMA crosses above 200 SMA (reverse signal)
+2. Price closes above 200 SMA (trend break)
+3. Whichever occurs first
+
+RISK MANAGEMENT:
+- Position Size: Maximum 2% of account per trade
+- Stop Loss: 2 ATR (Average True Range) below entry for longs, above entry for shorts
+- Trailing Stop: Move stop to breakeven when trade reaches 1.5x initial risk
+- Maximum Drawdown: Stop trading for the month if account drops 6% from peak
+
+REQUIRED INDICATORS:
+1. 20-period Simple Moving Average (SMA)
+2. 200-period Simple Moving Average (SMA)
+3. 14-period Average True Range (ATR) for stop loss calculation
+4. Volume indicator (optional but recommended for confirmation)
+
+ADAPTIVE ELEMENTS:
+- The strategy adapts to market conditions by using the 200 SMA as dynamic support/resistance
+- Crossover signals are filtered by requiring price confirmation to reduce false signals
+- ATR-based stops adapt to current market volatility
+- Position sizing adjusts based on current ATR levels relative to account size
+
+PERFORMANCE NOTES:
+- This strategy typically generates 4-8 signals per year on QQQ
+- Best performance in trending markets, may experience drawdowns in ranging conditions
+- Requires patience as signals develop over multiple 4-hour periods
+- Works well with QQQ due to its strong trending characteristics

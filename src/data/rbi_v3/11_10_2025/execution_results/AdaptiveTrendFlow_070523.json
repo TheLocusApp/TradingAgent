@@ -1,0 +1,8 @@
+{
+  "success": false,
+  "return_code": 1,
+  "stdout": "",
+  "stderr": "Traceback (most recent call last):\n  File \"C:\\Users\\ahmed\\CascadeProjects\\moon-dev-ai-agents\\src\\data\\rbi_v3\\11_10_2025\\backtests_optimized\\AdaptiveTrendFlow_OPT_v2.py\", line 203, in <module>\n    stats = bt.run()\n            ^^^^^^^^\n  File \"C:\\Users\\ahmed\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\backtesting\\backtesting.py\", line 1310, in run\n    strategy.init()\n  File \"C:\\Users\\ahmed\\CascadeProjects\\moon-dev-ai-agents\\src\\data\\rbi_v3\\11_10_2025\\backtests_optimized\\AdaptiveTrendFlow_OPT_v2.py\", line 43, in init\n    self.volatility_ratio = self.I(self.calculate_volatility_ratio, high_prices, low_prices)  # Volatility filter\n                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\ahmed\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\backtesting\\backtesting.py\", line 162, in I\n    raise ValueError(\nValueError: Indicators must return (optionally a tuple of) numpy.arrays of same length as `data` (data shape: (502,); indicator \"calculate\u2026(H,L)\" shape: (), returned value: 1.2408838659774828)\n",
+  "execution_time": 4.829342,
+  "timestamp": "2025-11-10T07:05:23.784868"
+}

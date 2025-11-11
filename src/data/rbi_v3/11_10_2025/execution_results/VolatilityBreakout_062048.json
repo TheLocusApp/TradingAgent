@@ -1,0 +1,8 @@
+{
+  "success": false,
+  "return_code": 1,
+  "stdout": "\ud83c\udf19 MOON DEV: STRONG LONG BREAKOUT - Close: 476.51, BB Upper: 476.49, Volume: 11988544, RSI: 61.8\n\ud83d\ude80 MOON DEV: ENTERED OPTIMIZED LONG - Size: 314, Entry: 476.88, SL: 475.07, TP: 479.89, R:R: 1.67\n",
+  "stderr": "\nBacktest.run:   0%|          | 0/3444 [00:00<?, ?bar/s]\n                                                       \nTraceback (most recent call last):\n  File \"C:\\Users\\ahmed\\CascadeProjects\\moon-dev-ai-agents\\src\\data\\rbi_v3\\11_10_2025\\backtests_optimized\\VolatilityBreakout_OPT_v2.py\", line 147, in <module>\n    stats = bt.run()\n            ^^^^^^^^\n  File \"C:\\Users\\ahmed\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\backtesting\\backtesting.py\", line 1339, in run\n    strategy.next()\n  File \"C:\\Users\\ahmed\\CascadeProjects\\moon-dev-ai-agents\\src\\data\\rbi_v3\\11_10_2025\\backtests_optimized\\VolatilityBreakout_OPT_v2.py\", line 138, in next\n    if current_close <= self.position.sl or current_close >= self.position.tp:\n                        ^^^^^^^^^^^^^^^^\nAttributeError: 'Position' object has no attribute 'sl'. Did you mean: 'pl'?\n",
+  "execution_time": 6.582479,
+  "timestamp": "2025-11-10T06:20:48.173811"
+}

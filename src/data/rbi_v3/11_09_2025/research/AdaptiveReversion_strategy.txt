@@ -1,0 +1,50 @@
+STRATEGY_NAME: AdaptiveReversion
+
+STRATEGY_DETAILS:
+This is a sophisticated mean reversion strategy specifically designed for SPY 1-hour timeframe that dynamically adapts to changing market volatility conditions.
+
+KEY STRATEGY COMPONENTS:
+1. Dynamic Bollinger Bands (20-period, 2 standard deviations) - Primary mean reversion indicator
+2. RSI (14-period) - Momentum confirmation filter
+3. ATR (14-period) - Volatility-based position sizing and stop loss calculation
+4. Volume confirmation - Ensures valid signals with above-average volume
+
+ENTRY RULES (LONG):
+- Price touches or crosses below lower Bollinger Band
+- RSI below 30 (oversold condition)
+- Volume above 20-period moving average
+- No additional bearish momentum divergence present
+
+ENTRY RULES (SHORT):
+- Price touches or crosses above upper Bollinger Band
+- RSI above 70 (overbought condition)
+- Volume above 20-period moving average
+- No additional bullish momentum divergence present
+
+EXIT RULES:
+- Primary: Price returns to 20-period SMA (middle Bollinger Band)
+- Secondary: RSI crosses back above 45 (for longs) or below 55 (for shorts)
+- Time-based: Close position after 5 bars if target not reached
+- Emergency: 2x ATR stop loss from entry price
+
+RISK MANAGEMENT:
+- Maximum position size: 2% of account equity per trade
+- Stop loss: 2x ATR from entry price
+- Maximum daily drawdown: 5% of account equity
+- No new entries if 3 consecutive losing trades occur (wait for reset)
+- Reduce position size by 50% during high VIX periods (>25)
+
+REQUIRED INDICATORS:
+- Bollinger Bands (20,2)
+- RSI (14)
+- ATR (14)
+- Volume + 20-period volume MA
+- 20-period Simple Moving Average
+
+OPTIMIZATION NOTES:
+- Backtest during different market regimes (bull, bear, sideways)
+- Adjust ATR multiplier based on personal risk tolerance
+- Consider adding VIX filter for enhanced risk management
+- Monitor performance during Fed announcement days and adjust accordingly
+
+This adaptive approach ensures the strategy remains effective across varying market conditions while maintaining strict risk controls appropriate for SPY's characteristics.

@@ -1,0 +1,52 @@
+STRATEGY_NAME: VolatilityBreakout
+
+STRATEGY_DETAILS:
+This strategy capitalizes on periods of low volatility followed by high-momentum breakouts using Bollinger Bands on SPY 1-hour timeframe.
+
+KEY COMPONENTS:
+- Bollinger Bands (20-period, 2 standard deviations)
+- Volume confirmation
+- Squeeze identification
+- Breakout momentum detection
+
+REQUIRED INDICATORS:
+1. Bollinger Bands (20,2)
+2. Volume indicator
+3. Optional: RSI (14) for momentum confirmation
+
+ENTRY RULES:
+LONG ENTRY:
+1. Identify Bollinger Band squeeze (bands width < 2% of price)
+2. Wait for price to break ABOVE upper Bollinger Band
+3. Confirm with increased volume (at least 20% above 20-period average)
+4. Enter on next candle opening after breakout confirmation
+
+SHORT ENTRY:
+1. Identify Bollinger Band squeeze (bands width < 2% of price)
+2. Wait for price to break BELOW lower Bollinger Band
+3. Confirm with increased volume (at least 20% above 20-period average)
+4. Enter on next candle opening after breakout confirmation
+
+EXIT RULES:
+LONG EXIT:
+- Take profit when price touches the middle Bollinger Band (20 SMA)
+- Stop loss: 2% below entry price OR below the lower Bollinger Band
+- Alternative: Exit when RSI reaches 70 (overbought)
+
+SHORT EXIT:
+- Take profit when price touches the middle Bollinger Band (20 SMA)
+- Stop loss: 2% above entry price OR above the upper Bollinger Band
+- Alternative: Exit when RSI reaches 30 (oversold)
+
+RISK MANAGEMENT:
+- Maximum risk per trade: 1% of account
+- Position sizing based on stop loss distance
+- No new entries during last trading hour (3-4 PM EST)
+- Avoid trading during major economic announcements
+
+FILTERING CONDITIONS:
+- Only trade between 9:30 AM - 3:00 PM EST
+- Higher probability setups occur after extended consolidation (minimum 4 hours of squeeze)
+- Avoid trading against the primary trend (use daily chart for context)
+
+This strategy works best in ranging markets transitioning to trending conditions and requires patience to wait for genuine squeeze breakouts rather than false breakouts.

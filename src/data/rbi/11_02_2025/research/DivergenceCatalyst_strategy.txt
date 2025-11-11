@@ -1,0 +1,49 @@
+STRATEGY_NAME: DivergenceCatalyst
+
+STRATEGY_DETAILS:
+This strategy combines RSI divergence patterns with MACD confirmation signals specifically for SPY daily charts, creating a robust mean-reversion approach with momentum validation.
+
+KEY COMPONENTS:
+1. RSI (Relative Strength Index) - 14-period standard setting
+2. MACD (Moving Average Convergence Divergence) - 12,26,9 standard settings
+3. SPY (SPDR S&P 500 ETF) daily timeframe exclusively
+4. Divergence detection between price action and RSI
+5. MACD histogram and signal line analysis
+
+ENTRY RULES:
+LONG ENTRY (Bullish Divergence):
+- Price makes lower low while RSI makes higher low (bullish divergence)
+- MACD histogram shows upward momentum (rising bars)
+- MACD line crosses above signal line or shows bullish alignment
+- Entry on next candle open after divergence confirmation
+
+SHORT ENTRY (Bearish Divergence):
+- Price makes higher high while RSI makes lower high (bearish divergence)
+- MACD histogram shows downward momentum (falling bars)
+- MACD line crosses below signal line or shows bearish alignment
+- Entry on next candle open after divergence confirmation
+
+EXIT RULES:
+- Take profit: 2:1 risk-reward ratio minimum
+- Stop loss: Recent swing low (long) or swing high (short)
+- Alternative exit: RSI reaches overbought (70+) for longs or oversold (30-) for shorts
+- Time-based exit: Close position after 5-10 trading days if target not reached
+
+RISK MANAGEMENT:
+- Maximum 2% risk per trade
+- Position sizing based on stop loss distance
+- No new entries during major economic events or Fed announcements
+- Avoid trading during first/last 30 minutes of market hours
+- Weekly correlation check with overall market trend
+
+REQUIRED INDICATORS:
+- RSI (14-period) - for divergence detection
+- MACD (12,26,9) - for momentum confirmation
+- Volume indicator (optional but recommended) - to confirm divergence strength
+
+SPECIAL CONSIDERATIONS FOR SPY:
+- Account for market hours (9:30 AM - 4:00 PM ET)
+- Consider overall market context and sector rotation
+- Be aware of dividend dates and ex-dividend price adjustments
+- Monitor VIX levels for market volatility context
+- Align with broader S&P 500 technical structure

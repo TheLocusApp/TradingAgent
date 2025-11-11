@@ -43,7 +43,11 @@ AI_MAX_TOKENS = 4000
 
 # Import model factory with proper path handling
 import sys
-sys.path.append('/Users/md/Dropbox/dev/github/moon-dev-ai-agents-for-trading')
+from pathlib import Path
+
+# Add project root to path for imports
+PROJECT_ROOT = Path(__file__).parent.parent.parent
+sys.path.insert(0, str(PROJECT_ROOT))
 
 try:
     from src.models import model_factory
@@ -52,29 +56,27 @@ except ImportError as e:
     print(f"⚠️ Could not import model_factory: {e}")
     sys.exit(1)
 
-# Model Configurations
-# You can switch between "deepseek", "xai", "openai", "claude", "groq", etc.
-# Available xAI models: grok-4-fast-reasoning (best value!), grok-4-0709, grok-4-fast-non-reasoning,
-#                       grok-3, grok-3-mini, grok-code-fast-1
-RESEARCH_CONFIG = {
-    "type": "xai",  # Using Grok 4 Fast Reasoning (2M context, cheap!)
-    "name": "grok-4-fast-reasoning"
-}
+# Dynamic Model Configuration - Reads from environment variable set by frontend
+def get_model_config():
+    """Get model configuration from environment variable or use default"""
+    model_type = os.getenv('RBI_AI_MODEL', 'deepseek').lower()
+    
+    model_defaults = {
+        'deepseek': {'type': 'deepseek', 'name': 'deepseek-chat'},
+        'openai': {'type': 'openai', 'name': 'gpt-4o'},
+        'claude': {'type': 'claude', 'name': 'claude-3-5-sonnet-20241022'},
+        'gemini': {'type': 'gemini', 'name': 'gemini-2.5-flash'},
+        'xai': {'type': 'xai', 'name': 'grok-4-fast-reasoning'},
+        'groq': {'type': 'groq', 'name': 'llama-3.3-70b-versatile'},
+    }
+    
+    return model_defaults.get(model_type, model_defaults['deepseek'])
 
-BACKTEST_CONFIG = {
-    "type": "xai",  # Using Grok 4 Fast Reasoning for backtest coding
-    "name": "grok-4-fast-reasoning"
-}
-
-DEBUG_CONFIG = {
-    "type": "xai",  # Using Grok 4 Fast Reasoning for debugging
-    "name": "grok-4-fast-reasoning"
-}
-
-PACKAGE_CONFIG = {
-    "type": "xai",  # Using Grok 4 Fast Reasoning for package checking
-    "name": "grok-4-fast-reasoning"
-}
+# Initialize configs (will be dynamically updated based on environment)
+RESEARCH_CONFIG = get_model_config()
+BACKTEST_CONFIG = get_model_config()
+DEBUG_CONFIG = get_model_config()
+PACKAGE_CONFIG = get_model_config()
 
 # Execution Configuration
 CONDA_ENV = "tflow"  # Your conda environment
@@ -160,6 +162,29 @@ Include:
 5. your size should be 1,000,000
 6. If you need indicators use TA lib or pandas TA.
 
+🚨 CRITICAL: KEEP STRATEGIES SIMPLE AND TRADEABLE! 🚨
+- Entry conditions should trigger FREQUENTLY (aim for 10-30+ trades over 2 years)
+- DO NOT add too many filters that prevent trades
+- SIMPLE is better than complex
+
+🚨 CRITICAL DATA FETCHING REQUIREMENT 🚨
+YOU MUST USE YFINANCE TO DOWNLOAD DATA - NEVER USE HARDCODED CSV FILE PATHS!
+
+Example:
+```python
+import yfinance as yf
+def load_data():
+    ticker = yf.Ticker("TICKER_SYMBOL")  # Replace TICKER_SYMBOL with actual ticker
+    # ⚠️ yfinance hourly data limit: max 730 days (2 years)
+    data = ticker.history(period="730d", interval="1h")  # Max allowed for hourly data
+    data = data.reset_index()
+    data.columns = data.columns.str.strip()
+    data = data.rename(columns={'Date': 'datetime'})
+    data['datetime'] = pd.to_datetime(data['datetime'])
+    data = data.set_index('datetime')
+    return data[['Open', 'High', 'Low', 'Close', 'Volume']]
+```
+
 IMPORTANT DATA HANDLING:
 1. Clean column names by removing spaces: data.columns = data.columns.str.strip().str.lower()
 2. Drop any unnamed columns: data = data.drop(columns=[col for col in data.columns if 'unnamed' in col.lower()])
@@ -177,6 +202,61 @@ INDICATOR CALCULATION RULES:
 3. For swing high/lows use talib.MAX/MIN:
    - Instead of: self.data.High.rolling(window=20).max()
    - Use: self.I(talib.MAX, self.data.High, timeperiod=20)
+
+🚨 CRITICAL: TA-LIB REQUIRES FLOAT64 DTYPE 🚨
+TA-Lib functions REQUIRE numpy arrays with dtype float64 (double precision).
+yfinance returns mixed dtypes (int64 for Volume, float64 for prices).
+
+❌ WRONG - Will crash with "input array type is not double":
+```python
+self.vol_sma = self.I(talib.SMA, self.data.Volume, timeperiod=20)
+self.rsi = self.I(talib.RSI, self.data.Close, timeperiod=14)
+```
+
+✅ CORRECT - Explicit conversion to float:
+```python
+self.vol_sma = self.I(talib.SMA, self.data.Volume.astype(float), timeperiod=20)
+self.rsi = self.I(talib.RSI, self.data.Close.astype(float), timeperiod=14)
+self.atr = self.I(talib.ATR, self.data.High.astype(float), self.data.Low.astype(float), self.data.Close.astype(float), timeperiod=14)
+```
+
+⚠️ ALWAYS add .astype(float) to ALL data columns passed to TA-Lib functions!
+This applies to: Close, Open, High, Low, Volume - ALL of them!
+
+🚨 CRITICAL: CUSTOM INDICATOR FUNCTIONS MUST RETURN ARRAYS 🚨
+When using self.I() with custom functions, they MUST return numpy arrays of same length as data.
+
+❌ WRONG - Returns scalar:
+```python
+def vix_shift_func(x):
+    return x[-5]  # Single value - WILL CRASH
+```
+
+✅ CORRECT - Returns array:
+```python
+def vix_shift_func(x):
+    result = np.empty_like(x)
+    for i in range(len(x)):
+        result[i] = x[max(0, i-5)]  # Shift by 5 bars
+    return result
+
+self.vix_shifted = self.I(vix_shift_func, self.data.VIX)
+```
+
+Every custom function passed to self.I() must return an array matching data length!
+
+🚨 CRITICAL NAMING RULE 🚨
+NEVER use the same name for parameters and indicators!
+❌ WRONG:
+```python
+ema_fast = 20  # parameter
+self.ema_fast = self.I(talib.EMA, ...)  # OVERWRITES parameter!
+```
+✅ CORRECT:
+```python
+ema_fast_period = 20  # parameter
+self.ema_fast = self.I(talib.EMA, self.data.Close, timeperiod=self.ema_fast_period)
+```
 
 BACKTEST EXECUTION ORDER:
 1. Run initial backtest with default parameters first
@@ -197,18 +277,31 @@ Example fix:
 ❌ self.buy(size=3546.0993)  # Will fail
 ✅ self.buy(size=int(round(3546.0993)))  # Will work
 
-RISK MANAGEMENT:
+RISK MANAGEMENT & STOP LOSSES:
 1. Always calculate position sizes based on risk percentage
-2. Use proper stop loss and take profit calculations
-4. Print entry/exit signals with Moon Dev themed messages
+2. ❌ NEVER access self.position.sl or self.position.tp (these attributes don't exist!)
+3. ✅ Pass sl= and tp= as parameters to self.buy() or self.sell()
+4. ✅ For trailing stops, track manually with instance variables (e.g., self.stop_price)
+5. Example: self.buy(sl=stop_price, tp=target_price, size=position_size)
+6. Print entry/exit signals with Moon Dev themed messages
 
-If you need indicators use TA lib or pandas TA. 
+If you need indicators use TA lib or pandas TA.
 
-Use this data path: /Users/md/Dropbox/dev/github/moon-dev-ai-agents-for-trading/src/data/rbi/BTC-USD-15m.csv
-the above data head looks like below
-datetime, open, high, low, close, volume,
-2023-01-01 00:00:00, 16531.83, 16532.69, 16509.11, 16510.82, 231.05338022,
-2023-01-01 00:15:00, 16509.78, 16534.66, 16509.11, 16533.43, 308.12276951,
+🚨 CRITICAL: DATA LOADING MUST USE THIS EXACT PATTERN 🚨
+```python
+# At the END of your code (after strategy class):
+from pathlib import Path
+data_path = Path(__file__).parent.parent / 'data/rbi/BTC-USD-15m.csv'
+data = pd.read_csv(data_path, parse_dates=['datetime'], index_col='datetime')
+data.columns = data.columns.str.strip().str.lower()
+data = data.drop(columns=[col for col in data.columns if 'unnamed' in col.lower()])
+data = data.rename(columns={'open': 'Open', 'high': 'High', 'low': 'Low', 'close': 'Close', 'volume': 'Volume'})
+bt = Backtest(data, YourStrategyClass, cash=1000000, commission=.002)
+stats = bt.run()
+print(stats)
+print(stats._strategy)
+```
+This uses a relative path that works on ALL operating systems!
 
 Always add plenty of Moon Dev themed debug prints with emojis to make debugging easier! 🌙 ✨ 🚀
 
@@ -313,8 +406,7 @@ ONLY SEND BACK CODE, NO OTHER TEXT.
 
 def execute_backtest(file_path: str, strategy_name: str) -> dict:
     """
-    Execute a backtest file in conda environment and capture output
-    This is the NEW MAGIC! 🚀
+    Execute a backtest file using direct Python (conda unreliable on Windows)
     """
     cprint(f"\n🚀 Executing backtest: {strategy_name}", "cyan")
     cprint(f"📂 File: {file_path}", "cyan")
@@ -323,21 +415,31 @@ def execute_backtest(file_path: str, strategy_name: str) -> dict:
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"File not found: {file_path}")
     
-    # Build the command
-    cmd = [
-        "conda", "run", "-n", CONDA_ENV,
-        "python", str(file_path)
-    ]
+    # Use direct Python execution (conda unreliable on Windows)
+    cprint("⚠️ Using direct Python (conda unreliable on Windows)...", "yellow")
+    
+    # Try multiple Python executables
+    python_executables = ["python", "python3", sys.executable]
     
     start_time = datetime.now()
+    result = None
     
-    # Run the backtest
-    result = subprocess.run(
-        cmd,
-        capture_output=True,
-        text=True,
-        timeout=EXECUTION_TIMEOUT
-    )
+    for python_exe in python_executables:
+        try:
+            cprint(f"🐍 Trying: {python_exe}", "cyan")
+            result = subprocess.run(
+                [python_exe, str(file_path)],
+                capture_output=True,
+                text=True,
+                timeout=EXECUTION_TIMEOUT
+            )
+            cprint(f"✅ Successfully executed with {python_exe}", "green")
+            break
+        except FileNotFoundError:
+            continue
+    
+    if result is None:
+        raise FileNotFoundError("Could not find a working Python executable")
     
     execution_time = (datetime.now() - start_time).total_seconds()
     

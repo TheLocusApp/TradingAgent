@@ -1,0 +1,10 @@
+{
+  "agent_allocations": {
+    "agent_1": 40000.0,
+    "agent_2": 40000.0
+  },
+  "agent_performance": {},
+  "last_rebalance": "2025-11-06T09:25:11.922397",
+  "peak_capital": 100000,
+  "last_updated": "2025-11-06T09:25:11.924114"
+}

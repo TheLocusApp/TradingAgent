@@ -1,0 +1,53 @@
+STRATEGY_NAME: DivergentMomentum
+
+STRATEGY_DETAILS:
+This strategy combines RSI divergence patterns with MACD confirmation signals on QQQ daily charts to identify high-probability momentum reversal opportunities.
+
+KEY COMPONENTS:
+1. RSI (Relative Strength Index) - 14-period standard setting
+2. MACD (Moving Average Convergence Divergence) - 12,26,9 standard settings
+3. QQQ daily timeframe analysis
+4. Divergence detection between price action and RSI
+5. MACD crossover confirmation
+
+ENTRY RULES:
+LONG ENTRY:
+- Bullish RSI divergence detected (price makes lower low, RSI makes higher low)
+- MACD histogram shows positive momentum (rising above zero line or showing upward slope)
+- MACD line crosses above signal line
+- Enter on next candle open after all conditions are met
+
+SHORT ENTRY:
+- Bearish RSI divergence detected (price makes higher high, RSI makes lower high)
+- MACD histogram shows negative momentum (falling below zero line or showing downward slope)
+- MACD line crosses below signal line
+- Enter on next candle open after all conditions are met
+
+EXIT RULES:
+LONG EXIT:
+- MACD line crosses below signal line
+- OR RSI reaches overbought territory (above 70)
+- OR trailing stop loss triggered
+
+SHORT EXIT:
+- MACD line crosses above signal line
+- OR RSI reaches oversold territory (below 30)
+- OR trailing stop loss triggered
+
+RISK MANAGEMENT:
+- Position size: Maximum 2% of capital per trade
+- Stop loss: Place below recent swing low (long) or above recent swing high (short)
+- Risk-reward ratio: Minimum 1:2
+- Maximum drawdown per trade: 1% of total capital
+
+REQUIRED INDICATORS:
+1. RSI (14) - for divergence detection and overbought/oversold levels
+2. MACD (12,26,9) - for momentum confirmation and trend direction
+3. Price action analysis for swing highs/lows identification
+
+ADDITIONAL NOTES:
+- Focus on clear, well-defined divergence patterns
+- Avoid trading during major economic events or earnings periods
+- Confirm divergence across multiple swing points for higher reliability
+- Use volume confirmation for added conviction in divergence signals
+- Monitor overall market conditions and sector rotation for QQQ context

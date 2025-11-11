@@ -1,0 +1,54 @@
+STRATEGY_NAME: VolatilityDivergence
+
+STRATEGY_DETAILS:
+
+KEY STRATEGY COMPONENTS:
+This strategy combines volatility analysis with divergence detection to identify potential trend reversals and momentum shifts. The core concept involves monitoring price volatility while simultaneously detecting divergence patterns between price action and momentum oscillators. This dual approach helps filter false signals and identify high-probability reversal points during periods of changing market volatility.
+
+REQUIRED INDICATORS:
+1. Bollinger Bands (20-period, 2 standard deviations) - for volatility measurement
+2. RSI (14-period) - for momentum divergence detection
+3. MACD (12,26,9) - for additional divergence confirmation
+4. ATR (14-period) - for volatility-based position sizing
+
+ENTRY RULES:
+LONG ENTRY:
+- Price touches or crosses below lower Bollinger Band (oversold condition)
+- RSI shows bullish divergence (price makes lower low, RSI makes higher low)
+- MACD histogram shows positive divergence
+- Volatility expansion confirmed by Bollinger Band width increasing
+- Entry on close of candle confirming divergence pattern
+
+SHORT ENTRY:
+- Price touches or crosses above upper Bollinger Band (overbought condition)
+- RSI shows bearish divergence (price makes higher high, RSI makes lower high)
+- MACD histogram shows negative divergence
+- Volatility expansion confirmed by Bollinger Band width increasing
+- Entry on close of candle confirming divergence pattern
+
+EXIT RULES:
+LONG EXIT:
+- Price reaches middle Bollinger Band (20-period SMA)
+- RSI crosses above 70 (overbought territory)
+- Opposite divergence signal appears
+- Stop loss triggered
+
+SHORT EXIT:
+- Price reaches middle Bollinger Band (20-period SMA)
+- RSI crosses below 30 (oversold territory)
+- Opposite divergence signal appears
+- Stop loss triggered
+
+RISK MANAGEMENT:
+- Position sizing based on ATR: Risk per trade = 1% of account, Stop loss = 2 x ATR
+- Maximum risk per trade: 2% of account equity
+- Stop loss placement: For long positions, below recent swing low; for short positions, above recent swing high
+- Take profit: 2:1 risk-reward ratio minimum
+- Maximum daily drawdown: 5% of account equity
+- No new trades if 3 consecutive losing trades occur in same session
+
+ADDITIONAL FILTERS:
+- Trade only during high volatility periods (Bollinger Band width > average of last 20 periods)
+- Avoid trading during first and last hour of trading session
+- Confirm divergence across multiple timeframes (primary and one higher timeframe)
+- Volume should confirm the divergence pattern (increasing volume on reversal confirmation)

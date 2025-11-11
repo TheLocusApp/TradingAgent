@@ -1,0 +1,58 @@
+STRATEGY_NAME: VolatilityMomentum
+
+STRATEGY_DETAILS:
+This strategy combines TTM Squeeze momentum signals with hourly timeframe analysis specifically for TSLA, focusing on capturing momentum breakouts during volatility compression periods.
+
+KEY COMPONENTS:
+1. TTM Squeeze Indicator - Primary momentum and volatility detection
+2. Hourly timeframe for optimal entry timing
+3. TSLA-specific volatility characteristics
+4. Momentum breakout confirmation
+
+REQUIRED INDICATORS:
+- TTM Squeeze (with default settings: 20-period BB, 20-period KC, 2.0/1.5 deviations)
+- Momentum histogram (TTM Squeeze momentum bars)
+- Volume confirmation
+- Optional: 20 EMA for trend direction
+
+ENTRY RULES:
+LONG ENTRY:
+1. Wait for TTM Squeeze to show compression (gray dots on histogram)
+2. Monitor for momentum histogram turning from gray to blue (bullish momentum)
+3. Enter when:
+   - First blue momentum bar appears after squeeze compression
+   - Price breaks above recent consolidation high
+   - Volume confirms the breakout (above average volume)
+
+SHORT ENTRY:
+1. Wait for TTM Squeeze compression (gray dots)
+2. Monitor for momentum histogram turning from gray to red (bearish momentum)
+3. Enter when:
+   - First red momentum bar appears after squeeze compression
+   - Price breaks below recent consolidation low
+   - Volume confirms the breakdown
+
+EXIT RULES:
+PROFIT TAKING:
+- Take partial profits when momentum histogram shows extreme readings (deep blue/red)
+- Full exit when momentum histogram reverses color (blue to red for longs, red to blue for shorts)
+- Alternative: Use 2:1 risk-reward ratio based on entry stop loss
+
+STOP LOSS:
+- For longs: Below the recent swing low or below the consolidation range
+- For shorts: Above the recent swing high or above the consolidation range
+- Maximum risk: 1-2% of account per trade
+
+RISK MANAGEMENT:
+1. Trade only during regular market hours for TSLA (9:30 AM - 4:00 PM EST)
+2. Avoid trading during major earnings announcements or news events
+3. Position size based on volatility - reduce size during high volatility periods
+4. Maximum 3 concurrent trades to avoid overexposure
+
+TSLA-SPECIFIC CONSIDERATIONS:
+- TSLA often exhibits strong momentum moves after compression periods
+- Pay attention to overall market sentiment and EV sector movement
+- Monitor Elon Musk-related news and Tesla-specific developments
+- Be aware of TSLA's tendency for gap moves - consider adjusting stop losses overnight
+
+This strategy leverages TSLA's characteristic volatility patterns by using the TTM Squeeze to identify optimal momentum entry points during low volatility periods, aiming to capture the explosive moves that frequently occur in this stock.

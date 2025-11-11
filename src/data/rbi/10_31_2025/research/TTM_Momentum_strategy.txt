@@ -1,0 +1,52 @@
+STRATEGY_NAME: TTM_Momentum
+
+STRATEGY_DETAILS:
+This strategy utilizes the TTM (Trade The Momentum) indicator on QQQ daily charts to capture momentum-based trading opportunities in the technology-heavy ETF.
+
+KEY COMPONENTS:
+- Primary Instrument: QQQ (Invesco QQQ Trust)
+- Timeframe: Daily charts
+- Core Indicator: TTM Momentum (specifically the TTM Squeeze or TTM Wave)
+- Market Focus: Technology sector momentum moves
+
+REQUIRED INDICATORS:
+1. TTM Momentum Indicator (typically shows momentum as colored histogram bars)
+2. Optional: 20-period EMA for trend confirmation
+3. Volume confirmation for momentum validation
+
+ENTRY RULES:
+LONG ENTRY:
+- TTM Momentum histogram turns from red to green (positive momentum)
+- Price above 20-period EMA for trend alignment
+- Confirming volume spike on the momentum shift candle
+- Entry on next candle open after momentum signal
+
+SHORT ENTRY:
+- TTM Momentum histogram turns from green to red (negative momentum)
+- Price below 20-period EMA for trend alignment
+- Confirming volume spike on the momentum shift
+- Entry on next candle open after momentum signal
+
+EXIT RULES:
+LONG EXIT:
+- TTM Momentum histogram turns from green to red
+- Or price closes below 20-period EMA
+- Or predetermined profit target reached (suggested: 3-5% for daily timeframe)
+
+SHORT EXIT:
+- TTM Momentum histogram turns from red to green
+- Or price closes above 20-period EMA
+- Or predetermined profit target reached
+
+RISK MANAGEMENT:
+- Position size: Maximum 2% of capital per trade
+- Stop loss: 2% below entry for long positions, 2% above for short positions
+- Maximum daily drawdown: 5% of account
+- No new entries if 3 consecutive losing trades occur
+- Avoid trading during major earnings announcements for QQQ components
+
+ADDITIONAL CONSIDERATIONS:
+- Monitor overall market conditions (VIX, SPY correlation)
+- QQQ tends to be more volatile than broader market - adjust position sizing accordingly
+- Best performance during trending markets, may underperform during choppy/range-bound periods
+- Consider using weekly charts for broader trend context before taking daily signals

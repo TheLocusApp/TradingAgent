@@ -1,0 +1,282 @@
+        function createAnalysisCard(data) {
+            const priceChange = data.market_data?.price_change_pct || 0;
+            const priceClass = priceChange >= 0 ? 'price-positive' : 'price-negative';
+            const priceSign = priceChange >= 0 ? '+' : '';
+            
+            const timeframe = data.timeframe || 'swing';
+            const timeframeMap = {
+                'day': { label: 'DAY TRADE', icon: 'bolt', class: 'day' },
+                'swing': { label: 'SWING TRADE', icon: 'chart-line', class: 'swing' },
+                'long': { label: 'INVESTMENT', icon: 'seedling', class: 'investment' }
+            };
+            const timeframeInfo = timeframeMap[timeframe] || timeframeMap['swing'];
+            
+            const signal = data.signal || 'HOLD';
+            const confidence = data.confidence || 50;
+            const signalClass = signal === 'BUY' ? 'signal-buy' : signal === 'SELL' ? 'signal-sell' : 'signal-hold';
+            
+            const bullPoints = data.bull_case?.points || [];
+            const bearPoints = data.bear_case?.points || [];
+            const bullProb = data.bull_case?.probability || 50;
+            const bearProb = data.bear_case?.probability || 50;
+            
+            const cardId = `card-${data.symbol}`;
+            
+            // Fair value data
+            const fairValue = data.fair_value || 0;
+            const upsidePct = data.upside_potential || 0;
+            const entryZones = data.entry_zones || {};
+            const riskReward = data.risk_reward_ratio || 0;
+            
+            // News sentiment
+            const newsLabel = data.market_data?.news_sentiment?.label || 'Neutral';
+            const newsCount = data.market_data?.news_sentiment?.article_count || 0;
+            const newsColor = newsLabel.includes('Bull') ? '#22c55e' : newsLabel.includes('Bear') ? '#ef4444' : '#fbbf24';
+            
+            return `
+                <div class="analysis-card" id="${cardId}">
+                    <button class="remove-btn" onclick="removeCard('${data.symbol}')">×</button>
+                    <div class="flip-card-inner">
+                        <!-- FRONT OF CARD -->
+                        <div class="flip-card-front">
+                            <!-- Header -->
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+                                <div>
+                                    <h3 style="font-size: 24px; font-weight: 700; color: #fff; margin: 0 0 8px 0;">${data.symbol}</h3>
+                                    <div class="ticker-price ${priceClass}" style="font-size: 18px; font-weight: 600;">
+                                        $${(data.market_data?.current_price || 0).toLocaleString('en-US', {minimumFractionDigits: 2})}
+                                        <span style="font-size: 14px; margin-left: 8px;">${priceSign}${priceChange.toFixed(2)}%</span>
+                                    </div>
+                                </div>
+                                <div class="signal-badge ${signalClass}">
+                                    ${signal} ${confidence}%
+                                </div>
+                            </div>
+                            
+                            <!-- Trade Type & Sentiment -->
+                            <div style="display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;">
+                                <span class="trade-type-badge ${timeframeInfo.class}">
+                                    <span class="icon-circle">
+                                        <i class="fas fa-${timeframeInfo.icon}"></i>
+                                    </span>
+                                    ${timeframeInfo.label}
+                                </span>
+                                <div style="display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: rgba(255,255,255,0.05); border-radius: 20px;">
+                                    <i class="fas fa-newspaper" style="color: ${newsColor};"></i>
+                                    <span style="color: ${newsColor}; font-weight: 600; font-size: 12px;">${newsLabel}</span>
+                                    <span style="color: #6b7280; font-size: 11px;">(${newsCount})</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Confidence Bar -->
+                            <div style="margin-bottom: 16px;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                                    <span style="font-size: 11px; color: #9ca3af; font-weight: 600; text-transform: uppercase;">Confidence</span>
+                                    <span style="font-size: 12px; color: #fff; font-weight: 600;">${confidence}%</span>
+                                </div>
+                                <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
+                                    <div style="width: ${confidence}%; height: 100%; background: linear-gradient(90deg, #22c55e, #6366f1); border-radius: 4px;"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- AI Summary -->
+                            ${data.ai_summary ? `
+                            <div style="background: rgba(99, 102, 241, 0.1); border-left: 3px solid #6366f1; padding: 12px; border-radius: 6px; margin-bottom: 16px;">
+                                <div style="display: flex; align-items: center; gap: 8px; color: #6366f1; font-size: 11px; font-weight: 600; margin-bottom: 8px; text-transform: uppercase;">
+                                    <i class="fas fa-robot"></i> AI SUMMARY
+                                </div>
+                                <div style="color: #e5e7eb; font-size: 13px; line-height: 1.6;">${data.ai_summary}</div>
+                            </div>
+                            ` : ''}
+                            
+                            <!-- Fair Value Section -->
+                            ${fairValue > 0 ? `
+                            <div class="fair-value-section">
+                                <h4>💰 VALUATION</h4>
+                                <div class="metric-row">
+                                    <span>Current Price:</span>
+                                    <strong>$${(data.market_data?.current_price || 0).toFixed(2)}</strong>
+                                </div>
+                                <div class="metric-row">
+                                    <span>Fair Value:</span>
+                                    <strong>$${fairValue.toFixed(2)}</strong>
+                                    <span class="upside">+${upsidePct.toFixed(1)}%</span>
+                                </div>
+                                
+                                ${entryZones.aggressive ? `
+                                <h4 style="margin-top: 12px;">ENTRY ZONES</h4>
+                                <div class="entry-zone aggressive">
+                                    <span class="zone-label">🟢 Aggressive (Now)</span>
+                                    <span>$${entryZones.aggressive.min.toFixed(2)} - $${entryZones.aggressive.max.toFixed(2)}</span>
+                                </div>
+                                <div class="entry-zone moderate">
+                                    <span class="zone-label">🟡 Moderate (Pullback)</span>
+                                    <span>$${entryZones.moderate.min.toFixed(2)} - $${entryZones.moderate.max.toFixed(2)}</span>
+                                </div>
+                                <div class="entry-zone conservative">
+                                    <span class="zone-label">🔵 Conservative (Dip)</span>
+                                    <span>$${entryZones.conservative.min.toFixed(2)} - $${entryZones.conservative.max.toFixed(2)}</span>
+                                </div>
+                                ` : ''}
+                                
+                                ${riskReward > 0 ? `
+                                <div class="metric-row" style="margin-top: 12px;">
+                                    <span>Risk/Reward:</span>
+                                    <strong style="color: #22c55e;">1:${riskReward.toFixed(2)}</strong>
+                                </div>
+                                ` : ''}
+                            </div>
+                            ` : ''}
+                            
+                            <!-- Flip Button & Timestamp -->
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.05);">
+                                <button class="flip-btn" onclick="toggleFlip('${cardId}')">
+                                    <i class="fas fa-info-circle"></i> Deep Dive
+                                </button>
+                                <span style="font-size: 11px; color: #6b7280;">
+                                    <i class="fas fa-clock"></i> ${new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <!-- BACK OF CARD -->
+                        <div class="flip-card-back">
+                            <button class="flip-btn" onclick="toggleFlip('${cardId}')" style="margin-bottom: 16px;">
+                                <i class="fas fa-arrow-left"></i> Back to Summary
+                            </button>
+                            
+                            <!-- Investment Thesis -->
+                            <div class="drawer-section">
+                                <h3><i class="fas fa-lightbulb"></i> Investment Thesis</h3>
+                                <div style="color: #e5e7eb; font-size: 14px; line-height: 1.8;">
+                                    ${data.ai_detailed || data.ai_summary || 'Detailed analysis not available.'}
+                                </div>
+                            </div>
+                            
+                            <!-- Bull Case -->
+                            <div class="drawer-section">
+                                <h3><i class="fas fa-arrow-up" style="color: #22c55e;"></i> Bull Case (${bullProb}%)</h3>
+                                <ul style="list-style: none; padding: 0; margin: 0;">
+                                    ${bullPoints.map(point => `
+                                        <li style="color: #e5e7eb; font-size: 14px; line-height: 1.8; margin-bottom: 8px; padding-left: 20px; position: relative;">
+                                            <span style="position: absolute; left: 0; color: #22c55e;">•</span>
+                                            ${point}
+                                        </li>
+                                    `).join('')}
+                                </ul>
+                            </div>
+                            
+                            <!-- Bear Case -->
+                            <div class="drawer-section">
+                                <h3><i class="fas fa-arrow-down" style="color: #ef4444;"></i> Bear Case (${bearProb}%)</h3>
+                                <ul style="list-style: none; padding: 0; margin: 0;">
+                                    ${bearPoints.map(point => `
+                                        <li style="color: #e5e7eb; font-size: 14px; line-height: 1.8; margin-bottom: 8px; padding-left: 20px; position: relative;">
+                                            <span style="position: absolute; left: 0; color: #ef4444;">•</span>
+                                            ${point}
+                                        </li>
+                                    `).join('')}
+                                </ul>
+                            </div>
+                            
+                            <!-- Fundamentals -->
+                            ${data.market_data?.fundamentals ? `
+                            <div class="drawer-section">
+                                <h3><i class="fas fa-chart-pie"></i> Fundamentals</h3>
+                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+                                    <div style="color: #e5e7eb; font-size: 14px;">
+                                        <span style="color: #9ca3af;">P/E Ratio:</span> <strong>${data.market_data.fundamentals.pe_ratio || 'N/A'}</strong>
+                                    </div>
+                                    <div style="color: #e5e7eb; font-size: 14px;">
+                                        <span style="color: #9ca3af;">Sector:</span> <strong>${data.market_data.fundamentals.sector || 'N/A'}</strong>
+                                    </div>
+                                    <div style="color: #e5e7eb; font-size: 14px;">
+                                        <span style="color: #9ca3af;">Market Cap:</span> <strong>${data.market_data.fundamentals.market_cap || 'N/A'}</strong>
+                                    </div>
+                                    <div style="color: #e5e7eb; font-size: 14px;">
+                                        <span style="color: #9ca3af;">ROE:</span> <strong>${data.market_data.fundamentals.roe || 'N/A'}</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            ` : ''}
+                            
+                            <!-- Technical Indicators -->
+                            <div class="drawer-section">
+                                <h3><i class="fas fa-chart-line"></i> Technical Indicators</h3>
+                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+                                    <div style="color: #e5e7eb; font-size: 14px;">
+                                        <span style="color: #9ca3af;">RSI:</span> <strong>${(data.market_data?.rsi_14 || 0).toFixed(1)}</strong>
+                                    </div>
+                                    <div style="color: #e5e7eb; font-size: 14px;">
+                                        <span style="color: #9ca3af;">MACD:</span> <strong>${data.market_data?.macd || 'N/A'}</strong>
+                                    </div>
+                                    <div style="color: #e5e7eb; font-size: 14px;">
+                                        <span style="color: #9ca3af;">Volume:</span> <strong>${data.market_data?.volume || 'N/A'}</strong>
+                                    </div>
+                                    <div style="color: #e5e7eb; font-size: 14px;">
+                                        <span style="color: #9ca3af;">ATR:</span> <strong>${(data.market_data?.atr || 0).toFixed(2)}</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Advanced Technicals -->
+                            <div class="drawer-section">
+                                <h3><i class="fas fa-microscope"></i> Advanced Technicals</h3>
+                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+                                    <div style="color: #e5e7eb; font-size: 14px;">
+                                        <span style="color: #9ca3af;">ROC:</span> <strong>${(data.market_data?.roc || 0).toFixed(1)}%</strong>
+                                    </div>
+                                    <div style="color: #e5e7eb; font-size: 14px;">
+                                        <span style="color: #9ca3af;">ADX:</span> <strong>${(data.market_data?.adx || 0).toFixed(0)}</strong>
+                                    </div>
+                                    <div style="color: #e5e7eb; font-size: 14px;">
+                                        <span style="color: #9ca3af;">Stochastic:</span> <strong>${(data.market_data?.stoch || 0).toFixed(0)}</strong>
+                                    </div>
+                                    <div style="color: #e5e7eb; font-size: 14px;">
+                                        <span style="color: #9ca3af;">OBV:</span> <strong>${data.market_data?.obv || 'N/A'}</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Risk Management -->
+                            ${data.risk_management && Object.keys(data.risk_management).length > 0 ? `
+                            <div class="drawer-section">
+                                <h3><i class="fas fa-shield-alt"></i> Risk Management</h3>
+                                <ul style="list-style: none; padding: 0; margin: 0;">
+                                    ${data.risk_management.position_size ? `<li style="color: #e5e7eb; font-size: 14px; line-height: 1.8; margin-bottom: 8px;"><span style="color: #6366f1;">→</span> <strong>Position Size:</strong> ${data.risk_management.position_size}</li>` : ''}
+                                    ${data.risk_management.risk_reward ? `<li style="color: #e5e7eb; font-size: 14px; line-height: 1.8; margin-bottom: 8px;"><span style="color: #6366f1;">→</span> <strong>Risk/Reward:</strong> ${data.risk_management.risk_reward}</li>` : ''}
+                                    ${data.risk_management.max_loss ? `<li style="color: #e5e7eb; font-size: 14px; line-height: 1.8; margin-bottom: 8px;"><span style="color: #6366f1;">→</span> <strong>Max Loss:</strong> ${data.risk_management.max_loss}</li>` : ''}
+                                    ${data.risk_management.scaling ? `<li style="color: #e5e7eb; font-size: 14px; line-height: 1.8; margin-bottom: 8px;"><span style="color: #6366f1;">→</span> <strong>Scaling:</strong> ${data.risk_management.scaling}</li>` : ''}
+                                </ul>
+                            </div>
+                            ` : ''}
+                            
+                            <!-- Macro Triggers -->
+                            ${data.macro_triggers && Object.keys(data.macro_triggers).length > 0 ? `
+                            <div class="drawer-section">
+                                <h3><i class="fas fa-globe"></i> Macro Triggers & Catalysts</h3>
+                                ${data.macro_triggers.exit_conditions && data.macro_triggers.exit_conditions.length > 0 ? `
+                                    <h4 style="color: #ef4444; font-size: 13px; font-weight: 600; margin: 12px 0 8px;">⚠ Exit Conditions:</h4>
+                                    <ul style="list-style: none; padding: 0; margin: 0 0 16px;">
+                                        ${data.macro_triggers.exit_conditions.map(c => `<li style="color: #e5e7eb; font-size: 14px; line-height: 1.8; margin-bottom: 6px; padding-left: 20px; position: relative;"><span style="position: absolute; left: 0; color: #ef4444;">⚠</span>${c}</li>`).join('')}
+                                    </ul>
+                                ` : ''}
+                                ${data.macro_triggers.watch_for && data.macro_triggers.watch_for.length > 0 ? `
+                                    <h4 style="color: #fbbf24; font-size: 13px; font-weight: 600; margin: 12px 0 8px;">👁 Watch For:</h4>
+                                    <ul style="list-style: none; padding: 0; margin: 0 0 16px;">
+                                        ${data.macro_triggers.watch_for.map(w => `<li style="color: #e5e7eb; font-size: 14px; line-height: 1.8; margin-bottom: 6px; padding-left: 20px; position: relative;"><span style="position: absolute; left: 0; color: #fbbf24;">👁</span>${w}</li>`).join('')}
+                                    </ul>
+                                ` : ''}
+                                ${data.macro_triggers.catalysts && data.macro_triggers.catalysts.length > 0 ? `
+                                    <h4 style="color: #22c55e; font-size: 13px; font-weight: 600; margin: 12px 0 8px;">🚀 Catalysts:</h4>
+                                    <ul style="list-style: none; padding: 0; margin: 0;">
+                                        ${data.macro_triggers.catalysts.map(c => `<li style="color: #e5e7eb; font-size: 14px; line-height: 1.8; margin-bottom: 6px; padding-left: 20px; position: relative;"><span style="position: absolute; left: 0; color: #22c55e;">🚀</span>${c}</li>`).join('')}
+                                    </ul>
+                                ` : ''}
+                            </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }

@@ -1,0 +1,52 @@
+STRATEGY_NAME: ContrarianSeventyThirty
+
+STRATEGY_DETAILS:
+Key components:
+- Instrument and timeframe: SPY (SPDR S&P 500 ETF), primary timeframe = daily bars; signals computed on daily close, orders executed next market open.
+- Core edge: Mean-reversion via RSI extremes; enter when oversold, exit when overbought.
+- Indicator settings: RSI(14), Wilder’s smoothing, standard 0–100 scale with close prices.
+
+Entry rules (long-only):
+- Signal: If flat and RSI(14) at today’s close < 30, schedule a market buy for next session’s open.
+- One-position rule: Do not pyramid; ignore additional <30 readings while already long.
+- Optional de-duplication: Require a “cross-under” event (yesterday RSI ≥ 30 and today RSI < 30) to avoid repeated signals in prolonged oversold periods.
+
+Exit rules:
+- Primary exit: If long and RSI(14) at today’s close > 70, sell the full position at next session’s open.
+- Protective exits (risk overrides):
+  - Initial stop-loss: Place at entry_price − 2.5 × ATR(14). If hit intraday, exit via stop order.
+  - Time stop: If still long after 60 trading days without hitting RSI > 70, exit at next open.
+  - Optional trailing stop: Highest close since entry − 3 × ATR(14).
+
+Risk management:
+- Position sizing:
+  - Simple: Allocate 100% of available capital to the single SPY position.
+  - Vol-adjusted (recommended): Size shares so that initial stop distance equals ~1% of equity risk:
+    - Risk per share = 2.5 × ATR(14).
+    - Shares = floor((0.01 × Equity) / Risk per share).
+- Portfolio limits: Max 1 open position (SPY). Max total equity at risk via stops ≤ 1%.
+- Slippage and costs: Model at least 1–2 bps slippage and current broker commissions; use adjusted prices for backtests.
+- Trading halts/gaps: If overnight gap breaches the stop, accept next available price (gap risk is part of the design).
+
+Required indicators and data:
+- RSI(14) on daily closes (Wilder’s smoothing).
+- ATR(14) for stop placement and optional trailing stop.
+- Optional filters (tunable, not required):
+  - SMA(200) trend filter: Only take entries when SPY close > SMA(200) to reduce bear-market exposure.
+  - Volatility cap: Skip entries when ATR(14)/Close > 3% to avoid crash regimes.
+
+Operational notes:
+- Order timing: Compute signals after market close; place orders for next open.
+- Signal precedence: If both a risk stop and an RSI > 70 exit would trigger the next day, the stop (intraday) takes precedence; otherwise, exit at open per RSI rule.
+- Re-entry: After an exit, wait for a fresh entry signal (RSI < 30 or cross-under) before re-entering.
+- No shorting: Ignore RSI > 70 when flat (used only as an exit condition).
+
+Parameter variants (for research):
+- RSI length: 10–20; thresholds: 25/75 or 20/80 for fewer, higher-conviction trades.
+- ATR multiple for stops: 2.0–3.0; time stop: 40–80 trading days.
+- Execution variant: Enter on close when signal occurs (higher slippage sensitivity) vs. default next-open execution.
+
+Validation checklist:
+- Use dividend-adjusted SPY data for RSI calculations.
+- Ensure one trade at a time; no overlapping positions.
+- Backtest across multiple market regimes (2000–2003, 2008–2009, 2020) to assess drawdown and recovery behavior.

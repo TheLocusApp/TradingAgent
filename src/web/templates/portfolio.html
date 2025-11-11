@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio | Moon Dev Trading Platform</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='modern-style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="nav-links">
+                <a href="/strategy-lab">BACKTEST LAB</a>
+                <a href="/analyst">ANALYST</a>
+                <a href="/">LIVE AGENTS</a>
+                <a href="/portfolio" class="active">PORTFOLIO</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container" style="max-width: 1400px; margin: 0 auto; padding: 24px;">
+
+        <!-- Macro Dashboard -->
+        <div class="card" style="margin-bottom: 24px; padding: 24px;">
+            <h2 style="font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 20px;">
+                <i class="fas fa-globe-americas"></i> Macro Dashboard
+            </h2>
+            
+            <!-- Combined Economic Cycle + Key Indicators -->
+            <div style="background: #1a1a24; padding: 24px; border-radius: 8px;">
+                <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 32px; align-items: center;">
+                    <!-- Economic Cycle Visual -->
+                    <div style="text-align: center;">
+                        <h3 style="color: #9ca3af; font-size: 14px; font-weight: 600; margin-bottom: 12px;">ECONOMIC CYCLE</h3>
+                        <div id="cycle-phase" style="font-size: 28px; font-weight: 700; color: #6366f1; margin-bottom: 8px;">
+                            Loading...
+                        </div>
+                        <div id="cycle-confidence" style="color: #9ca3af; font-size: 14px; margin-bottom: 16px;">
+                            -- % confidence
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 16px; text-align: center;">
+                            <div title="Expansion: Economy is growing, unemployment falling, consumer confidence rising">
+                                <div id="cycle-dot-expansion" style="width: 12px; height: 12px; border-radius: 50%; background: #4a4a5a; margin: 0 auto 6px; cursor: help;"></div>
+                                <div style="font-size: 10px; color: #6b7280;">Expansion</div>
+                            </div>
+                            <div title="Peak: Economy at maximum output, inflation rising, interest rates high">
+                                <div id="cycle-dot-peak" style="width: 12px; height: 12px; border-radius: 50%; background: #4a4a5a; margin: 0 auto 6px; cursor: help;"></div>
+                                <div style="font-size: 10px; color: #6b7280;">Peak</div>
+                            </div>
+                            <div title="Contraction: Economic activity declining, unemployment rising, consumer spending falling">
+                                <div id="cycle-dot-contraction" style="width: 12px; height: 12px; border-radius: 50%; background: #4a4a5a; margin: 0 auto 6px; cursor: help;"></div>
+                                <div style="font-size: 10px; color: #6b7280;">Contraction</div>
+                            </div>
+                            <div title="Recovery: Economy stabilizing, growth resuming, confidence returning">
+                                <div id="cycle-dot-recovery" style="width: 12px; height: 12px; border-radius: 50%; background: #4a4a5a; margin: 0 auto 6px; cursor: help;"></div>
+                                <div style="font-size: 10px; color: #6b7280;">Recovery</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Key Indicators -->
+                    <div>
+                        <h3 style="color: #9ca3af; font-size: 14px; font-weight: 600; margin-bottom: 16px;">
+                            KEY INDICATORS
+                        </h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
+                            <div>
+                                <div style="color: #9ca3af; font-size: 12px; font-weight: 600; margin-bottom: 6px;">
+                                    <i class="fas fa-chart-line"></i> VIX (Fear Index)
+                                </div>
+                                <div style="display: flex; align-items: baseline; gap: 8px;">
+                                    <div id="vix-value" style="color: #fff; font-size: 24px; font-weight: 700;">--</div>
+                                    <div id="vix-trend" style="font-size: 13px; font-weight: 600;"></div>
+                                </div>
+                                <div style="color: #6b7280; font-size: 10px; margin-top: 4px;">Market volatility</div>
+                            </div>
+                            <div>
+                                <div style="color: #9ca3af; font-size: 12px; font-weight: 600; margin-bottom: 6px;">
+                                    <i class="fas fa-industry"></i> PMI Manufacturing
+                                </div>
+                                <div style="display: flex; align-items: baseline; gap: 8px;">
+                                    <div id="pmi-value" style="color: #fff; font-size: 24px; font-weight: 700;">--</div>
+                                    <div id="pmi-trend" style="font-size: 13px; font-weight: 600;"></div>
+                                </div>
+                                <div style="color: #6b7280; font-size: 10px; margin-top: 4px;">>50 = expansion</div>
+                            </div>
+                            <div>
+                                <div style="color: #9ca3af; font-size: 12px; font-weight: 600; margin-bottom: 6px;">
+                                    <i class="fas fa-chart-area"></i> Yield Curve
+                                </div>
+                                <div style="display: flex; align-items: baseline; gap: 8px;">
+                                    <div id="yield-curve-value" style="color: #fff; font-size: 24px; font-weight: 700;">--</div>
+                                    <div id="yield-trend" style="font-size: 13px; font-weight: 600;"></div>
+                                </div>
+                                <div style="color: #6b7280; font-size: 10px; margin-top: 4px;">10Y-2Y spread</div>
+                            </div>
+                            <div>
+                                <div style="color: #9ca3af; font-size: 12px; font-weight: 600; margin-bottom: 6px;">
+                                    <i class="fas fa-smile"></i> Consumer Confidence
+                                </div>
+                                <div style="display: flex; align-items: baseline; gap: 8px;">
+                                    <div id="consumer-confidence-value" style="color: #fff; font-size: 24px; font-weight: 700;">--</div>
+                                    <div id="consumer-trend" style="font-size: 13px; font-weight: 600;"></div>
+                                </div>
+                                <div style="color: #6b7280; font-size: 10px; margin-top: 4px;">Spending outlook</div>
+                            </div>
+                            <div>
+                                <div style="color: #9ca3af; font-size: 12px; font-weight: 600; margin-bottom: 6px;">
+                                    <i class="fas fa-percentage"></i> Inflation (CPI)
+                                </div>
+                                <div style="display: flex; align-items: baseline; gap: 8px;">
+                                    <div id="cpi-value" style="color: #fff; font-size: 24px; font-weight: 700;">--</div>
+                                    <div id="cpi-trend" style="font-size: 13px; font-weight: 600;"></div>
+                                </div>
+                                <div style="color: #6b7280; font-size: 10px; margin-top: 4px;">Price changes</div>
+                            </div>
+                            <div>
+                                <div style="color: #9ca3af; font-size: 12px; font-weight: 600; margin-bottom: 6px;">
+                                    <i class="fas fa-university"></i> Fed Funds Rate
+                                </div>
+                                <div style="display: flex; align-items: baseline; gap: 8px;">
+                                    <div id="fed-rate-value" style="color: #fff; font-size: 24px; font-weight: 700;">--</div>
+                                    <div id="fed-trend" style="font-size: 13px; font-weight: 600;"></div>
+                                </div>
+                                <div style="color: #6b7280; font-size: 10px; margin-top: 4px;">Interest rate</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Allocation Comparison -->
+        <div class="card" style="margin-bottom: 24px; padding: 24px;">
+            <h2 style="font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 20px;">
+                <i class="fas fa-chart-pie"></i> Sector Allocation
+            </h2>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px;">
+                <!-- Current Allocation -->
+                <div style="background: #1a1a24; padding: 20px; border-radius: 8px;">
+                    <h3 style="color: #9ca3af; font-size: 14px; font-weight: 600; margin-bottom: 16px; text-align: center;">
+                        YOUR ALLOCATION
+                    </h3>
+                    <canvas id="currentAllocationChart" style="max-height: 250px;"></canvas>
+                </div>
+
+                <!-- Recommended Allocation -->
+                <div style="background: #1a1a24; padding: 20px; border-radius: 8px;">
+                    <h3 style="color: #9ca3af; font-size: 14px; font-weight: 600; margin-bottom: 16px; text-align: center;">
+                        RECOMMENDED
+                    </h3>
+                    <canvas id="recommendedAllocationChart" style="max-height: 250px;"></canvas>
+                </div>
+
+                <!-- Rebalancing Suggestions -->
+                <div style="background: #1a1a24; padding: 20px; border-radius: 8px;">
+                    <h3 style="color: #9ca3af; font-size: 14px; font-weight: 600; margin-bottom: 16px;">
+                        REBALANCING
+                    </h3>
+                    <div id="rebalancing-suggestions" style="font-size: 13px; line-height: 1.8;">
+                        <!-- Populated via JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Holdings Table -->
+        <div class="card" style="padding: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="font-size: 20px; font-weight: 700; color: #fff;">
+                    <i class="fas fa-list"></i> Holdings
+                </h2>
+                <div style="color: #9ca3af; font-size: 14px;">
+                    Last Updated: <span id="last-updated">--</span>
+                </div>
+            </div>
+
+            <div id="holdings-table-container">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid #2a2a3a;">
+                            <th style="text-align: left; padding: 12px; color: #9ca3af; font-size: 12px; font-weight: 600;">SYMBOL</th>
+                            <th style="text-align: left; padding: 12px; color: #9ca3af; font-size: 12px; font-weight: 600;">SECTOR</th>
+                            <th style="text-align: right; padding: 12px; color: #9ca3af; font-size: 12px; font-weight: 600;">WEIGHT</th>
+                            <th style="text-align: right; padding: 12px; color: #9ca3af; font-size: 12px; font-weight: 600;">PRICE</th>
+                            <th style="text-align: right; padding: 12px; color: #9ca3af; font-size: 12px; font-weight: 600;">P/E</th>
+                            <th style="text-align: right; padding: 12px; color: #9ca3af; font-size: 12px; font-weight: 600;">ADDED</th>
+                            <th style="text-align: center; padding: 12px; color: #9ca3af; font-size: 12px; font-weight: 600;">ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody id="holdings-tbody">
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 40px; color: #9ca3af;">
+                                No holdings yet. Add stocks from the Screener page.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentAllocationChart = null;
+        let recommendedAllocationChart = null;
+
+        // Load macro dashboard
+        async function loadMacroDashboard() {
+            try {
+                const response = await fetch('/api/portfolio/macro');
+                const data = await response.json();
+
+                // Update cycle display
+                document.getElementById('cycle-phase').textContent = data.cycle.phase;
+                document.getElementById('cycle-confidence').textContent = 
+                    `${(data.cycle.confidence * 100).toFixed(0)}% confidence`;
+
+                // Update indicators with trending
+                const indicators = data.cycle.indicators;
+                
+                // Helper function to show trend
+                function updateIndicator(id, indicator, isPercentage = true, decimals = 1) {
+                    const valueEl = document.getElementById(`${id}-value`);
+                    const trendEl = document.getElementById(`${id}-trend`);
+                    
+                    if (indicator && indicator.value !== undefined && indicator.value !== 0) {
+                        // Format value based on type
+                        if (isPercentage) {
+                            valueEl.textContent = `${indicator.value.toFixed(decimals)}%`;
+                        } else {
+                            valueEl.textContent = indicator.value.toFixed(decimals);
+                        }
+                        
+                        if (trendEl && indicator.trend !== undefined) {
+                            const trend = indicator.trend;
+                            if (Math.abs(trend) > 0.01) {  // Only show if meaningful change
+                                if (trend > 0) {
+                                    trendEl.innerHTML = `<span style="color: #22c55e;">▲ ${trend.toFixed(2)}%</span>`;
+                                } else {
+                                    trendEl.innerHTML = `<span style="color: #ef4444;">▼ ${Math.abs(trend).toFixed(2)}%</span>`;
+                                }
+                            } else {
+                                trendEl.innerHTML = `<span style="color: #6b7280;">─</span>`;
+                            }
+                        }
+                    } else {
+                        valueEl.textContent = '--';
+                        if (trendEl) trendEl.innerHTML = '';
+                    }
+                }
+                
+                // Update all indicators with proper formatting
+                updateIndicator('cpi', indicators.cpi, true, 1);  // CPI as percentage
+                updateIndicator('fed-rate', indicators.fed_rate, true, 2);  // Fed rate as percentage
+                updateIndicator('vix', indicators.vix, false, 1);  // VIX as number
+                updateIndicator('pmi', indicators.pmi, false, 1);  // PMI as number
+                updateIndicator('yield-curve', indicators.yield_curve, false, 2);  // Yield curve as number
+                updateIndicator('consumer-confidence', indicators.consumer_confidence, false, 1);  // Consumer confidence as number
+
+                // Update cycle indicator position
+                updateCycleIndicator(data.cycle.phase);
+
+                // Update recommended allocation
+                updateAllocationCharts(data.recommended_allocation);
+
+            } catch (error) {
+                console.error('Error loading macro dashboard:', error);
+            }
+        }
+
+        // Update cycle indicator position
+        function updateCycleIndicator(phase) {
+            // Reset all dots
+            ['expansion', 'peak', 'contraction', 'recovery'].forEach(p => {
+                const dot = document.getElementById(`cycle-dot-${p}`);
+                if (dot) {
+                    dot.style.width = '12px';
+                    dot.style.height = '12px';
+                    dot.style.background = '#4a4a5a';
+                    dot.style.boxShadow = 'none';
+                }
+            });
+            
+            // Highlight current phase
+            const phaseMap = {
+                'Early Expansion': 'expansion',
+                'Mid Expansion': 'expansion',
+                'Late Expansion': 'peak',
+                'Peak': 'peak',
+                'Early Contraction': 'contraction',
+                'Contraction': 'contraction',
+                'Recovery': 'recovery',
+                'Recession': 'contraction'
+            };
+            
+            const dotId = phaseMap[phase] || 'expansion';
+            const dot = document.getElementById(`cycle-dot-${dotId}`);
+            if (dot) {
+                dot.style.width = '16px';
+                dot.style.height = '16px';
+                dot.style.background = '#6366f1';
+                dot.style.boxShadow = '0 0 12px #6366f1';
+            }
+        }
+
+        // Update allocation charts
+        function updateAllocationCharts(recommendedAllocation) {
+            // Get current allocation from holdings
+            loadHoldings().then(portfolio => {
+                const currentAllocation = calculateCurrentAllocation(portfolio.holdings);
+                
+                // Destroy existing charts
+                if (currentAllocationChart) currentAllocationChart.destroy();
+                if (recommendedAllocationChart) recommendedAllocationChart.destroy();
+
+                // Chart colors
+                const colors = [
+                    '#6366f1', '#8b5cf6', '#ec4899', '#f43f5e', '#f59e0b',
+                    '#10b981', '#14b8a6', '#06b6d4', '#3b82f6', '#6366f1'
+                ];
+
+                // Current allocation chart
+                const currentCtx = document.getElementById('currentAllocationChart').getContext('2d');
+                currentAllocationChart = new Chart(currentCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: Object.keys(currentAllocation),
+                        datasets: [{
+                            data: Object.values(currentAllocation),
+                            backgroundColor: colors,
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'bottom',
+                                labels: {color: '#9ca3af', font: {size: 10}}
+                            }
+                        }
+                    }
+                });
+
+                // Recommended allocation chart
+                const recommendedCtx = document.getElementById('recommendedAllocationChart').getContext('2d');
+                const recLabels = Object.keys(recommendedAllocation).filter(k => recommendedAllocation[k] > 0);
+                const recData = recLabels.map(k => recommendedAllocation[k]);
+                
+                recommendedAllocationChart = new Chart(recommendedCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: recLabels,
+                        datasets: [{
+                            data: recData,
+                            backgroundColor: colors,
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'bottom',
+                                labels: {color: '#9ca3af', font: {size: 10}}
+                            }
+                        }
+                    }
+                });
+
+                // Generate rebalancing suggestions
+                generateRebalancingSuggestions(currentAllocation, recommendedAllocation);
+            });
+        }
+
+        // Calculate current allocation from holdings
+        function calculateCurrentAllocation(holdings) {
+            const allocation = {};
+            const totalWeight = holdings.reduce((sum, h) => sum + (h.weight || 0), 0);
+            
+            holdings.forEach(holding => {
+                const sector = holding.sector || 'Unknown';
+                const weight = totalWeight > 0 ? (holding.weight / totalWeight * 100) : 0;
+                allocation[sector] = (allocation[sector] || 0) + weight;
+            });
+            
+            return allocation;
+        }
+
+        // Generate rebalancing suggestions
+        function generateRebalancingSuggestions(current, recommended) {
+            const container = document.getElementById('rebalancing-suggestions');
+            const suggestions = [];
+
+            Object.keys(recommended).forEach(sector => {
+                const currentPct = current[sector] || 0;
+                const recommendedPct = recommended[sector];
+                const diff = recommendedPct - currentPct;
+
+                if (Math.abs(diff) > 2) {  // Only show if difference > 2%
+                    if (diff > 0) {
+                        suggestions.push(`<div style="color: #22c55e;"><i class="fas fa-arrow-up"></i> Buy ${diff.toFixed(1)}% more ${sector}</div>`);
+                    } else {
+                        suggestions.push(`<div style="color: #ef4444;"><i class="fas fa-arrow-down"></i> Sell ${Math.abs(diff).toFixed(1)}% ${sector}</div>`);
+                    }
+                }
+            });
+
+            if (suggestions.length === 0) {
+                container.innerHTML = '<div style="color: #22c55e;"><i class="fas fa-check-circle"></i> Portfolio is well balanced!</div>';
+            } else {
+                container.innerHTML = suggestions.join('');
+            }
+        }
+
+        // Load holdings
+        async function loadHoldings() {
+            try {
+                const response = await fetch('/api/portfolio/holdings');
+                const portfolio = await response.json();
+
+                if (portfolio.last_updated) {
+                    const date = new Date(portfolio.last_updated);
+                    document.getElementById('last-updated').textContent = date.toLocaleString();
+                }
+
+                const tbody = document.getElementById('holdings-tbody');
+                
+                if (portfolio.holdings.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 40px; color: #9ca3af;">
+                                No holdings yet. Add stocks from the Screener page.
+                            </td>
+                        </tr>
+                    `;
+                } else {
+                    tbody.innerHTML = portfolio.holdings.map(holding => `
+                        <tr style="border-bottom: 1px solid #2a2a3a;">
+                            <td style="padding: 16px; color: #fff; font-weight: 600;">${holding.symbol}</td>
+                            <td style="padding: 16px; color: #9ca3af;">${holding.sector}</td>
+                            <td style="padding: 16px; text-align: right;">
+                                <input type="number" 
+                                       value="${holding.weight}" 
+                                       min="0" 
+                                       max="100" 
+                                       step="0.1"
+                                       onchange="updateWeight('${holding.symbol}', this.value)"
+                                       style="width: 70px; background: #1a1a24; border: 1px solid #2d2d3d; color: #fff; padding: 4px 8px; border-radius: 4px; text-align: right;">
+                                <span style="color: #9ca3af; margin-left: 4px;">%</span>
+                            </td>
+                            <td style="padding: 16px; color: #fff; text-align: right;">--</td>
+                            <td style="padding: 16px; color: #fff; text-align: right;">--</td>
+                            <td style="padding: 16px; color: #9ca3af; text-align: right; font-size: 12px;">
+                                ${new Date(holding.added_date).toLocaleDateString()}
+                            </td>
+                            <td style="padding: 16px; text-align: center;">
+                                <button onclick="removeFromPortfolio('${holding.symbol}')" 
+                                        class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+
+                return portfolio;
+
+            } catch (error) {
+                console.error('Error loading holdings:', error);
+                return {holdings: [], last_updated: null};
+            }
+        }
+
+        // Update weight
+        async function updateWeight(symbol, weight) {
+            try {
+                const response = await fetch('/api/portfolio/update-weight', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({symbol, weight: parseFloat(weight)})
+                });
+
+                const data = await response.json();
+                if (data.status === 'success') {
+                    console.log(`✅ Updated ${symbol} weight to ${weight}%`);
+                    loadMacroDashboard();  // Refresh allocation charts
+                } else {
+                    alert(data.message);
+                    loadHoldings();  // Reload to reset input
+                }
+            } catch (error) {
+                console.error('Error updating weight:', error);
+                loadHoldings();  // Reload to reset input
+            }
+        }
+
+        // Remove from portfolio
+        async function removeFromPortfolio(symbol) {
+            if (!confirm(`Remove ${symbol} from portfolio?`)) return;
+
+            try {
+                const response = await fetch('/api/portfolio/remove', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({symbol})
+                });
+
+                const data = await response.json();
+                if (data.status === 'success') {
+                    loadHoldings();
+                    loadMacroDashboard();  // Refresh allocation charts
+                }
+            } catch (error) {
+                console.error('Error removing from portfolio:', error);
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadMacroDashboard();
+            loadHoldings();
+
+            // Refresh every 5 minutes
+            setInterval(() => {
+                loadMacroDashboard();
+                loadHoldings();
+            }, 300000);
+        });
+    </script>
+</body>
+</html>

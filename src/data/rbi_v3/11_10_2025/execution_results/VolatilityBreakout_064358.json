@@ -1,0 +1,8 @@
+{
+  "success": true,
+  "return_code": 0,
+  "stdout": "\ud83c\udf19 MOON DEV: Loaded 3494 bars of SPY data\n\ud83c\udf19 MOON DEV: Data range: 2023-11-08 09:30:00-05:00 to 2025-11-07 15:30:00-05:00\n\ud83c\udf19 MOON DEV: Columns: ['Open', 'High', 'Low', 'Close', 'Volume', 'dividends', 'stock splits', 'capital gains']\n\ud83c\udf19 MOON DEV CRITICAL ERROR: Indicator \"Volume_SMA\" error. See traceback above.\n\ud83c\udf19 MOON DEV: Attempting to load data with alternative method...\n\ud83c\udf19 MOON DEV: All data loading methods failed: Can only use .str accessor with Index, not MultiIndex\n",
+  "stderr": "C:\\Users\\ahmed\\CascadeProjects\\moon-dev-ai-agents\\src\\data\\rbi_v3\\11_10_2025\\backtests_final\\VolatilityBreakout_BTFinal_v6.py:217: FutureWarning: YF.download() has changed argument auto_adjust default to True\n  data = yf.download(\"SPY\", period=\"2y\", interval=\"1h\")\n\n[*********************100%***********************]  1 of 1 completed\n",
+  "execution_time": 7.107342,
+  "timestamp": "2025-11-10T06:43:58.189144"
+}

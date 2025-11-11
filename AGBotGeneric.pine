@@ -1,0 +1,267 @@
+//@version=5
+indicator("AGBot Generic Strategy", overlay=true, max_lines_count=500, max_boxes_count=500)
+
+// ============================================================================
+// STRATEGY PARAMETERS (Adjustable - Match AGBotGeneric.py)
+// ============================================================================
+
+// Trend Filter
+ma_length = input.int(200, title="MA Length (EMA)", minval=1, maxval=500, group="Trend Filter")
+
+// UT Bot ATR Trailing Stop
+key_value = input.float(3.0, title="Key Value (UT Bot)", minval=0.1, maxval=10.0, step=0.1, group="UT Bot")
+atr_period = input.int(1, title="ATR Period (UT Bot)", minval=1, maxval=50, group="UT Bot")
+
+// Stop Loss
+adaptive_atr_mult = input.float(1.5, title="Adaptive ATR Mult (SL)", minval=0.1, maxval=5.0, step=0.1, group="Stop Loss")
+stoploss_type = input.string("atr", title="Stop Loss Type", options=["atr", "swing"], group="Stop Loss")
+swing_high_bars = input.int(10, title="Swing High Bars", minval=1, maxval=50, group="Stop Loss")
+swing_low_bars = input.int(10, title="Swing Low Bars", minval=1, maxval=50, group="Stop Loss")
+
+// Risk Management
+risk_per_trade = input.float(2.5, title="Risk Per Trade (%)", minval=0.1, maxval=10.0, step=0.1, group="Risk Management")
+
+// Take Profit
+use_takeprofit = input.bool(true, title="Use Take Profit", group="Take Profit")
+num_take_profits = input.int(2, title="Number of Take Profits", options=[1, 2], group="Take Profit")
+second_tp_type = input.string("atr_trailing", title="Second TP Type", options=["rr", "atr_trailing"], group="Take Profit")
+tp1_rr_long = input.float(1.0, title="TP1 R:R Long", minval=0.1, maxval=5.0, step=0.1, group="Take Profit")
+tp2_rr_long = input.float(3.0, title="TP2 R:R Long", minval=0.1, maxval=5.0, step=0.1, group="Take Profit")
+tp1_rr_short = input.float(1.0, title="TP1 R:R Short", minval=0.1, maxval=5.0, step=0.1, group="Take Profit")
+tp2_rr_short = input.float(3.0, title="TP2 R:R Short", minval=0.1, maxval=5.0, step=0.1, group="Take Profit")
+tp1_percent = input.float(30.0, title="TP1 Close %", minval=1, maxval=100, step=1, group="Take Profit")
+
+// Position Management
+long_positions = input.bool(true, title="Enable Long Positions", group="Position Management")
+short_positions = input.bool(true, title="Enable Short Positions", group="Position Management")
+
+// Session Settings (for reference - not enforced in indicator)
+session_start_hour = input.int(9, title="Session Start Hour", minval=0, maxval=23, group="Session")
+session_start_minute = input.int(30, title="Session Start Minute", minval=0, maxval=59, group="Session")
+session_end_hour = input.int(16, title="Session End Hour", minval=0, maxval=23, group="Session")
+session_end_minute = input.int(0, title="Session End Minute", minval=0, maxval=59, group="Session")
+enable_eod_close = input.bool(true, title="Enable EOD Close", group="Session")
+
+// Display Options
+show_ema = input.bool(true, title="Show EMA", group="Display")
+show_ut_bot = input.bool(true, title="Show UT Bot Trailing Stop", group="Display")
+show_signals = input.bool(true, title="Show Entry Signals", group="Display")
+show_tp_levels = input.bool(true, title="Show TP Levels", group="Display")
+
+// ============================================================================
+// INDICATOR CALCULATIONS
+// ============================================================================
+
+// Calculate EMA
+ema = ta.ema(close, ma_length)
+
+// Calculate ATR
+atr = ta.atr(14)
+smoothed_atr = ta.sma(atr, 14)
+
+// Calculate UT Bot ATR Trailing Stop
+calculate_ut_bot() =>
+    high_low = high - low
+    high_close = math.abs(high - close[1])
+    low_close = math.abs(low - close[1])
+    tr = math.max(high_low, math.max(high_close, low_close))
+    atr_ut = ta.sma(tr, atr_period)
+    
+    n_loss = key_value * atr_ut
+    src = close
+    
+    // Initialize xATRTrailingStop array
+    var float xATRTrailingStop = na
+    
+    if na(xATRTrailingStop)
+        xATRTrailingStop := src
+    else
+        prev_stop = xATRTrailingStop
+        
+        if src > prev_stop
+            xATRTrailingStop := math.max(prev_stop, src - n_loss)
+        else if src < prev_stop
+            xATRTrailingStop := math.min(prev_stop, src + n_loss)
+        else
+            if close[1] > prev_stop
+                xATRTrailingStop := src - n_loss
+            else
+                xATRTrailingStop := src + n_loss
+    
+    xATRTrailingStop
+
+xATRTrailingStop = calculate_ut_bot()
+
+// Calculate Stop Loss Levels
+long_stop = stoploss_type == "atr" ? close - (atr * adaptive_atr_mult) : ta.lowest(low, swing_low_bars)
+short_stop = stoploss_type == "atr" ? close + (atr * adaptive_atr_mult) : ta.highest(high, swing_high_bars)
+
+// ============================================================================
+// SIGNAL GENERATION
+// ============================================================================
+
+// Trend conditions
+bullish = close > ema
+bearish = close < ema
+
+// UT Bot signals
+buy_signal = close > xATRTrailingStop and close[1] <= xATRTrailingStop[1]
+sell_signal = close < xATRTrailingStop and close[1] >= xATRTrailingStop[1]
+
+// Combined entry signals
+long_entry = buy_signal and bullish and long_positions
+short_entry = sell_signal and bearish and short_positions
+
+// ============================================================================
+// POSITION TRACKING (Simulated)
+// ============================================================================
+
+var bool in_long = false
+var bool in_short = false
+var float entry_price = na
+var float initial_sl = na
+var bool tp1_hit = false
+var float highest_since_entry = na
+var float lowest_since_entry = na
+
+// Entry logic
+if long_entry and not in_long and not in_short
+    in_long := true
+    in_short := false
+    entry_price := close
+    initial_sl := long_stop
+    tp1_hit := false
+    highest_since_entry := high
+
+if short_entry and not in_short and not in_long
+    in_short := true
+    in_long := false
+    entry_price := close
+    initial_sl := short_stop
+    tp1_hit := false
+    lowest_since_entry := low
+
+// Position management for long
+if in_long
+    highest_since_entry := math.max(highest_since_entry, high)
+    
+    // Check TP1
+    if not tp1_hit and use_takeprofit
+        sl_distance = entry_price - initial_sl
+        tp1 = entry_price + (sl_distance * tp1_rr_long)
+        
+        if high >= tp1
+            tp1_hit := true
+    
+    // Check TP2 with trailing stop
+    if tp1_hit and num_take_profits == 2 and second_tp_type == "atr_trailing"
+        trail_stop = highest_since_entry - (atr * adaptive_atr_mult)
+        
+        if low <= trail_stop
+            in_long := false
+    
+    // Check TP2 with R:R
+    if tp1_hit and num_take_profits == 2 and second_tp_type == "rr"
+        sl_distance = entry_price - initial_sl
+        tp2 = entry_price + (sl_distance * tp2_rr_long)
+        
+        if high >= tp2
+            in_long := false
+    
+    // Check stop loss
+    if low <= initial_sl
+        in_long := false
+
+// Position management for short
+if in_short
+    lowest_since_entry := math.min(lowest_since_entry, low)
+    
+    // Check TP1
+    if not tp1_hit and use_takeprofit
+        sl_distance = initial_sl - entry_price
+        tp1 = entry_price - (sl_distance * tp1_rr_short)
+        
+        if low <= tp1
+            tp1_hit := true
+    
+    // Check TP2 with trailing stop
+    if tp1_hit and num_take_profits == 2 and second_tp_type == "atr_trailing"
+        trail_stop = lowest_since_entry + (atr * adaptive_atr_mult)
+        
+        if high >= trail_stop
+            in_short := false
+    
+    // Check TP2 with R:R
+    if tp1_hit and num_take_profits == 2 and second_tp_type == "rr"
+        sl_distance = initial_sl - entry_price
+        tp2 = entry_price - (sl_distance * tp2_rr_short)
+        
+        if low <= tp2
+            in_short := false
+    
+    // Check stop loss
+    if high >= initial_sl
+        in_short := false
+
+// ============================================================================
+// PLOTTING
+// ============================================================================
+
+// Plot EMA
+plot(show_ema ? ema : na, title="EMA", color=color.blue, linewidth=2)
+
+// Plot UT Bot Trailing Stop
+plot(show_ut_bot ? xATRTrailingStop : na, title="UT Bot Trailing Stop", color=color.orange, linewidth=1)
+
+// Plot Stop Loss Levels
+plot(show_tp_levels and (in_long or in_short) ? initial_sl : na, title="Stop Loss", color=color.red, linewidth=1, style=plot.style_dashed)
+
+// Plot Take Profit Levels
+if show_tp_levels and in_long
+    sl_distance = entry_price - initial_sl
+    tp1 = entry_price + (sl_distance * tp1_rr_long)
+    plot(tp1, title="TP1 Long", color=color.green, linewidth=1, style=plot.style_dashed)
+    
+    if num_take_profits == 2
+        tp2 = entry_price + (sl_distance * tp2_rr_long)
+        plot(tp2, title="TP2 Long", color=color.lime, linewidth=1, style=plot.style_dashed)
+
+if show_tp_levels and in_short
+    sl_distance = initial_sl - entry_price
+    tp1 = entry_price - (sl_distance * tp1_rr_short)
+    plot(tp1, title="TP1 Short", color=color.green, linewidth=1, style=plot.style_dashed)
+    
+    if num_take_profits == 2
+        tp2 = entry_price - (sl_distance * tp2_rr_short)
+        plot(tp2, title="TP2 Short", color=color.lime, linewidth=1, style=plot.style_dashed)
+
+// Plot Entry Signals
+plotshape(show_signals and long_entry ? low : na, title="Long Entry", style=shape.labelup, location=location.belowbar, color=color.green, textcolor=color.white, size=size.small)
+plotshape(show_signals and short_entry ? high : na, title="Short Entry", style=shape.labeldown, location=location.abovebar, color=color.red, textcolor=color.white, size=size.small)
+
+// Plot Position Status
+plotshape(show_signals and in_long and tp1_hit ? high : na, title="TP1 Hit (Long)", style=shape.diamond, location=location.abovebar, color=color.yellow, size=size.tiny)
+plotshape(show_signals and in_short and tp1_hit ? low : na, title="TP1 Hit (Short)", style=shape.diamond, location=location.belowbar, color=color.yellow, size=size.tiny)
+
+// ============================================================================
+// ALERTS (Optional - for notifications)
+// ============================================================================
+
+alertcondition(long_entry, title="Long Entry Signal", message="AGBot Long Entry")
+alertcondition(short_entry, title="Short Entry Signal", message="AGBot Short Entry")
+alertcondition(in_long and low <= initial_sl, title="Long Stop Loss Hit", message="AGBot Long SL Hit")
+alertcondition(in_short and high >= initial_sl, title="Short Stop Loss Hit", message="AGBot Short SL Hit")
+
+// ============================================================================
+// INFO BOX
+// ============================================================================
+
+info_text = "AGBot Generic Strategy\nMA: " + str.tostring(ma_length) + " | Key: " + str.tostring(key_value, "#.##") + " | ATR Mult: " + str.tostring(adaptive_atr_mult, "#.##") + "\nTP1 RR: " + str.tostring(tp1_rr_long, "#.##") + " | TP1%: " + str.tostring(tp1_percent, "#") + " | Risk: " + str.tostring(risk_per_trade, "#.##") + "%"
+
+var box info_box = na
+if na(info_box)
+    info_box := box.new(bar_index, high, bar_index + 1, low, text=info_text, bgcolor=color.new(color.gray, 80), border_color=color.white)
+else
+    box.set_xy1(info_box, bar_index, high)
+    box.set_xy2(info_box, bar_index + 1, low)
+    box.set_text(info_box, info_text)

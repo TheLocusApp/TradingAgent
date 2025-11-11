@@ -1,0 +1,56 @@
+AGBot Strategy Optimization Request - TSLA 4H Timeframe
+
+PROBLEM WITH CURRENT STRATEGY:
+The AGBot strategy on TSLA 1H generates +43% return but with only +0.64% average trade size. This is too small - commissions and slippage eat the profits. We need to optimize for:
+1. Larger average trade size (target: 1-2% per trade)
+2. Better risk-reward ratios
+3. Fewer but higher-quality trades
+
+CURRENT BEST PARAMETERS (1H):
+- MA Length: 250
+- Key Value: 1.5
+- Adaptive ATR Mult: 2.0
+- TP1 RR Long: 0.5 (TOO SMALL - this is the problem)
+- TP1 Percent: 45
+
+OPTIMIZATION GOALS:
+1. Test on TSLA 4H timeframe (fewer trades, larger moves)
+2. Increase TP1 RR from 0.5 to 1.0-2.0 (let winners run more)
+3. Reduce TP1 Percent from 45 to 20-30 (take smaller partial profits)
+4. Adjust MA length and Key Value for 4H timeframe
+5. Target: Average trade size of 1-2% minimum
+
+PARAMETERS TO OPTIMIZE:
+- ma_length: [50, 100, 150, 200] (shorter for 4H)
+- key_value: [1.5, 2.0, 2.5, 3.0]
+- adaptive_atr_mult: [1.0, 1.5, 2.0, 2.5]
+- tp1_rr_long: [1.0, 1.5, 2.0, 2.5] (INCREASED from 0.5)
+- tp1_percent: [20, 25, 30] (REDUCED from 45)
+- tp2_rr_long: [3.0, 4.0, 5.0]
+
+OPTIMIZATION CRITERIA:
+1. Primary: Maximize average trade size (target >= 1.0%)
+2. Secondary: Maintain Sharpe ratio >= 1.5
+3. Tertiary: Win rate >= 60%
+4. Constraint: Max drawdown <= 15%
+
+BACKTEST SETTINGS:
+- Asset: TSLA
+- Timeframe: 4H (4-hour candles)
+- Period: 1 year minimum
+- Initial Capital: $10,000
+- Commission: 0.03%
+- Strategy File: src/strategies/AGBot.py
+
+EXPECTED IMPROVEMENTS:
+- Fewer trades (better quality)
+- Larger average trade size (1-2% instead of 0.64%)
+- Better risk-reward ratios
+- Reduced commission impact
+- More sustainable strategy
+
+NOTES:
+- Current 1H strategy has too many marginal trades
+- 4H timeframe should reduce noise and improve signal quality
+- Longer TP1 RR will let winners run instead of taking quick profits
+- This is a fundamental strategy improvement, not just parameter tweaking

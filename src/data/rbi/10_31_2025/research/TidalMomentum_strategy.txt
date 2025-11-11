@@ -1,0 +1,49 @@
+STRATEGY_NAME: TidalMomentum
+
+STRATEGY_DETAILS:
+
+KEY STRATEGY COMPONENTS:
+This strategy utilizes the TTM Squeeze indicator on QQQ 1-hour timeframe to identify momentum breakouts from consolidation periods. The core concept revolves around detecting when volatility compression (squeeze) releases into directional momentum moves. The strategy combines squeeze state detection with momentum confirmation for high-probability entries.
+
+REQUIRED INDICATORS:
+1. TTM Squeeze Indicator (with histogram and dots)
+2. 20-period Exponential Moving Average (EMA)
+3. 50-period Exponential Moving Average (EMA)
+4. Volume (for confirmation)
+
+ENTRY RULES:
+LONG ENTRY:
+- TTM Squeeze shows "squeeze release" (histogram turns from negative to positive)
+- Price breaks above the 20 EMA
+- 20 EMA is above 50 EMA (bullish alignment)
+- Entry on next candle after squeeze release confirmation
+
+SHORT ENTRY:
+- TTM Squeeze shows "squeeze release" (histogram turns from positive to negative)
+- Price breaks below the 20 EMA
+- 20 EMA is below 50 EMA (bearish alignment)
+- Entry on next candle after squeeze release confirmation
+
+EXIT RULES:
+PROFIT TAKING:
+- Take 50% profit when momentum histogram reaches extreme levels (far from zero line)
+- Trail remaining position with 20 EMA as dynamic exit
+- Close entire position when TTM Squeeze histogram crosses back to opposite side
+
+STOP LOSS:
+- Place stop loss below recent swing low (for longs) or above recent swing high (for shorts)
+- Alternative: Use 2x ATR (Average True Range) from entry price
+- Maximum risk per trade: 1-2% of account capital
+
+RISK MANAGEMENT:
+- Only trade during active market hours (9:30 AM - 4:00 PM EST)
+- Avoid trading during first/last 30 minutes of session
+- Maximum 2-3 concurrent positions
+- Wait for clear squeeze cycles (avoid choppy market conditions)
+- Use volume confirmation - higher volume on breakout increases validity
+
+ADDITIONAL FILTERS:
+- Look for consecutive squeeze dots before release for stronger signals
+- Prefer entries when overall market trend aligns with trade direction
+- Avoid trading during major economic announcements or Fed events
+- Monitor for divergence between price and momentum histogram for early exit signals

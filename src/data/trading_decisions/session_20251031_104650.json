@@ -1,0 +1,55 @@
+{
+  "session_id": "20251031_104650",
+  "config": {
+    "models": [
+      "deepseek"
+    ],
+    "model_temperature": 0.7,
+    "model_max_tokens": 1024,
+    "system_prompt": "",
+    "asset_type": "crypto",
+    "ticker": "BTC",
+    "timeframe": "3m",
+    "cycle_interval": 180,
+    "use_simulation": true,
+    "initial_balance": 10000,
+    "position_size_percentage": 0.1,
+    "max_positions": 3,
+    "risk_per_trade": 0.02,
+    "monitored_assets": [
+      "BTC",
+      "ETH",
+      "SOL",
+      "DOGE"
+    ],
+    "agent_name": "Crypto Agent",
+    "agent_strategy": "You are an expert trader with deep knowledge of technical analysis, risk management, and market dynamics. Analyze real-time market data and make trading decisions based on technical indicators (EMA, MACD, RSI, ATR), price action, volume analysis, and risk management principles. Consider both intraday patterns and longer-term context. Maximize risk-adjusted returns while managing position sizing and drawdown.",
+    "save_decisions": true,
+    "decisions_dir": "src/data/trading_decisions",
+    "use_live_data": false
+  },
+  "session_start": "2025-10-31T10:46:50.949831",
+  "decisions_count": 1,
+  "decisions": [
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "prompt": "It has been 0 minutes since you started trading. The current time is 2025-10-31 10:47:10.730186 and you've been invoked 1 times. Below, we are providing you with a variety of state data, price data, and predictive signals so you can discover alpha. Below that is your current account information, value, performance, positions, etc.\n\nALL OF THE PRICE OR SIGNAL DATA BELOW IS ORDERED: OLDEST \u2192 NEWEST\n\nTimeframes note: Unless stated otherwise in a section title, intraday series are provided at 3\u2011minute intervals.\n\nCURRENT MARKET STATE FOR ALL COINS\n\nALL BTC DATA\ncurrent_price = 110019.48, current_ema20 = 109882.01, current_macd = 34.020, current_rsi (7 period) = 71.79\nIntraday series (3\u2011minute intervals, oldest \u2192 latest):\nMid prices: [109901.648, 109791.039, 109782.641, 109795.086, 109883.406, 109810.242, 109738.242, 109877.703, 110027.602, 110019.477]\nEMA indicators (20\u2011period): [109888.086, 109878.843, 109869.681, 109862.577, 109864.561, 109859.387, 109847.850, 109850.693, 109867.541, 109882.011]\nMACD indicators: [68.982, 53.112, 39.403, 29.206, 27.929, 20.775, 9.189, 11.132, 24.485, 34.020]\nRSI indicators (7\u2011Period): [40.803, 29.650, 33.564, 37.340, 38.088, 40.020, 40.690, 47.626, 71.755, 71.791]\nRSI indicators (14\u2011Period): [48.309, 42.762, 33.402, 40.302, 40.450, 27.865, 32.957, 44.346, 50.579, 53.745]\nLonger\u2011term context (4\u2011hour timeframe):\n20\u2011Period EMA: 110605.571 vs. 50\u2011Period EMA: 111271.158\n3\u2011Period ATR: 1284.969 vs. 14\u2011Period ATR: 1741.025\nCurrent Volume: 9951625216.000 vs. Average Volume: 3134448390.454\nMACD indicators: [-200.842, -330.752, -372.076, -524.686, -801.614, -1112.828, -1196.580, -1174.885, -1125.595, -1029.612]\nRSI indicators (14\u2011Period): [21.051, 26.136, 34.393, 29.786, 23.054, 20.013, 28.131, 34.790, 37.551, 41.127]\n\nHERE IS YOUR ACCOUNT INFORMATION & PERFORMANCE\nCurrent Total Return (percent): 0.00%\nAvailable Cash: 10000.00\nCurrent Account Value: 10000.00\nCurrent live positions & performance: No open positions\n",
+      "response": "SIGNAL: HOLD\nCONFIDENCE: 65%\nREASONING: The current price of 110019.48 is above the 20-period EMA (109882.01), indicating short-term bullish momentum. However, the RSI(7) at 71.79 is approaching overbought territory (>70), suggesting potential for a pullback. The MACD is positive and rising (34.020), supporting the bullish case, but the 4-hour timeframe shows longer-term weakness with price below both 20 and 50-period EMAs. Volume is significantly above average, indicating strong interest, but the elevated RSI and mixed timeframe signals warrant caution. Given the conflicting signals and early stage of trading, holding to gather more data is prudent rather than entering at potentially overextended levels.",
+      "system_prompt": "You are an expert crypto trading AI.\n\nYour role is to analyze real-time market data for BTC/USD and make trading decisions on 3m candles.\n\nOBJECTIVE: Maximize risk-adjusted returns on 3m timeframe.\n\nProvide your response in this format:\nSIGNAL: [BUY/SELL/HOLD]\nCONFIDENCE: [0-100]%\nREASONING: [your analysis]\n",
+      "timestamp": "2025-10-31T10:47:19.775305",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "The current price of 110019.48 is above the 20-period EMA (109882.01), indicating short-term bullish momentum. However, the RSI(7) at 71.79 is approaching overbought territory (>70), suggesting potential for a pullback. The MACD is positive and rising (34.020), supporting the bullish case, but the 4-hour timeframe shows longer-term weakness with price below both 20 and 50-period EMAs. Volume is significantly above average, indicating strong interest, but the elevated RSI and mixed timeframe signals warrant caution. Given the conflicting signals and early stage of trading, holding to gather more data is prudent rather than entering at potentially overextended levels.",
+          "raw_response": "SIGNAL: HOLD\nCONFIDENCE: 65%\nREASONING: The current price of 110019.48 is above the 20-period EMA (109882.01), indicating short-term bullish momentum. However, the RSI(7) at 71.79 is approaching overbought territory (>70), suggesting potential for a pullback. The MACD is positive and rising (34.020), supporting the bullish case, but the 4-hour timeframe shows longer-term weakness with price below both 20 and 50-period EMAs. Volume is significantly above average, indicating strong interest, but the elevated RSI and mixed timeframe signals warrant caution. Given the conflicting signals and early stage of trading, holding to gather more data is prudent rather than entering at potentially overextended levels.",
+          "prompt": "It has been 0 minutes since you started trading. The current time is 2025-10-31 10:47:10.730186 and you've been invoked 1 times. Below, we are providing you with a variety of state data, price data, and predictive signals so you can discover alpha. Below that is your current account information, value, performance, positions, etc.\n\nALL OF THE PRICE OR SIGNAL DATA BELOW IS ORDERED: OLDEST \u2192 NEWEST\n\nTimeframes note: Unless stated otherwise in a section title, intraday series are provided at 3\u2011minute intervals.\n\nCURRENT MARKET STATE FOR ALL COINS\n\nALL BTC DATA\ncurrent_price = 110019.48, current_ema20 = 109882.01, current_macd = 34.020, current_rsi (7 period) = 71.79\nIntraday series (3\u2011minute intervals, oldest \u2192 latest):\nMid prices: [109901.648, 109791.039, 109782.641, 109795.086, 109883.406, 109810.242, 109738.242, 109877.703, 110027.602, 110019.477]\nEMA indicators (20\u2011period): [109888.086, 109878.843, 109869.681, 109862.577, 109864.561, 109859.387, 109847.850, 109850.693, 109867.541, 109882.011]\nMACD indicators: [68.982, 53.112, 39.403, 29.206, 27.929, 20.775, 9.189, 11.132, 24.485, 34.020]\nRSI indicators (7\u2011Period): [40.803, 29.650, 33.564, 37.340, 38.088, 40.020, 40.690, 47.626, 71.755, 71.791]\nRSI indicators (14\u2011Period): [48.309, 42.762, 33.402, 40.302, 40.450, 27.865, 32.957, 44.346, 50.579, 53.745]\nLonger\u2011term context (4\u2011hour timeframe):\n20\u2011Period EMA: 110605.571 vs. 50\u2011Period EMA: 111271.158\n3\u2011Period ATR: 1284.969 vs. 14\u2011Period ATR: 1741.025\nCurrent Volume: 9951625216.000 vs. Average Volume: 3134448390.454\nMACD indicators: [-200.842, -330.752, -372.076, -524.686, -801.614, -1112.828, -1196.580, -1174.885, -1125.595, -1029.612]\nRSI indicators (14\u2011Period): [21.051, 26.136, 34.393, 29.786, 23.054, 20.013, 28.131, 34.790, 37.551, 41.127]\n\nHERE IS YOUR ACCOUNT INFORMATION & PERFORMANCE\nCurrent Total Return (percent): 0.00%\nAvailable Cash: 10000.00\nCurrent Account Value: 10000.00\nCurrent live positions & performance: No open positions\n",
+          "system_prompt": "You are an expert crypto trading AI.\n\nYour role is to analyze real-time market data for BTC/USD and make trading decisions on 3m candles.\n\nOBJECTIVE: Maximize risk-adjusted returns on 3m timeframe.\n\nProvide your response in this format:\nSIGNAL: [BUY/SELL/HOLD]\nCONFIDENCE: [0-100]%\nREASONING: [your analysis]\n"
+        }
+      }
+    }
+  ]
+}

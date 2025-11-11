@@ -1,0 +1,47 @@
+STRATEGY_NAME: DualHorizonCrossover
+
+STRATEGY_DETAILS:
+This strategy utilizes a dual timeframe approach combining the 20-period and 200-period Exponential Moving Averages (EMA) on SPY hourly charts to capture both short-term momentum shifts and long-term trend direction.
+
+KEY COMPONENTS:
+- Primary Trend Filter: 200-period EMA (long-term trend direction)
+- Signal Generator: 20-period EMA (short-term momentum)
+- Instrument: SPY (SPDR S&P 500 ETF Trust)
+- Timeframe: Hourly charts
+
+INDICATORS REQUIRED:
+- 20-period Exponential Moving Average (EMA)
+- 200-period Exponential Moving Average (EMA)
+
+ENTRY RULES:
+LONG ENTRY:
+1. Wait for 20 EMA to cross ABOVE 200 EMA (golden cross)
+2. Enter on the next candle after crossover confirmation
+3. Ensure price is trading above both EMAs at entry
+
+SHORT ENTRY:
+1. Wait for 20 EMA to cross BELOW 200 EMA (death cross)
+2. Enter on the next candle after crossover confirmation
+3. Ensure price is trading below both EMAs at entry
+
+EXIT RULES:
+LONG POSITIONS:
+- Exit when 20 EMA crosses below 200 EMA
+- Or use trailing stop of 2-3% below recent swing low
+
+SHORT POSITIONS:
+- Exit when 20 EMA crosses above 200 EMA
+- Or use trailing stop of 2-3% above recent swing high
+
+RISK MANAGEMENT:
+- Position sizing: Risk no more than 1-2% of capital per trade
+- Stop loss: Place 2-3% below entry for longs, 2-3% above entry for shorts
+- Maximum drawdown: Limit to 5-8% of total capital
+- Avoid trading during major economic announcements or extreme volatility
+
+ADDITIONAL CONSIDERATIONS:
+- This strategy works best in trending markets, may generate false signals in ranging conditions
+- Consider using volume confirmation to validate crossover signals
+- Monitor for EMA convergence/divergence as potential early warning signs
+- Backtest thoroughly on SPY historical hourly data before live implementation
+- Consider combining with RSI or MACD for additional confirmation in choppy markets

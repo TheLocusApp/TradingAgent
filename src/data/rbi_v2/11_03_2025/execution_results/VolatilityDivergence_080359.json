@@ -1,0 +1,8 @@
+{
+  "success": false,
+  "return_code": 1,
+  "stdout": "\ud83c\udf19 Moon Dev Backtest Starting...\n\ud83d\udcca Data loaded: 502 periods\n\ud83d\udcc8 First date: 2023-11-01 00:00:00-04:00\n\ud83d\udcc9 Last date: 2025-10-31 00:00:00-04:00\n",
+  "stderr": "Traceback (most recent call last):\n  File \"C:\\Users\\ahmed\\CascadeProjects\\moon-dev-ai-agents\\src\\data\\rbi_v2\\11_03_2025\\backtests_final\\VolatilityDivergence_BTFinal_v1.py\", line 153, in <module>\n    stats = bt.run()\n            ^^^^^^^^\n  File \"C:\\Users\\ahmed\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\backtesting\\backtesting.py\", line 1310, in run\n    strategy.init()\n  File \"C:\\Users\\ahmed\\CascadeProjects\\moon-dev-ai-agents\\src\\data\\rbi_v2\\11_03_2025\\backtests_final\\VolatilityDivergence_BTFinal_v1.py\", line 57, in init\n    self.vix_shifted = self.I(vix_shift_func, vix)\n                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\ahmed\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\backtesting\\backtesting.py\", line 162, in I\n    raise ValueError(\nValueError: Indicators must return (optionally a tuple of) numpy.arrays of same length as `data` (data shape: (502,); indicator \"vix_shift\u2026(VIX)\" shape: (), returned value: 15.789999961853027)\n",
+  "execution_time": 3.11399,
+  "timestamp": "2025-11-03T08:03:59.904489"
+}

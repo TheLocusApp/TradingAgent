@@ -1,0 +1,84 @@
+STRATEGY_NAME: HourlyRegime Crossover
+
+STRATEGY_DETAILS:
+Key Strategy Components:
+- Market/Timeframe: SPY on hourly bars (RTH only: 09:30–16:00 ET).
+- Core Logic: Regime identification via 48-EMA crossing the 200-EMA; trades in direction of the regime.
+- Confirmation Filters: Price location, EMA slopes, trend strength, and liquidity filters to reduce whipsaws.
+- Trade Management: ATR-based stops and trailing, time-based exits, and opposite-signal exits.
+- Risk Controls: Volatility-adjusted position sizing, daily loss limits, VIX/regime circuit breaker, and event filters.
+
+Required Indicators:
+- EMA(48) on hourly close.
+- EMA(200) on hourly close.
+- ATR(14) on hourly close.
+- ADX(14) on hourly (or daily) for trend-strength filter.
+- Volume SMA(20) on hourly for liquidity confirmation.
+- Optional: VIX level (for macro risk filter).
+
+Entry Rules:
+- Long (primary bias for SPY):
+  - Trigger: CrossUp occurs when EMA48[t-1] ≤ EMA200[t-1] AND EMA48[t] > EMA200[t] on a closed hourly bar.
+  - Confirmations (recommended):
+    - Close[t] > max(EMA48[t], EMA200[t]).
+    - Slope(EMA200) > 0 (current EMA200 > EMA200 5 bars ago).
+    - ADX(14) > 18 on hourly (or > 20 on daily) to avoid chop.
+    - Hourly volume > SMA(20) volume.
+  - Entry: Market or limit at next bar open; if using limit, place near EMA48 with a tolerance of 0.05–0.10%.
+
+- Short (optional; more whipsaw-prone on SPY):
+  - Trigger: CrossDown occurs when EMA48[t-1] ≥ EMA200[t-1] AND EMA48[t] < EMA200[t].
+  - Confirmations:
+    - Close[t] < min(EMA48[t], EMA200[t]).
+    - Slope(EMA200) < 0.
+    - ADX(14) > 18.
+    - Hourly volume > SMA(20).
+  - Entry: As above.
+
+Exit Rules:
+- Hard Exit (signal-based):
+  - Long: Exit when EMA48 crosses below EMA200 on a closed bar.
+  - Short: Exit when EMA48 crosses above EMA200.
+
+- Protective Stop (initial):
+  - Long: Initial stop = Entry Price − k × ATR(14); k = 2.0–2.5. Place immediately upon entry.
+  - Short: Initial stop = Entry Price + k × ATR(14).
+
+- Trailing Stop (dynamic):
+  - Long: Trail at max(Initial Stop, Highest Close since entry − 2.5 × ATR(14)).
+  - Short: Trail at min(Initial Stop, Lowest Close since entry + 2.5 × ATR(14)).
+
+- Time/Behavioral Exits:
+  - If after 35–40 hourly bars (~1 week RTH) unrealized PnL < 0, exit to avoid capital drag.
+  - If price closes beyond the opposite side of EMA48 for 3 consecutive bars, consider early exit (trend weakening).
+  - Optional profit-taking: Take 50% off at +2 × ATR; let the rest ride with trailing stop.
+
+Risk Management:
+- Position Sizing:
+  - Risk per trade: 0.5–1.0% of account.
+  - Shares = (Account_Risk) / (Entry − Stop distance). Round down to nearest lot size.
+
+- Portfolio/Exposure Limits:
+  - Max concurrent exposure: 100% long on SPY for long-only variant; if shorts enabled, cap net exposure to ±100%.
+  - Daily loss limit: Stop trading new signals if daily realized + unrealized drawdown exceeds 2× average trade risk.
+
+- Regime Safety Filters:
+  - VIX > 35: No new positions; manage open trades with tighter k (e.g., 2.0 × ATR).
+  - Major event filter: No new entries in the hour preceding FOMC rate decisions, CPI/NFP releases.
+
+- Whipsaw Guard:
+  - Require at least 0.10% separation between EMA48 and EMA200 at cross confirmation.
+  - Cooldown: No re-entry in the same direction within 3 bars after an exit.
+  - Optional: Two-bar confirmation (EMA48 above/below EMA200 for two consecutive closed bars).
+
+Operational Notes:
+- Data: Use RTH-only hourly bars; adjust SPY data for dividends; include realistic slippage (1–2 cents/share) and commissions.
+- Testing Window: Backtest 2005–present; evaluate long-only vs. long+short variants.
+- Parameter Tuning (robust ranges):
+  - Fast EMA: 40–60; Slow EMA: 180–220; ATR multiplier k: 2.0–3.0; ADX threshold: 15–25.
+- Expected Behavior:
+  - Long-only variant aims to capture medium-term uptrends (48 ≈ ~7.5 RTH days; 200 ≈ ~31 RTH days).
+  - Short signals are rarer and typically shorter-lived; consider smaller position size for shorts or skip entirely.
+
+Summary:
+HourlyRegime Crossover trades SPY on an hourly EMA(48/200) regime switch, filtered for trend strength and liquidity. It emphasizes volatility-adjusted sizing, ATR-based protection, and disciplined exits to mitigate whipsaws common to crossover systems.

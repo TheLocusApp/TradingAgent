@@ -1,0 +1,43 @@
+STRATEGY_NAME: DivergenceConfirm
+
+STRATEGY_DETAILS:
+This strategy combines RSI divergence patterns with MACD confirmation signals specifically for SPY daily charts, creating a robust mean-reversion approach with momentum validation.
+
+KEY STRATEGY COMPONENTS:
+1. Primary Instrument: SPY (S&P 500 ETF) on daily timeframe only
+2. Core Pattern: RSI divergence detection between price action and RSI indicator
+3. Confirmation Mechanism: MACD crossover signals to validate divergence setups
+4. Timeframe Requirement: Strictly daily charts for reliable signal generation
+
+REQUIRED INDICATORS:
+- RSI (Relative Strength Index): Period 14, standard settings
+- MACD (Moving Average Convergence Divergence): 12,26,9 standard settings
+
+ENTRY RULES:
+LONG ENTRY (Bullish Divergence):
+1. Price makes lower low while RSI makes higher low (classic bullish divergence)
+2. MACD histogram shows bullish crossover (turns positive) OR MACD line crosses above signal line
+3. Enter on next candle open after both conditions are met
+
+SHORT ENTRY (Bearish Divergence):
+1. Price makes higher high while RSI makes lower high (classic bearish divergence)
+2. MACD histogram shows bearish crossover (turns negative) OR MACD line crosses below signal line
+3. Enter on next candle open after both conditions are met
+
+EXIT RULES:
+- Take Profit: 2:1 risk-reward ratio minimum
+- Stop Loss: Recent swing low (for longs) or swing high (for shorts)
+- Alternative Exit: When RSI reaches overbought (70+) for long positions or oversold (30-) for short positions
+
+RISK MANAGEMENT:
+1. Position sizing: Maximum 2% risk per trade
+2. Stop loss placement based on recent price structure
+3. No new entries if SPY is in strong trending phase (avoid counter-trend trades during strong momentum)
+4. Wait for clear divergence patterns - avoid marginal or unclear setups
+
+ADDITIONAL FILTERS:
+- Volume confirmation: Higher volume on confirmation candle increases validity
+- Market context: Avoid trading during major economic events or FOMC announcements
+- Pattern quality: Divergence should be clear and significant, not minor fluctuations
+
+This strategy leverages the reliability of RSI divergence patterns while using MACD as a timing mechanism, specifically optimized for SPY's daily price action characteristics.

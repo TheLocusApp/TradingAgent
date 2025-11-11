@@ -1,0 +1,47 @@
+STRATEGY_NAME: DualWave Crossover
+
+STRATEGY_DETAILS:
+This strategy employs a dual exponential moving average (EMA) crossover system specifically designed for SPY on the hourly timeframe, focusing on capturing medium-term trend changes with reduced lag compared to traditional moving averages.
+
+KEY STRATEGY COMPONENTS:
+- Primary Instrument: SPY (SPDR S&P 500 ETF Trust)
+- Timeframe: 1-hour charts exclusively
+- Core Indicators: 13-period EMA (fast) and 48-period EMA (slow)
+- Trend Detection: Uses the relationship between fast and slow EMAs to identify trend direction changes
+
+ENTRY RULES:
+LONG ENTRY:
+- Trigger when 13-period EMA crosses ABOVE 48-period EMA
+- Confirm with price action closing above both EMAs
+- Enter on next candle open after crossover confirmation
+
+SHORT ENTRY:
+- Trigger when 13-period EMA crosses BELOW 48-period EMA
+- Confirm with price action closing below both EMAs
+- Enter on next candle open after crossover confirmation
+
+EXIT RULES:
+LONG EXIT:
+- When 13-period EMA crosses below 48-period EMA
+- Close position on next candle open after bearish crossover
+
+SHORT EXIT:
+- When 13-period EMA crosses above 48-period EMA
+- Close position on next candle open after bullish crossover
+
+RISK MANAGEMENT:
+- Position sizing: Risk no more than 1-2% of capital per trade
+- Stop-loss: Place 2-3 ATR (Average True Range) below entry for long positions, above entry for short positions
+- Time-based exit: Consider exiting if no significant movement occurs within 5-10 bars after entry
+- Avoid trading during first/last hour of market session due to increased volatility
+
+REQUIRED INDICATORS:
+1. 13-period Exponential Moving Average (EMA)
+2. 48-period Exponential Moving Average (EMA)
+3. Optional: 14-period ATR for stop-loss calculation
+
+ADDITIONAL CONSIDERATIONS:
+- Monitor for false signals during choppy/consolidation periods
+- Consider higher timeframe (daily) trend alignment for improved signal quality
+- Be aware of economic events and earnings reports that may cause abnormal price action
+- The 13/48 EMA combination provides balanced responsiveness while filtering minor noise on hourly charts

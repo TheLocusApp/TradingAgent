@@ -1,0 +1,300 @@
+//@version=5
+strategy("AGBot Generic Strategy - EMA Ribbon Filter (Longs & Shorts)",
+     overlay=true,
+     initial_capital=100000,
+     commission_type=strategy.commission.percent,
+     commission_value=0.1,
+     calc_on_order_fills=true,
+     calc_on_every_tick=false,
+     pyramiding=0,
+     max_labels_count=500)
+
+// =============== EMA RIBBON FILTER STRATEGY ===============
+// KEY INSIGHT: Apply EMA filter ONLY to shorts!
+// 
+// LONGS: Trade normally (no filter) - already works great!
+//
+// SHORTS: Only when Price < EMA13 < EMA48 < EMA200
+//   → Shorts only work in confirmed downtrends
+//   → Filter prevents early shorts above ribbon
+//
+// This solves the shorts problem while keeping
+// the proven longs strategy intact!
+
+// =============== Inputs ===============
+tradingMode        = input.string("both", "Trading Mode", options=["longs_only", "shorts_only", "both"])
+useEMAFilterShorts = input.bool(true, "Use EMA Filter for Shorts", tooltip="Only short when price below EMA13 < EMA48 < EMA200")
+
+maLength           = input.int(100,   "EMA Length", minval=1)
+keyValue           = input.float(2.0, "UT Bot Key (×ATR)", minval=0.1, step=0.1)
+atrPeriodUT        = input.int(1,     "UT Bot ATR Period", minval=1)
+atrPeriod          = input.int(14,    "ATR Period (SL/Trail)", minval=1)
+
+// LONGS parameters
+adaptiveAtrMultLongs = input.float(2.0, "ATR Mult Longs (SL/Trail)", minval=0.1, step=0.1)
+tp1RRLong          = input.float(1.0, "TP1 R:R Long", step=0.1)
+tp2RRLong          = input.float(3.0, "TP2 R:R Long", step=0.1)
+tp1PercentLongs    = input.float(35.0,"TP1 Close % Longs", minval=0, maxval=100, step=1)
+
+// SHORTS parameters
+adaptiveAtrMultShorts = input.float(1.0, "ATR Mult Shorts (SL/Trail)", minval=0.1, step=0.1)
+tp1RRShort         = input.float(0.5, "TP1 R:R Short", step=0.1)
+tp2RRShort         = input.float(2.0, "TP2 R:R Short", step=0.1)
+tp1PercentShorts   = input.float(35.0,"TP1 Close % Shorts", minval=0, maxval=100, step=1)
+useSwingHighShorts = input.bool(true, "Use Swing High Stop for Shorts", tooltip="Use swing high instead of ATR for shorts (better in downtrends)")
+swingHighBarsShorts = input.int(5, "Swing High Bars (Shorts)", minval=1, tooltip="Number of bars to look back for swing high")
+
+riskPerTradePct    = input.float(2.5, "Risk % of Equity per Trade", minval=0.01, step=0.01)
+stoplossType       = input.string("atr", "Stoploss Type", options=["atr","swing"])
+swingHighBars      = input.int(10, "Swing High Bars", minval=1)
+swingLowBars       = input.int(10, "Swing Low Bars", minval=1)
+
+useTP              = input.bool(true,  "Use Take Profits")
+numTPs             = input.int(2,      "Number of TPs (1 or 2)", minval=1, maxval=2)
+secondTPType       = input.string("atr_trailing", "Second TP Type", options=["rr","atr_trailing"])
+
+sessStartHour      = input.int(9,  "Session Start Hour (exchange time)", minval=0, maxval=23)
+sessStartMinute    = input.int(30, "Session Start Minute", minval=0, maxval=59)
+sessEndHour        = input.int(16, "Session End Hour", minval=0, maxval=23)
+sessEndMinute      = input.int(0,  "Session End Minute", minval=0, maxval=59)
+enableEODClose     = input.bool(true, "Flatten at End of Session")
+
+// =============== Helpers ===============
+pad2(n) =>
+    n < 10 ? "0" + str.tostring(n) : str.tostring(n)
+
+sessStr = pad2(sessStartHour) + pad2(sessStartMinute) + "-" + pad2(sessEndHour) + pad2(sessEndMinute)
+
+// Indicators
+emaVal  = ta.ema(close, maLength)
+atr14   = ta.atr(atrPeriod)
+smAtr14 = ta.sma(atr14, 14)
+
+// EMA RIBBON (13, 48, 200)
+ema13 = ta.ema(close, 13)
+ema48 = ta.ema(close, 48)
+ema200 = ta.ema(close, 200)
+
+// Trend Alignment (for shorts filter only)
+bearAlignment = close < ema13 and ema13 < ema48 and ema48 < ema200
+
+// UT Bot ATR Trailing Stop
+float trueRangeUT = math.max(math.max(high - low, math.abs(high - close[1])), math.abs(low - close[1]))
+atrUT = ta.sma(trueRangeUT, atrPeriodUT)
+nLoss = keyValue * atrUT
+
+var float xATRTrail = na
+xATRTrail := na(xATRTrail[1]) ? close :
+     (close > xATRTrail[1] ? math.max(xATRTrail[1], close - nLoss) :
+      close < xATRTrail[1] ? math.min(xATRTrail[1], close + nLoss) :
+      (close[1] > xATRTrail[1] ? close - nLoss : close + nLoss))
+
+// Stop references - DYNAMIC based on position type
+adaptiveAtrMult = strategy.position_size < 0 ? adaptiveAtrMultShorts : adaptiveAtrMultLongs
+
+longStopATR     = close - atr14 * adaptiveAtrMultLongs
+shortStopATR    = close + atr14 * adaptiveAtrMultShorts
+longStopSwing   = ta.lowest(low,  swingLowBars)
+shortStopSwing  = ta.highest(high, swingHighBarsShorts)  // Use shorts-specific swing high
+
+// Longs: Use stoplossType setting
+longStopChosen  = stoplossType == "atr" ? longStopATR  : longStopSwing
+
+// Shorts: Use swing high if enabled, otherwise ATR
+shortStopChosen = useSwingHighShorts ? shortStopSwing : shortStopATR
+
+// Trend & signals
+bullish    = close > emaVal
+bearish    = close < emaVal
+buySignal  = ta.crossover(close, xATRTrail)
+sellSignal = ta.crossunder(close, xATRTrail)
+
+// FILTERED SIGNALS
+// Longs: No filter (already works great!)
+// Shorts: Optional EMA filter (only in confirmed downtrends)
+longSignal = buySignal
+shortSignal = useEMAFilterShorts ? (sellSignal and bearAlignment) : sellSignal
+
+// Trading mode filter
+enableLongs = tradingMode == "longs_only" or tradingMode == "both"
+enableShorts = tradingMode == "shorts_only" or tradingMode == "both"
+
+// Session logic
+inSession       = not na(time(timeframe.period, sessStr))
+justLeftSession = not inSession and inSession[1]
+
+// =============== Position/Risk Sizing ===============
+var float entryPrice = na
+var float initialSL  = na
+var bool  tp1Hit     = false
+var float hiSince    = na
+var float loSince    = na
+var int   entryBar   = na
+
+float equity  = strategy.equity
+float riskAmt = equity * (riskPerTradePct/100.0)
+
+calcQtyLong(price, stop) =>
+    dist = math.max(price - stop, 0.0)
+    dist <= 0 ? 0.0 : (riskAmt / (dist * syminfo.pointvalue))
+
+calcQtyShort(price, stop) =>
+    dist = math.max(stop - price, 0.0)
+    dist <= 0 ? 0.0 : (riskAmt / (dist * syminfo.pointvalue))
+
+// =============== EOD flatten ===============
+if enableEODClose and justLeftSession
+    if strategy.position_size != 0
+        strategy.close_all(comment="EOD Flat")
+
+// =============== Entry Logic ===============
+havePos   = strategy.position_size != 0
+isLongPos = strategy.position_size > 0
+isSrtPos  = strategy.position_size < 0
+
+if inSession and not havePos
+    // LONGS: No filter (already works!)
+    if enableLongs and longSignal and bullish and not na(longStopChosen)
+        qtyL = calcQtyLong(close, longStopChosen)
+        if qtyL > 0
+            strategy.entry(id="Long", direction=strategy.long, qty=qtyL, comment="Long")
+            entryPrice := close
+            initialSL  := longStopChosen
+            tp1Hit     := false
+            hiSince    := high
+            loSince    := na
+            entryBar   := bar_index
+    
+    // SHORTS: With optional EMA filter
+    if enableShorts and shortSignal and bearish and not na(shortStopChosen)
+        qtyS = calcQtyShort(close, shortStopChosen)
+        if qtyS > 0
+            filterStatus = useEMAFilterShorts ? " (Bear Filter)" : ""
+            strategy.entry(id="Short", direction=strategy.short, qty=qtyS, comment="Short" + filterStatus)
+            entryPrice := close
+            initialSL  := shortStopChosen
+            tp1Hit     := false
+            loSince    := low
+            hiSince    := na
+            entryBar   := bar_index
+
+// =============== Management ===============
+if havePos
+    hiSince := isLongPos ? (na(hiSince) ? high : math.max(hiSince, high)) : hiSince
+    loSince := isSrtPos  ? (na(loSince) ? low  : math.min(loSince,  low )) : loSince
+
+    longSLDist  = isLongPos and not na(entryPrice) and not na(initialSL) ? entryPrice - initialSL : na
+    shortSLDist = isSrtPos  and not na(entryPrice) and not na(initialSL) ? initialSL - entryPrice : na
+
+    // =============== LONG MANAGEMENT ===============
+    if isLongPos and not na(longSLDist)
+        tp1Long = entryPrice + longSLDist * tp1RRLong
+
+        if useTP and not tp1Hit and high >= tp1Long
+            qtyPct = math.min(math.max(tp1PercentLongs, 0.0), 100.0)
+            strategy.close(id="Long", qty_percent=qtyPct, comment="TP1 Long")
+            tp1Hit := true
+
+        if useTP and numTPs == 2 and tp1Hit
+            if secondTPType == "rr"
+                tp2Long = entryPrice + longSLDist * tp2RRLong
+                if high >= tp2Long
+                    strategy.close(id="Long", comment="TP2 Long (RR)")
+            else
+                if not na(hiSince)
+                    trailStopL = hiSince - atr14 * adaptiveAtrMult
+                    if low <= trailStopL
+                        strategy.close(id="Long", comment="TP2 Long (ATR Trail)")
+
+        // Longs don't use alignment filter, so no exit on alignment break
+
+        if not na(initialSL)
+            strategy.exit(id="LX", from_entry="Long", stop=initialSL)
+
+    // =============== SHORT MANAGEMENT ===============
+    if isSrtPos and not na(shortSLDist)
+        tp1Short = entryPrice - shortSLDist * tp1RRShort
+
+        if useTP and not tp1Hit and low <= tp1Short
+            qtyPct = math.min(math.max(tp1PercentShorts, 0.0), 100.0)
+            strategy.close(id="Short", qty_percent=qtyPct, comment="TP1 Short")
+            tp1Hit := true
+
+        if useTP and numTPs == 2 and tp1Hit
+            if secondTPType == "rr"
+                tp2Short = entryPrice - shortSLDist * tp2RRShort
+                if low <= tp2Short
+                    strategy.close(id="Short", comment="TP2 Short (RR)")
+            else
+                if not na(loSince)
+                    trailStopS = loSince + atr14 * adaptiveAtrMult
+                    if high >= trailStopS
+                        strategy.close(id="Short", comment="TP2 Short (ATR Trail)")
+
+        // Exit if bear alignment breaks (only if filter enabled)
+        if useEMAFilterShorts and not bearAlignment
+            strategy.close(id="Short", comment="Bear Broken")
+
+        if not na(initialSL)
+            strategy.exit(id="SX", from_entry="Short", stop=initialSL)
+
+// =============== Plots ===============
+plot(emaVal, "EMA", color=color.new(color.teal, 0))
+plot(xATRTrail, "UT ATR Trail", color=color.new(color.orange, 0))
+
+// EMA Ribbon
+plot(ema13, "EMA 13", color=color.new(color.green, 50), linewidth=1)
+plot(ema48, "EMA 48", color=color.new(color.blue, 50), linewidth=1)
+plot(ema200, "EMA 200", color=color.new(color.red, 50), linewidth=2)
+
+// Trend background (only show if filter enabled)
+bgcolor(useEMAFilterShorts and bearAlignment ? color.new(color.red, 95) : na, title="Bear Alignment")
+
+plot(longStopChosen,  "Long Stop Ref",  color=color.new(color.lime, 70))
+plot(shortStopChosen, "Short Stop Ref", color=color.new(color.red,  70))
+
+plotshape(longSignal and bullish,  title="Buy",  style=shape.triangleup,   location=location.belowbar, color=color.new(color.teal,0), size=size.tiny, text="BUY")
+plotshape(shortSignal and bearish, title="Sell", style=shape.triangledown, location=location.abovebar, color=color.new(color.red,0),  size=size.tiny, text="SELL")
+
+// =============== Trend Display ===============
+var table trendTable = na
+if na(trendTable)
+    trendTable := table.new(position.top_left, 2, 5, bgcolor=color.new(color.gray, 80), border_color=color.white)
+    table.cell(trendTable, 0, 0, "TRADING MODE", text_color=color.white, text_size=size.small)
+
+modeColor = tradingMode == "longs_only" ? color.green : (tradingMode == "shorts_only" ? color.red : color.yellow)
+modeText = tradingMode == "longs_only" ? "LONGS ONLY" : (tradingMode == "shorts_only" ? "SHORTS ONLY" : "BOTH")
+
+table.cell(trendTable, 0, 1, "Mode:", text_color=color.white, text_size=size.small)
+table.cell(trendTable, 1, 1, modeText, text_color=modeColor, text_size=size.small)
+table.cell(trendTable, 0, 2, "Shorts Filter:", text_color=color.white, text_size=size.small)
+filterText = useEMAFilterShorts ? "ON" : "OFF"
+filterColor = useEMAFilterShorts ? color.green : color.gray
+table.cell(trendTable, 1, 2, filterText, text_color=filterColor, text_size=size.small)
+table.cell(trendTable, 0, 3, "Bear Align:", text_color=color.white, text_size=size.small)
+bearText = bearAlignment ? "YES" : "NO"
+bearColor = bearAlignment ? color.red : color.gray
+table.cell(trendTable, 1, 3, bearText, text_color=bearColor, text_size=size.small)
+table.cell(trendTable, 0, 4, "EMA Ribbon:", text_color=color.white, text_size=size.small)
+table.cell(trendTable, 1, 4, "13/48/200", text_color=color.yellow, text_size=size.small)
+
+// =============== Info Display ===============
+var table infoTable = na
+if na(infoTable)
+    infoTable := table.new(position.top_right, 2, 8, bgcolor=color.new(color.gray, 80), border_color=color.white)
+    table.cell(infoTable, 0, 0, "AGBot EMA Filter", text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 0, 1, "Longs ATR Mult:", text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 1, 1, str.tostring(adaptiveAtrMultLongs, "#.##"), text_color=color.yellow, text_size=size.small)
+    table.cell(infoTable, 0, 2, "Shorts ATR Mult:", text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 1, 2, str.tostring(adaptiveAtrMultShorts, "#.##"), text_color=color.yellow, text_size=size.small)
+    table.cell(infoTable, 0, 3, "Longs TP1%:", text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 1, 3, str.tostring(tp1PercentLongs, "#") + "%", text_color=color.yellow, text_size=size.small)
+    table.cell(infoTable, 0, 4, "Shorts TP1%:", text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 1, 4, str.tostring(tp1PercentShorts, "#") + "%", text_color=color.yellow, text_size=size.small)
+    table.cell(infoTable, 0, 5, "Longs Filter:", text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 1, 5, "NONE", text_color=color.lime, text_size=size.small)
+    table.cell(infoTable, 0, 6, "Shorts Filter:", text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 1, 6, "C<13<48<200", text_color=color.red, text_size=size.small)
+    table.cell(infoTable, 0, 7, "Shorts Stop:", text_color=color.white, text_size=size.small)
+    shortsStopText = useSwingHighShorts ? "Swing High" : "ATR"
+    table.cell(infoTable, 1, 7, shortsStopText, text_color=color.orange, text_size=size.small)

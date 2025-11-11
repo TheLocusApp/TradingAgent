@@ -1,0 +1,214 @@
+//@version=5
+strategy("AGBot Generic Strategy - NVDA Optimized",
+     overlay=true,
+     initial_capital=100000,
+     commission_type=strategy.commission.percent,
+     commission_value=0.0,
+     calc_on_order_fills=true,
+     calc_on_every_tick=false,
+     pyramiding=0,
+     max_labels_count=500)
+
+// =============== OPTIMIZED PARAMETERS FOR NVDA (1H Timeframe) ===============
+// Source: AGBot Optimization Results - SMOOTHEST CURVE
+// Return: 25.64% | Sharpe: 2.03 | Max DD: -2.99% | Win Rate: 49.2% | Trades: 59
+// Note: Tighter stops (ATR Mult 1.5) = Much smoother equity curve!
+
+// =============== Inputs ===============
+maLength           = input.int(100,   "EMA Length", minval=1)
+keyValue           = input.float(2.0, "UT Bot Key (×ATR)", minval=0.1, step=0.1)
+atrPeriodUT        = input.int(1,     "UT Bot ATR Period", minval=1)
+atrPeriod          = input.int(14,    "ATR Period (SL/Trail)", minval=1)
+adaptiveAtrMult    = input.float(1.5, "ATR Mult (SL/Trail)", minval=0.1, step=0.1)
+
+riskPerTradePct    = input.float(2.5, "Risk % of Equity per Trade", minval=0.01, step=0.01)
+stoplossType       = input.string("atr", "Stoploss Type", options=["atr","swing"])
+swingHighBars      = input.int(10, "Swing High Bars", minval=1)
+swingLowBars       = input.int(10, "Swing Low Bars", minval=1)
+
+useTP              = input.bool(true,  "Use Take Profits")
+numTPs             = input.int(2,      "Number of TPs (1 or 2)", minval=1, maxval=2)
+secondTPType       = input.string("atr_trailing", "Second TP Type", options=["rr","atr_trailing"])
+tp1RRLong          = input.float(1.0, "TP1 R:R Long", step=0.1)
+tp2RRLong          = input.float(3.0, "TP2 R:R Long", step=0.1)
+tp1RRShort         = input.float(1.0, "TP1 R:R Short", step=0.1)
+tp2RRShort         = input.float(3.0, "TP2 R:R Short", step=0.1)
+tp1Percent         = input.float(45.0,"TP1 Close %", minval=0, maxval=100, step=1)
+
+allowLongs         = input.bool(true,  "Enable Longs")
+allowShorts        = input.bool(true,  "Enable Shorts")
+
+sessStartHour      = input.int(9,  "Session Start Hour (exchange time)", minval=0, maxval=23)
+sessStartMinute    = input.int(30, "Session Start Minute", minval=0, maxval=59)
+sessEndHour        = input.int(16, "Session End Hour", minval=0, maxval=23)
+sessEndMinute      = input.int(0,  "Session End Minute", minval=0, maxval=59)
+enableEODClose     = input.bool(true, "Flatten at End of Session")
+
+// =============== Helpers ===============
+pad2(n) =>
+    n < 10 ? "0" + str.tostring(n) : str.tostring(n)
+
+sessStr = pad2(sessStartHour) + pad2(sessStartMinute) + "-" + pad2(sessEndHour) + pad2(sessEndMinute)
+
+// Indicators
+emaVal  = ta.ema(close, maLength)
+atr14   = ta.atr(atrPeriod)
+smAtr14 = ta.sma(atr14, 14)
+
+// UT Bot ATR Trailing Stop
+float trueRangeUT = math.max(math.max(high - low, math.abs(high - close[1])), math.abs(low - close[1]))
+atrUT = ta.sma(trueRangeUT, atrPeriodUT)
+nLoss = keyValue * atrUT
+
+var float xATRTrail = na
+xATRTrail := na(xATRTrail[1]) ? close :
+     (close > xATRTrail[1] ? math.max(xATRTrail[1], close - nLoss) :
+      close < xATRTrail[1] ? math.min(xATRTrail[1], close + nLoss) :
+      (close[1] > xATRTrail[1] ? close - nLoss : close + nLoss))
+
+// Stop references
+longStopATR     = close - atr14 * adaptiveAtrMult
+shortStopATR    = close + atr14 * adaptiveAtrMult
+longStopSwing   = ta.lowest(low,  swingLowBars)
+shortStopSwing  = ta.highest(high, swingHighBars)
+longStopChosen  = stoplossType == "atr" ? longStopATR  : longStopSwing
+shortStopChosen = stoplossType == "atr" ? shortStopATR : shortStopSwing
+
+// Trend & signals
+bullish    = close > emaVal
+bearish    = close < emaVal
+buySignal  = ta.crossover(close, xATRTrail)
+sellSignal = ta.crossunder(close, xATRTrail)
+
+// Session logic
+inSession       = not na(time(timeframe.period, sessStr))
+justLeftSession = not inSession and inSession[1]
+
+// =============== Position/Risk Sizing ===============
+var float entryPrice = na
+var float initialSL  = na
+var bool  tp1Hit     = false
+var float hiSince    = na
+var float loSince    = na
+
+float equity  = strategy.equity
+float riskAmt = equity * (riskPerTradePct/100.0)
+
+calcQtyLong(price, stop) =>
+    dist = math.max(price - stop, 0.0)
+    dist <= 0 ? 0.0 : (riskAmt / (dist * syminfo.pointvalue))
+
+calcQtyShort(price, stop) =>
+    dist = math.max(stop - price, 0.0)
+    dist <= 0 ? 0.0 : (riskAmt / (dist * syminfo.pointvalue))
+
+// =============== EOD flatten ===============
+if enableEODClose and justLeftSession
+    if strategy.position_size != 0
+        strategy.close_all(comment="EOD Flat")
+
+// =============== Entry Logic ===============
+havePos   = strategy.position_size != 0
+isLongPos = strategy.position_size > 0
+isSrtPos  = strategy.position_size < 0
+
+if inSession and not havePos
+    if allowLongs and buySignal and bullish and not na(longStopChosen)
+        qtyL = calcQtyLong(close, longStopChosen)
+        if qtyL > 0
+            strategy.entry(id="Long", direction=strategy.long, qty=qtyL, comment="Long")
+            entryPrice := close
+            initialSL  := longStopChosen
+            tp1Hit     := false
+            hiSince    := high
+            loSince    := na
+    if allowShorts and sellSignal and bearish and not na(shortStopChosen)
+        qtyS = calcQtyShort(close, shortStopChosen)
+        if qtyS > 0
+            strategy.entry(id="Short", direction=strategy.short, qty=qtyS, comment="Short")
+            entryPrice := close
+            initialSL  := shortStopChosen
+            tp1Hit     := false
+            loSince    := low
+            hiSince    := na
+
+// =============== Management ===============
+if havePos
+    hiSince := isLongPos ? (na(hiSince) ? high : math.max(hiSince, high)) : hiSince
+    loSince := isSrtPos  ? (na(loSince) ? low  : math.min(loSince,  low )) : loSince
+
+    longSLDist  = isLongPos and not na(entryPrice) and not na(initialSL) ? entryPrice - initialSL : na
+    shortSLDist = isSrtPos  and not na(entryPrice) and not na(initialSL) ? initialSL - entryPrice : na
+
+    if isLongPos and not na(longSLDist)
+        tp1Long = entryPrice + longSLDist * tp1RRLong
+
+        if useTP and not tp1Hit and high >= tp1Long
+            qtyPct = math.min(math.max(tp1Percent, 0.0), 100.0)
+            strategy.close(id="Long", qty_percent=qtyPct, comment="TP1 Long")
+            tp1Hit := true
+
+        if useTP and numTPs == 2 and tp1Hit
+            if secondTPType == "rr"
+                tp2Long = entryPrice + longSLDist * tp2RRLong
+                if high >= tp2Long
+                    strategy.close(id="Long", comment="TP2 Long (RR)")
+            else
+                if not na(hiSince)
+                    trailStopL = hiSince - atr14 * adaptiveAtrMult
+                    if low <= trailStopL
+                        strategy.close(id="Long", comment="TP2 Long (ATR Trail)")
+
+        if not na(initialSL)
+            strategy.exit(id="LX", from_entry="Long", stop=initialSL)
+
+    if isSrtPos and not na(shortSLDist)
+        tp1Short = entryPrice - shortSLDist * tp1RRShort
+
+        if useTP and not tp1Hit and low <= tp1Short
+            qtyPct = math.min(math.max(tp1Percent, 0.0), 100.0)
+            strategy.close(id="Short", qty_percent=qtyPct, comment="TP1 Short")
+            tp1Hit := true
+
+        if useTP and numTPs == 2 and tp1Hit
+            if secondTPType == "rr"
+                tp2Short = entryPrice - shortSLDist * tp2RRShort
+                if low <= tp2Short
+                    strategy.close(id="Short", comment="TP2 Short (RR)")
+            else
+                if not na(loSince)
+                    trailStopS = loSince + atr14 * adaptiveAtrMult
+                    if high >= trailStopS
+                        strategy.close(id="Short", comment="TP2 Short (ATR Trail)")
+
+        if not na(initialSL)
+            strategy.exit(id="SX", from_entry="Short", stop=initialSL)
+
+// =============== Plots ===============
+plot(emaVal, "EMA", color=color.new(color.teal, 0))
+plot(xATRTrail, "UT ATR Trail", color=color.new(color.orange, 0))
+plot(longStopChosen,  "Long Stop Ref",  color=color.new(color.lime, 70))
+plot(shortStopChosen, "Short Stop Ref", color=color.new(color.red,  70))
+
+plotshape(buySignal and bullish and allowLongs,  title="Buy",  style=shape.triangleup,   location=location.belowbar, color=color.new(color.teal,0), size=size.tiny, text="BUY")
+plotshape(sellSignal and bearish and allowShorts,title="Sell", style=shape.triangledown, location=location.abovebar, color=color.new(color.red,0),  size=size.tiny, text="SELL")
+
+// =============== Info Display ===============
+var table infoTable = na
+if na(infoTable)
+    infoTable := table.new(position.top_right, 2, 8, bgcolor=color.new(color.gray, 80), border_color=color.white)
+    table.cell(infoTable, 0, 0, "AGBot NVDA Optimized", text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 0, 1, "MA Length:", text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 1, 1, str.tostring(maLength), text_color=color.yellow, text_size=size.small)
+    table.cell(infoTable, 0, 2, "Key Value:", text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 1, 2, str.tostring(keyValue, "#.##"), text_color=color.yellow, text_size=size.small)
+    table.cell(infoTable, 0, 3, "ATR Mult:", text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 1, 3, str.tostring(adaptiveAtrMult, "#.##"), text_color=color.yellow, text_size=size.small)
+    table.cell(infoTable, 0, 4, "TP1 R:R:", text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 1, 4, str.tostring(tp1RRLong, "#.##"), text_color=color.yellow, text_size=size.small)
+    table.cell(infoTable, 0, 5, "TP1 Close %:", text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 1, 5, str.tostring(tp1Percent, "#") + "%", text_color=color.yellow, text_size=size.small)
+    table.cell(infoTable, 0, 6, "Max Drawdown:", text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 1, 6, "-2.99%", text_color=color.lime, text_size=size.small)
+    table.cell(infoTable, 0, 7, "Expected Return:", text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 1, 7, "25.64%", text_color=color.lime, text_size=size.small)

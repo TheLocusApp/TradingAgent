@@ -1,0 +1,49 @@
+STRATEGY_NAME: QuantumDivergence
+
+STRATEGY_DETAILS:
+
+KEY STRATEGY COMPONENTS:
+This is a high-frequency day trading strategy specifically designed for QQQ on 5-minute timeframes that combines RSI divergence patterns with MACD confirmation signals. The strategy focuses on identifying potential trend reversals through momentum divergence while using MACD for timing and confirmation.
+
+REQUIRED INDICATORS:
+1. RSI (Relative Strength Index) - Period 14, levels 30/70
+2. MACD (Moving Average Convergence Divergence) - Standard settings (12,26,9)
+3. Volume indicator (optional but recommended)
+
+ENTRY RULES:
+
+BULLISH SETUP:
+1. RSI shows BULLISH DIVERGENCE: Price makes lower lows while RSI makes higher lows
+2. Wait for RSI to cross above 30 level from oversold territory
+3. MACD must show bullish confirmation: MACD line crosses above signal line OR histogram turns positive
+4. Enter long position on the next candle after all conditions are met
+
+BEARISH SETUP:
+1. RSI shows BEARISH DIVERGENCE: Price makes higher highs while RSI makes lower highs
+2. Wait for RSI to cross below 70 level from overbought territory
+3. MACD must show bearish confirmation: MACD line crosses below signal line OR histogram turns negative
+4. Enter short position on the next candle after all conditions are met
+
+EXIT RULES:
+- Take profit when RSI reaches opposite extreme (70 for long trades, 30 for short trades)
+- Alternative exit: MACD shows opposite signal (cross against position direction)
+- Time-based exit: Close all positions 15 minutes before market close
+- Stop loss triggered if price moves against position by more than 0.5%
+
+RISK MANAGEMENT:
+1. Position sizing: Risk no more than 1% of account per trade
+2. Stop loss: 0.5% below entry for long positions, 0.5% above entry for short positions
+3. Maximum 3 concurrent positions
+4. No trading during first 30 minutes of market open
+5. Avoid trading during major economic announcements
+
+ADDITIONAL FILTERS:
+- Volume should be above 20-period average for higher probability setups
+- Look for divergence patterns that span at least 4-6 candles for stronger signals
+- Prefer setups that occur during the main trading session (10:00 AM - 3:30 PM EST)
+
+STRATEGY NOTES:
+- This strategy works best in ranging or mildly trending markets
+- Avoid using during strong trending days where divergence signals may fail
+- Practice identifying clean divergence patterns before trading with real money
+- Backtest extensively on QQQ 5-minute charts to understand strategy performance characteristics

@@ -1,0 +1,102 @@
+STRATEGY_NAME: HourlyEMA Crossover
+
+STRATEGY_DETAILS:
+Overview:
+- A trend-following crossover on SPY using 13-EMA and 48-EMA on the hourly chart. Trades trigger only on candle close to avoid intrabar whipsaws. Optional filters help reduce chop and align with broader market trend.
+
+Key Components:
+- Timeframe: 1-hour bars (prefer Regular Trading Hours, 9:30–16:00 ET, to reduce overnight noise; extended hours optional).
+- Instrument: SPY (long-only baseline). Optional symmetry for short exposure via SPY short, SH, or options.
+- Core Indicators:
+  - EMA(13) fast
+  - EMA(48) slow
+- Optional Filters/Helpers:
+  - EMA(200) for higher-timeframe trend filter
+  - ATR(14) for stops and position sizing
+  - ADX(14) for trend strength filter (optional)
+
+Entry Rules:
+- Long Entry:
+  1) On hourly close, EMA(13) crosses above EMA(48).
+  2) Optional confirmation (recommended to reduce false signals):
+     - Price close > EMA(200)
+     - ADX(14) > 18–22
+     - Slope filter: EMA(48) slope > 0
+- Short Entry (optional):
+  1) On hourly close, EMA(13) crosses below EMA(48).
+  2) Optional confirmation:
+     - Price close < EMA(200)
+     - ADX(14) > 18–22
+     - EMA(48) slope < 0
+- Re-entry:
+  - If stopped out but crossover condition still holds after N bars (e.g., 5–10) and price regains the fast EMA with confirmation, allow one re-entry per signal leg to capture resumed trend.
+
+Exit Rules:
+- Primary Exit:
+  - Opposite crossover on candle close (13 crosses back through 48).
+- Protective Stop (choose one; test both):
+  - ATR stop: For longs, initial stop = entry price − 2.0×ATR(14); trail at max(48-EMA, entry − 2.0×ATR) as trade develops.
+  - EMA stop: For longs, stop below EMA(48) − 0.5×ATR buffer.
+- Profit Management (optional but recommended):
+  - Partial take-profit at +1.5R (scale out 30–50%), move stop to breakeven + small buffer.
+  - Time stop: If unrealized P/L < +0.5R after 20 bars, exit to avoid capital drag.
+- Overnight/Gaps:
+  - Honor stops at next available open if gaps skip stop levels.
+  - Optionally avoid holding over weekends if testing shows adverse gap risk.
+
+Risk Management:
+- Position Sizing:
+  - Fixed-fractional risk per trade: 0.5–1.0% of account equity.
+  - Shares = (Account_Risk) / (Entry − Stop) for longs; round down to nearest lot.
+- Portfolio Controls:
+  - Max concurrent exposure to SPY strategy: 50–70% of account if running other systems.
+  - Max 2 active positions (long and/or short leg); no pyramiding unless above +2R and ADX rising.
+- Drawdown Controls:
+  - If system drawdown exceeds 10%, cut risk per trade by 50% until new equity high.
+  - If 5 consecutive losses occur, pause new entries for 3 trading days; resume upon ADX > threshold or slope of EMA(48) positive for 3 bars (for long side).
+- Slippage/Costs:
+  - Assume realistic slippage and commissions; avoid market orders during opening/closing auction. Use limit-or-cancel or marketable limit with small offset.
+
+Required Indicators and Settings:
+- EMA(13), EMA(48), EMA(200) (optional filter)
+- ATR(14) on hourly close
+- ADX(14) on hourly data (optional)
+- Session filter to use RTH only (recommended baseline)
+
+Execution Notes:
+- Signals valid only on bar close; do not act on intrabar crosses.
+- Avoid initiating new positions in last trading hour on Fridays; consider disabling entries on major Fed/ CPI release hours unless tested.
+- Ensure data includes dividends and splits (total return not required for intraday, but check ETF adjustments).
+
+Baseline Parameter Defaults:
+- Fast EMA = 13
+- Slow EMA = 48
+- Trend filter = price above/below EMA(200)
+- ADX threshold = 20
+- ATR stop multiple = 2.0
+- Partial take-profit = 1.5R; trail via EMA(48) or 2.0×ATR, whichever is tighter after +1.5R
+
+Backtesting Guidance:
+- Use at least 10 years of hourly SPY data, RTH-only baseline; test extended-hours as a variant.
+- Include realistic trading frictions (e.g., 1–2 bps commission, 1–3 cents slippage).
+- Conduct walk-forward optimization around:
+  - Fast EMA: 10–16
+  - Slow EMA: 40–56
+  - ATR multiple: 1.5–2.5
+  - ADX threshold: 15–25
+- Evaluate metrics: CAGR, max DD, MAR, win rate, PF, average trade, exposure, and tail risk during high-vol regimes (e.g., 2020, 2022).
+- Perform regime stratification: VIX < 18 vs 18–28 vs > 28 to understand robustness.
+
+Optional Variants:
+- Long-only for retirement or tax-sensitive accounts.
+- Hedged version: when short signal triggers, rotate to SH rather than shorting SPY.
+- Options overlay: replace stop with defined-risk debit call/put when signal triggers and ATR is elevated.
+
+Pseudocode Logic (concise):
+- Long entry: close_cross_up(EMA13, EMA48) AND close > EMA200 AND ADX > 20
+- Long exit: close_cross_down(EMA13, EMA48) OR close < EMA48 − 0.5×ATR OR time_stop
+- Short entry (optional): mirror conditions
+- Sizing: risk_per_trade = 0.75% of equity; shares = risk_per_trade / (entry − stop)
+- Slippage/costs applied; execute on next bar open or close with marketable limit
+
+This defines a clear, testable EMA(13)/EMA(48) hourly crossover on SPY with robust filters, entries/exits, and risk controls.

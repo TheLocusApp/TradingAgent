@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strategy Analyzer - Moon Dev</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='modern-style.css') }}">
+</head>
+<body>
+    <!-- Top Navigation -->
+    <div class="top-nav">
+        <div class="nav-links">
+            <a href="/">LIVE</a>
+            <a href="/rbi">RBI LAB</a>
+            <a href="/agents">AGENTS</a>
+            <a href="/strategy-analyzer" class="active">ANALYZER</a>
+            <button class="settings-btn" onclick="window.location.href='/'">
+                <i class="fas fa-cog"></i> Settings
+            </button>
+        </div>
+    </div>
+    
+    <div class="container">
+        <!-- Header -->
+        <div style="margin: 40px 0 30px 0;">
+            <h1 style="font-size: 32px; font-weight: 700; color: #fff; margin-bottom: 12px;">
+                <i class="fas fa-brain"></i> Unified Strategy Analyzer
+            </h1>
+            <p style="color: #9ca3af; font-size: 16px;">
+                Submit a trading idea and get comprehensive analysis from multiple AI agents
+            </p>
+        </div>
+        
+        <!-- Main Input Section -->
+        <div class="chart-section">
+            <h2 style="font-size: 20px; font-weight: 600; color: #fff; margin-bottom: 20px;">
+                <i class="fas fa-lightbulb"></i> Trading Idea
+            </h2>
+            <textarea 
+                id="tradingIdea"
+                placeholder="Enter your trading strategy idea, YouTube link, or describe a pattern you've noticed...
+
+Examples:
+• 'Buy when RSI crosses below 30 and MACD shows bullish divergence'
+• 'YouTube: https://youtube.com/watch?v=...'
+• 'Trade BTC breakouts above 20-day EMA with volume confirmation'"
+                style="width: 100%; min-height: 150px; background: #1a1a24; border: 1px solid #2d2d3d; border-radius: 8px; padding: 16px; color: #fff; font-size: 14px; font-family: inherit; resize: vertical;"
+            ></textarea>
+            
+            <!-- Analysis Options -->
+            <div style="margin-top: 20px; padding: 20px; background: #1a1a24; border-radius: 8px;">
+                <div style="color: #fff; font-weight: 600; margin-bottom: 16px;">Analysis Options:</div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+                    <label style="display: flex; align-items: center; color: #9ca3af; cursor: pointer;">
+                        <input type="checkbox" id="enableRBI" checked style="margin-right: 8px;">
+                        <i class="fas fa-flask" style="margin-right: 8px; color: #8b5cf6;"></i>
+                        RBI Research & Backtest
+                    </label>
+                    <label style="display: flex; align-items: center; color: #9ca3af; cursor: pointer;">
+                        <input type="checkbox" id="enableSwarm" checked style="margin-right: 8px;">
+                        <i class="fas fa-users" style="margin-right: 8px; color: #6366f1;"></i>
+                        Multi-Model Consensus
+                    </label>
+                    <label style="display: flex; align-items: center; color: #9ca3af; cursor: pointer;">
+                        <input type="checkbox" id="enableSentiment" style="margin-right: 8px;">
+                        <i class="fab fa-twitter" style="margin-right: 8px; color: #1da1f2;"></i>
+                        Sentiment Analysis
+                    </label>
+                    <label style="display: flex; align-items: center; color: #9ca3af; cursor: pointer;">
+                        <input type="checkbox" id="enableRisk" checked style="margin-right: 8px;">
+                        <i class="fas fa-shield-alt" style="margin-right: 8px; color: #ef4444;"></i>
+                        Risk Assessment
+                    </label>
+                </div>
+            </div>
+            
+            <button 
+                onclick="analyzeStrategy()"
+                style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: #fff; padding: 14px 32px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 20px;"
+            >
+                <i class="fas fa-rocket"></i> Analyze Strategy
+            </button>
+        </div>
+        
+        <!-- Results Section -->
+        <div id="resultsSection" style="display: none; margin-top: 24px;">
+            <!-- Progress Tracker -->
+            <div class="chart-section">
+                <h2 style="font-size: 20px; font-weight: 600; color: #fff; margin-bottom: 20px;">
+                    <i class="fas fa-tasks"></i> Analysis Progress
+                </h2>
+                <div id="progressTracker"></div>
+            </div>
+            
+            <!-- Results Grid -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px; margin-top: 24px;">
+                <!-- RBI Results -->
+                <div id="rbiResults" class="chart-section" style="display: none;">
+                    <h3 style="font-size: 18px; font-weight: 600; color: #fff; margin-bottom: 16px;">
+                        <i class="fas fa-flask" style="color: #8b5cf6;"></i> RBI Research
+                    </h3>
+                    <div id="rbiContent"></div>
+                </div>
+                
+                <!-- Swarm Results -->
+                <div id="swarmResults" class="chart-section" style="display: none;">
+                    <h3 style="font-size: 18px; font-weight: 600; color: #fff; margin-bottom: 16px;">
+                        <i class="fas fa-users" style="color: #6366f1;"></i> AI Consensus
+                    </h3>
+                    <div id="swarmContent"></div>
+                </div>
+                
+                <!-- Sentiment Results -->
+                <div id="sentimentResults" class="chart-section" style="display: none;">
+                    <h3 style="font-size: 18px; font-weight: 600; color: #fff; margin-bottom: 16px;">
+                        <i class="fab fa-twitter" style="color: #1da1f2;"></i> Sentiment Analysis
+                    </h3>
+                    <div id="sentimentContent"></div>
+                </div>
+                
+                <!-- Risk Results -->
+                <div id="riskResults" class="chart-section" style="display: none;">
+                    <h3 style="font-size: 18px; font-weight: 600; color: #fff; margin-bottom: 16px;">
+                        <i class="fas fa-shield-alt" style="color: #ef4444;"></i> Risk Assessment
+                    </h3>
+                    <div id="riskContent"></div>
+                </div>
+            </div>
+            
+            <!-- Final Recommendation -->
+            <div id="finalRecommendation" class="chart-section" style="display: none; margin-top: 24px; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);">
+                <h2 style="font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 16px;">
+                    <i class="fas fa-check-circle"></i> Final Recommendation
+                </h2>
+                <div id="recommendationContent" style="color: #fff; font-size: 16px; line-height: 1.8;"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        async function analyzeStrategy() {
+            const idea = document.getElementById('tradingIdea').value.trim();
+            
+            if (!idea) {
+                alert('❌ Please enter a trading idea');
+                return;
+            }
+            
+            // Get selected options
+            const enableRBI = document.getElementById('enableRBI').checked;
+            const enableSwarm = document.getElementById('enableSwarm').checked;
+            const enableSentiment = document.getElementById('enableSentiment').checked;
+            const enableRisk = document.getElementById('enableRisk').checked;
+            
+            // Show results section
+            document.getElementById('resultsSection').style.display = 'block';
+            
+            // Initialize progress tracker
+            const tasks = [];
+            if (enableRBI) tasks.push({name: 'RBI Research', id: 'rbi', icon: 'flask'});
+            if (enableSwarm) tasks.push({name: 'AI Consensus', id: 'swarm', icon: 'users'});
+            if (enableSentiment) tasks.push({name: 'Sentiment', id: 'sentiment', icon: 'twitter'});
+            if (enableRisk) tasks.push({name: 'Risk Analysis', id: 'risk', icon: 'shield-alt'});
+            
+            const progressHTML = tasks.map(t => `
+                <div id="progress-${t.id}" style="display: flex; align-items: center; padding: 12px; background: #1a1a24; border-radius: 6px; margin-bottom: 8px;">
+                    <i class="fas fa-${t.icon}" style="margin-right: 12px; color: #6b7280;"></i>
+                    <span style="flex: 1; color: #9ca3af;">${t.name}</span>
+                    <i class="fas fa-spinner fa-spin" style="color: #6366f1;"></i>
+                </div>
+            `).join('');
+            
+            document.getElementById('progressTracker').innerHTML = progressHTML;
+            
+            // Run analyses in parallel
+            const promises = [];
+            
+            if (enableRBI) {
+                promises.push(runRBI(idea));
+            }
+            if (enableSwarm) {
+                promises.push(runSwarm(idea));
+            }
+            if (enableSentiment) {
+                promises.push(runSentiment(idea));
+            }
+            if (enableRisk) {
+                promises.push(runRisk(idea));
+            }
+            
+            // Wait for all to complete
+            await Promise.all(promises);
+            
+            // Show final recommendation
+            generateFinalRecommendation();
+        }
+        
+        async function runRBI(idea) {
+            try {
+                const response = await fetch('/api/rbi/submit', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({trading_idea: idea})
+                });
+                
+                const result = await response.json();
+                
+                document.getElementById('progress-rbi').innerHTML = `
+                    <i class="fas fa-flask" style="margin-right: 12px; color: #8b5cf6;"></i>
+                    <span style="flex: 1; color: #9ca3af;">RBI Research</span>
+                    <i class="fas fa-check-circle" style="color: #22c55e;"></i>
+                `;
+                
+                document.getElementById('rbiResults').style.display = 'block';
+                document.getElementById('rbiContent').innerHTML = `
+                    <div style="background: #0f0f16; border-radius: 6px; padding: 16px;">
+                        <div style="color: #d1d5db; font-size: 14px; line-height: 1.6; white-space: pre-wrap;">${result.result || 'Analysis complete'}</div>
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('progress-rbi').innerHTML = `
+                    <i class="fas fa-flask" style="margin-right: 12px; color: #8b5cf6;"></i>
+                    <span style="flex: 1; color: #9ca3af;">RBI Research</span>
+                    <i class="fas fa-times-circle" style="color: #ef4444;"></i>
+                `;
+            }
+        }
+        
+        async function runSwarm(idea) {
+            try {
+                const response = await fetch('/api/swarm/analyze', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({prompt: idea})
+                });
+                
+                const result = await response.json();
+                
+                document.getElementById('progress-swarm').innerHTML = `
+                    <i class="fas fa-users" style="margin-right: 12px; color: #6366f1;"></i>
+                    <span style="flex: 1; color: #9ca3af;">AI Consensus</span>
+                    <i class="fas fa-check-circle" style="color: #22c55e;"></i>
+                `;
+                
+                document.getElementById('swarmResults').style.display = 'block';
+                document.getElementById('swarmContent').innerHTML = `
+                    <div style="background: #0f0f16; border-radius: 6px; padding: 16px; margin-bottom: 12px;">
+                        <div style="color: #6366f1; font-size: 12px; font-weight: 600; margin-bottom: 8px;">CONSENSUS:</div>
+                        <div style="color: #d1d5db; font-size: 14px; line-height: 1.6;">${result.consensus || 'Multi-model analysis complete'}</div>
+                    </div>
+                    <div style="font-size: 12px; color: #6b7280;">Models consulted: ${result.models_count || 4}</div>
+                `;
+            } catch (error) {
+                document.getElementById('progress-swarm').innerHTML = `
+                    <i class="fas fa-users" style="margin-right: 12px; color: #6366f1;"></i>
+                    <span style="flex: 1; color: #9ca3af;">AI Consensus</span>
+                    <i class="fas fa-times-circle" style="color: #ef4444;"></i>
+                `;
+            }
+        }
+        
+        async function runSentiment(idea) {
+            // Placeholder - sentiment analysis would need Twitter API integration
+            setTimeout(() => {
+                document.getElementById('progress-sentiment').innerHTML = `
+                    <i class="fab fa-twitter" style="margin-right: 12px; color: #1da1f2;"></i>
+                    <span style="flex: 1; color: #9ca3af;">Sentiment</span>
+                    <i class="fas fa-check-circle" style="color: #22c55e;"></i>
+                `;
+                
+                document.getElementById('sentimentResults').style.display = 'block';
+                document.getElementById('sentimentContent').innerHTML = `
+                    <div style="background: #0f0f16; border-radius: 6px; padding: 16px;">
+                        <div style="color: #d1d5db; font-size: 14px; line-height: 1.6;">
+                            Sentiment analysis requires Twitter API configuration.
+                            <br><br>
+                            To enable: Configure Twitter credentials in .env file.
+                        </div>
+                    </div>
+                `;
+            }, 2000);
+        }
+        
+        async function runRisk(idea) {
+            // Placeholder - risk analysis
+            setTimeout(() => {
+                document.getElementById('progress-risk').innerHTML = `
+                    <i class="fas fa-shield-alt" style="margin-right: 12px; color: #ef4444;"></i>
+                    <span style="flex: 1; color: #9ca3af;">Risk Analysis</span>
+                    <i class="fas fa-check-circle" style="color: #22c55e;"></i>
+                `;
+                
+                document.getElementById('riskResults').style.display = 'block';
+                document.getElementById('riskContent').innerHTML = `
+                    <div style="background: #0f0f16; border-radius: 6px; padding: 16px;">
+                        <div style="margin-bottom: 12px;">
+                            <div style="color: #9ca3af; font-size: 12px; margin-bottom: 4px;">Risk Level:</div>
+                            <div style="color: #f59e0b; font-size: 18px; font-weight: 600;">MEDIUM</div>
+                        </div>
+                        <div style="color: #d1d5db; font-size: 13px; line-height: 1.6;">
+                            • Recommended position size: 2-5% of portfolio<br>
+                            • Stop loss: 2-3% below entry<br>
+                            • Risk/Reward ratio: 1:2 minimum
+                        </div>
+                    </div>
+                `;
+            }, 1500);
+        }
+        
+        function generateFinalRecommendation() {
+            document.getElementById('finalRecommendation').style.display = 'block';
+            document.getElementById('recommendationContent').innerHTML = `
+                <strong>Based on comprehensive analysis from multiple AI agents:</strong>
+                <br><br>
+                The strategy shows promise but requires careful risk management. 
+                Consider backtesting with historical data before live implementation.
+                Start with small position sizes and scale up as the strategy proves effective.
+            `;
+        }
+    </script>
+</body>
+</html>

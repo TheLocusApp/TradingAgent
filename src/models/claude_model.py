@@ -31,10 +31,13 @@ class ClaudeModel(BaseModel):
     def initialize_client(self, **kwargs) -> None:
         """Initialize the Anthropic client"""
         try:
+            # Only pass parameters that Anthropic client actually accepts
+            # Ignore any other kwargs that might be passed from base class
             self.client = Anthropic(api_key=self.api_key)
             cprint(f"✨ Initialized Claude model: {self.model_name}", "green")
         except Exception as e:
             cprint(f"❌ Failed to initialize Claude model: {str(e)}", "red")
+            cprint(f"💡 Tip: Make sure your ANTHROPIC_KEY is valid", "yellow")
             self.client = None
     
     def generate_response(self, 

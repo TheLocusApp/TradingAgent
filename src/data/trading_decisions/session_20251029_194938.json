@@ -1,0 +1,40 @@
+{
+  "session_id": "20251029_194938",
+  "config": {
+    "models": [
+      "deepseek"
+    ],
+    "model_temperature": 0.7,
+    "model_max_tokens": 1024,
+    "system_prompt": "",
+    "asset_type": "crypto",
+    "ticker": "BTC",
+    "timeframe": "3m",
+    "cycle_interval": 180,
+    "use_simulation": true,
+    "initial_balance": 10000,
+    "position_size_percentage": 0.9,
+    "save_decisions": true,
+    "decisions_dir": "src/data/trading_decisions",
+    "use_live_data": false
+  },
+  "session_start": "2025-10-29T19:49:38.823699",
+  "decisions_count": 1,
+  "decisions": [
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Consensus from 1 models",
+      "model_count": 1,
+      "timestamp": "2025-10-29T19:49:51.841876",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "The price is trading slightly above the EMA(20), indicating a neutral to slightly bullish short-term trend. The RSI(7) at 53.61 is in a neutral zone, showing no strong overbought or oversold conditions. However, the MACD is negative at -50.596, suggesting underlying bearish momentum despite the recent price stability. Given the conflicting signals\u2014modest bullish price action versus bearish MACD\u2014and the absence of a clear directional bias, the prudent approach is to wait for stronger confirmation before entering a trade.",
+          "raw_response": "SIGNAL: HOLD  \nCONFIDENCE: 65%  \nREASONING: The price is trading slightly above the EMA(20), indicating a neutral to slightly bullish short-term trend. The RSI(7) at 53.61 is in a neutral zone, showing no strong overbought or oversold conditions. However, the MACD is negative at -50.596, suggesting underlying bearish momentum despite the recent price stability. Given the conflicting signals\u2014modest bullish price action versus bearish MACD\u2014and the absence of a clear directional bias, the prudent approach is to wait for stronger confirmation before entering a trade."
+        }
+      }
+    }
+  ]
+}

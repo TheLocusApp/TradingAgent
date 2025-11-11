@@ -1,0 +1,100 @@
+{
+  "session_id": "20251031_184053",
+  "config": {
+    "models": [
+      "deepseek"
+    ],
+    "model_temperature": 0.7,
+    "model_max_tokens": 1024,
+    "system_prompt": "",
+    "asset_type": "stock",
+    "ticker": "BTC",
+    "timeframe": "3m",
+    "cycle_interval": 180,
+    "use_simulation": true,
+    "initial_balance": 10000,
+    "position_size_percentage": 0.1,
+    "max_positions": 3,
+    "risk_per_trade": 0.02,
+    "monitored_assets": [
+      "TSLA"
+    ],
+    "agent_name": "TESLA Agent",
+    "agent_strategy": "You are an expert trader with deep knowledge of technical analysis, risk management, and market dynamics. Analyze real-time market data and make trading decisions based on technical indicators (EMA, MACD, RSI, ATR), price action, volume analysis, and risk management principles. Consider both intraday patterns and longer-term context. Maximize risk-adjusted returns while managing position sizing and drawdown.",
+    "save_decisions": true,
+    "decisions_dir": "src/data/trading_decisions",
+    "use_live_data": false
+  },
+  "session_start": "2025-10-31T18:40:53.284798",
+  "decisions_count": 6,
+  "decisions": [
+    {
+      "signal": "HOLD",
+      "confidence": 0,
+      "reasoning": "No models available",
+      "timestamp": "2025-10-31T18:41:05.923633",
+      "individual_decisions": {}
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 0,
+      "reasoning": "No models available",
+      "timestamp": "2025-10-31T18:44:07.412716",
+      "individual_decisions": {}
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 0,
+      "reasoning": "No models available",
+      "timestamp": "2025-10-31T18:47:08.704470",
+      "individual_decisions": {}
+    },
+    {
+      "signal": "HOLD",
+      "confidence": 0,
+      "reasoning": "No models available",
+      "timestamp": "2025-10-31T18:50:10.219136",
+      "individual_decisions": {}
+    },
+    {
+      "signal": "BUY",
+      "confidence": 68,
+      "reasoning": "The 3-minute data shows improving momentum with MACD rising from -144 to -57 (significant bullish divergence), RSI(7) recovering from oversold 34.6 to neutral 54.8, and price recently bouncing from 109,009 to 109,326. Current price at 109,326.84 is above EMA20 of 109,308.87, suggesting short-term bullish momentum. While longer-term 4h trends remain bearish (price below both EMAs), the improving short-term indicators and oversold bounce present a tactical buying opportunity for a quick 3m timeframe trade. Volume spike indicates institutional interest. Risk is controlled by the recent support level around 109,000.",
+      "model_count": 1,
+      "prompt": "It has been 12 minutes since you started trading. The current time is 2025-10-31 18:53:31.596406 and you've been invoked 5 times. Below, we are providing you with a variety of state data, price data, and predictive signals so you can discover alpha. Below that is your current account information, value, performance, positions, etc.\nALL OF THE PRICE OR SIGNAL DATA BELOW IS ORDERED: OLDEST \u2192 NEWEST\nTimeframes note: Unless stated otherwise in a section title, intraday series are provided at 3\u2011minute intervals. If a coin uses a different interval, it is explicitly stated in that coin's section.\nCURRENT MARKET STATE FOR ALL COINS\nALL BTC DATA\ncurrent_price = 109326.84, current_ema20 = 109308.868, current_macd = -57.121, current_rsi (7 period) = 54.797\nIntraday series (3\u2011minute intervals, oldest \u2192 latest):\nMid prices: [109453.109, 109373.953, 109244.625, 109260.719, 109214.281, 109009.641, 109226.391, 109463.141, 109405.750, 109326.844]\nEMA indicators (20\u2011period): [109336.082, 109339.689, 109330.635, 109323.977, 109313.529, 109284.588, 109279.045, 109296.578, 109306.975, 109308.868]\nMACD indicators: [-144.152, -124.602, -118.182, -110.522, -106.965, -119.284, -110.285, -83.092, -65.418, -57.121]\nRSI indicators (7\u2011Period): [82.315, 69.238, 56.674, 53.131, 39.865, 34.559, 41.860, 50.540, 51.752, 54.797]\nRSI indicators (14\u2011Period): [72.271, 69.321, 57.061, 58.797, 65.422, 55.169, 53.319, 63.363, 58.841, 55.666]\nLonger\u2011term context (4\u2011hour timeframe):\n20\u2011Period EMA: 110471.291 vs. 50\u2011Period EMA: 111165.068\n3\u2011Period ATR: 1425.609 vs. 14\u2011Period ATR: 1834.257\nCurrent Volume: 31486722048.000 vs. Average Volume: 3233228275.164\nMACD indicators: [-372.076, -524.686, -801.614, -1112.828, -1196.580, -1174.885, -1125.595, -1003.156, -911.004, -894.924]\nRSI indicators (14\u2011Period): [34.393, 29.786, 23.054, 20.013, 28.131, 34.790, 37.551, 42.471, 37.650, 36.413]\nHERE IS YOUR ACCOUNT INFORMATION & PERFORMANCE\nCurrent Total Return (percent): 0.00%\nAvailable Cash: 10000.00\nCurrent Account Value: 10000.00\nCurrent live positions & performance: No open positions",
+      "response": "SIGNAL: BUY\nCONFIDENCE: 68%\nREASONING: The 3-minute data shows improving momentum with MACD rising from -144 to -57 (significant bullish divergence), RSI(7) recovering from oversold 34.6 to neutral 54.8, and price recently bouncing from 109,009 to 109,326. Current price at 109,326.84 is above EMA20 of 109,308.87, suggesting short-term bullish momentum. While longer-term 4h trends remain bearish (price below both EMAs), the improving short-term indicators and oversold bounce present a tactical buying opportunity for a quick 3m timeframe trade. Volume spike indicates institutional interest. Risk is controlled by the recent support level around 109,000.",
+      "system_prompt": "You are an expert stock trading AI.\n\nYour role is to analyze real-time market data for BTC and make trading decisions on 3m candles.\n\nOBJECTIVE: Maximize risk-adjusted returns on 3m timeframe.\n\nProvide your response in this format:\nSIGNAL: [BUY/SELL/HOLD]\nCONFIDENCE: [0-100]%\nREASONING: [your analysis]\n",
+      "timestamp": "2025-10-31T18:54:05.919689",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "BUY",
+          "confidence": 68,
+          "reasoning": "The 3-minute data shows improving momentum with MACD rising from -144 to -57 (significant bullish divergence), RSI(7) recovering from oversold 34.6 to neutral 54.8, and price recently bouncing from 109,009 to 109,326. Current price at 109,326.84 is above EMA20 of 109,308.87, suggesting short-term bullish momentum. While longer-term 4h trends remain bearish (price below both EMAs), the improving short-term indicators and oversold bounce present a tactical buying opportunity for a quick 3m timeframe trade. Volume spike indicates institutional interest. Risk is controlled by the recent support level around 109,000.",
+          "raw_response": "SIGNAL: BUY\nCONFIDENCE: 68%\nREASONING: The 3-minute data shows improving momentum with MACD rising from -144 to -57 (significant bullish divergence), RSI(7) recovering from oversold 34.6 to neutral 54.8, and price recently bouncing from 109,009 to 109,326. Current price at 109,326.84 is above EMA20 of 109,308.87, suggesting short-term bullish momentum. While longer-term 4h trends remain bearish (price below both EMAs), the improving short-term indicators and oversold bounce present a tactical buying opportunity for a quick 3m timeframe trade. Volume spike indicates institutional interest. Risk is controlled by the recent support level around 109,000.",
+          "prompt": "It has been 12 minutes since you started trading. The current time is 2025-10-31 18:53:31.596406 and you've been invoked 5 times. Below, we are providing you with a variety of state data, price data, and predictive signals so you can discover alpha. Below that is your current account information, value, performance, positions, etc.\nALL OF THE PRICE OR SIGNAL DATA BELOW IS ORDERED: OLDEST \u2192 NEWEST\nTimeframes note: Unless stated otherwise in a section title, intraday series are provided at 3\u2011minute intervals. If a coin uses a different interval, it is explicitly stated in that coin's section.\nCURRENT MARKET STATE FOR ALL COINS\nALL BTC DATA\ncurrent_price = 109326.84, current_ema20 = 109308.868, current_macd = -57.121, current_rsi (7 period) = 54.797\nIntraday series (3\u2011minute intervals, oldest \u2192 latest):\nMid prices: [109453.109, 109373.953, 109244.625, 109260.719, 109214.281, 109009.641, 109226.391, 109463.141, 109405.750, 109326.844]\nEMA indicators (20\u2011period): [109336.082, 109339.689, 109330.635, 109323.977, 109313.529, 109284.588, 109279.045, 109296.578, 109306.975, 109308.868]\nMACD indicators: [-144.152, -124.602, -118.182, -110.522, -106.965, -119.284, -110.285, -83.092, -65.418, -57.121]\nRSI indicators (7\u2011Period): [82.315, 69.238, 56.674, 53.131, 39.865, 34.559, 41.860, 50.540, 51.752, 54.797]\nRSI indicators (14\u2011Period): [72.271, 69.321, 57.061, 58.797, 65.422, 55.169, 53.319, 63.363, 58.841, 55.666]\nLonger\u2011term context (4\u2011hour timeframe):\n20\u2011Period EMA: 110471.291 vs. 50\u2011Period EMA: 111165.068\n3\u2011Period ATR: 1425.609 vs. 14\u2011Period ATR: 1834.257\nCurrent Volume: 31486722048.000 vs. Average Volume: 3233228275.164\nMACD indicators: [-372.076, -524.686, -801.614, -1112.828, -1196.580, -1174.885, -1125.595, -1003.156, -911.004, -894.924]\nRSI indicators (14\u2011Period): [34.393, 29.786, 23.054, 20.013, 28.131, 34.790, 37.551, 42.471, 37.650, 36.413]\nHERE IS YOUR ACCOUNT INFORMATION & PERFORMANCE\nCurrent Total Return (percent): 0.00%\nAvailable Cash: 10000.00\nCurrent Account Value: 10000.00\nCurrent live positions & performance: No open positions",
+          "system_prompt": "You are an expert stock trading AI.\n\nYour role is to analyze real-time market data for BTC and make trading decisions on 3m candles.\n\nOBJECTIVE: Maximize risk-adjusted returns on 3m timeframe.\n\nProvide your response in this format:\nSIGNAL: [BUY/SELL/HOLD]\nCONFIDENCE: [0-100]%\nREASONING: [your analysis]\n"
+        }
+      }
+    },
+    {
+      "signal": "BUY",
+      "confidence": 72,
+      "reasoning": "The 3m timeframe shows bullish momentum developing. Current price (109326.84) has crossed above EMA20 (109308.868), MACD is improving significantly from -144 to -57 (strong bullish momentum), and RSI(7) at 54.797 is neutral with room to run. The MACD histogram shows consistent improvement over the last 10 periods, indicating strengthening bullish momentum. Volume is significantly elevated (314B vs 3.2B average), suggesting institutional interest. While the 4h timeframe shows longer-term bearish pressure with price below both EMAs, the short-term momentum and technical improvements on the 3m chart present a compelling entry opportunity for a swing trade.",
+      "model_count": 1,
+      "prompt": "It has been 16 minutes since you started trading. The current time is 2025-10-31 18:57:06.069660 and you've been invoked 6 times. Below, we are providing you with a variety of state data, price data, and predictive signals so you can discover alpha. Below that is your current account information, value, performance, positions, etc.\nALL OF THE PRICE OR SIGNAL DATA BELOW IS ORDERED: OLDEST \u2192 NEWEST\nTimeframes note: Unless stated otherwise in a section title, intraday series are provided at 3\u2011minute intervals. If a coin uses a different interval, it is explicitly stated in that coin's section.\nCURRENT MARKET STATE FOR ALL COINS\nALL BTC DATA\ncurrent_price = 109326.84, current_ema20 = 109308.868, current_macd = -57.121, current_rsi (7 period) = 54.797\nIntraday series (3\u2011minute intervals, oldest \u2192 latest):\nMid prices: [109453.109, 109373.953, 109244.625, 109260.719, 109214.281, 109009.641, 109226.391, 109463.141, 109405.750, 109326.844]\nEMA indicators (20\u2011period): [109336.082, 109339.689, 109330.635, 109323.977, 109313.529, 109284.588, 109279.045, 109296.578, 109306.975, 109308.868]\nMACD indicators: [-144.152, -124.602, -118.182, -110.522, -106.965, -119.284, -110.285, -83.092, -65.418, -57.121]\nRSI indicators (7\u2011Period): [82.315, 69.238, 56.674, 53.131, 39.865, 34.559, 41.860, 50.540, 51.752, 54.797]\nRSI indicators (14\u2011Period): [72.271, 69.321, 57.061, 58.797, 65.422, 55.169, 53.319, 63.363, 58.841, 55.666]\nLonger\u2011term context (4\u2011hour timeframe):\n20\u2011Period EMA: 110471.291 vs. 50\u2011Period EMA: 111165.068\n3\u2011Period ATR: 1425.609 vs. 14\u2011Period ATR: 1834.257\nCurrent Volume: 31486722048.000 vs. Average Volume: 3233228275.164\nMACD indicators: [-372.076, -524.686, -801.614, -1112.828, -1196.580, -1174.885, -1125.595, -1003.156, -911.004, -894.924]\nRSI indicators (14\u2011Period): [34.393, 29.786, 23.054, 20.013, 28.131, 34.790, 37.551, 42.471, 37.650, 36.413]\nHERE IS YOUR ACCOUNT INFORMATION & PERFORMANCE\nCurrent Total Return (percent): 0.00%\nAvailable Cash: 10000.00\nCurrent Account Value: 10000.00\nCurrent live positions & performance: No open positions",
+      "response": "SIGNAL: BUY\nCONFIDENCE: 72%\nREASONING: The 3m timeframe shows bullish momentum developing. Current price (109326.84) has crossed above EMA20 (109308.868), MACD is improving significantly from -144 to -57 (strong bullish momentum), and RSI(7) at 54.797 is neutral with room to run. The MACD histogram shows consistent improvement over the last 10 periods, indicating strengthening bullish momentum. Volume is significantly elevated (314B vs 3.2B average), suggesting institutional interest. While the 4h timeframe shows longer-term bearish pressure with price below both EMAs, the short-term momentum and technical improvements on the 3m chart present a compelling entry opportunity for a swing trade.",
+      "system_prompt": "You are an expert stock trading AI.\n\nYour role is to analyze real-time market data for BTC and make trading decisions on 3m candles.\n\nOBJECTIVE: Maximize risk-adjusted returns on 3m timeframe.\n\nProvide your response in this format:\nSIGNAL: [BUY/SELL/HOLD]\nCONFIDENCE: [0-100]%\nREASONING: [your analysis]\n",
+      "timestamp": "2025-10-31T18:57:13.031339",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "BUY",
+          "confidence": 72,
+          "reasoning": "The 3m timeframe shows bullish momentum developing. Current price (109326.84) has crossed above EMA20 (109308.868), MACD is improving significantly from -144 to -57 (strong bullish momentum), and RSI(7) at 54.797 is neutral with room to run. The MACD histogram shows consistent improvement over the last 10 periods, indicating strengthening bullish momentum. Volume is significantly elevated (314B vs 3.2B average), suggesting institutional interest. While the 4h timeframe shows longer-term bearish pressure with price below both EMAs, the short-term momentum and technical improvements on the 3m chart present a compelling entry opportunity for a swing trade.",
+          "raw_response": "SIGNAL: BUY\nCONFIDENCE: 72%\nREASONING: The 3m timeframe shows bullish momentum developing. Current price (109326.84) has crossed above EMA20 (109308.868), MACD is improving significantly from -144 to -57 (strong bullish momentum), and RSI(7) at 54.797 is neutral with room to run. The MACD histogram shows consistent improvement over the last 10 periods, indicating strengthening bullish momentum. Volume is significantly elevated (314B vs 3.2B average), suggesting institutional interest. While the 4h timeframe shows longer-term bearish pressure with price below both EMAs, the short-term momentum and technical improvements on the 3m chart present a compelling entry opportunity for a swing trade.",
+          "prompt": "It has been 16 minutes since you started trading. The current time is 2025-10-31 18:57:06.069660 and you've been invoked 6 times. Below, we are providing you with a variety of state data, price data, and predictive signals so you can discover alpha. Below that is your current account information, value, performance, positions, etc.\nALL OF THE PRICE OR SIGNAL DATA BELOW IS ORDERED: OLDEST \u2192 NEWEST\nTimeframes note: Unless stated otherwise in a section title, intraday series are provided at 3\u2011minute intervals. If a coin uses a different interval, it is explicitly stated in that coin's section.\nCURRENT MARKET STATE FOR ALL COINS\nALL BTC DATA\ncurrent_price = 109326.84, current_ema20 = 109308.868, current_macd = -57.121, current_rsi (7 period) = 54.797\nIntraday series (3\u2011minute intervals, oldest \u2192 latest):\nMid prices: [109453.109, 109373.953, 109244.625, 109260.719, 109214.281, 109009.641, 109226.391, 109463.141, 109405.750, 109326.844]\nEMA indicators (20\u2011period): [109336.082, 109339.689, 109330.635, 109323.977, 109313.529, 109284.588, 109279.045, 109296.578, 109306.975, 109308.868]\nMACD indicators: [-144.152, -124.602, -118.182, -110.522, -106.965, -119.284, -110.285, -83.092, -65.418, -57.121]\nRSI indicators (7\u2011Period): [82.315, 69.238, 56.674, 53.131, 39.865, 34.559, 41.860, 50.540, 51.752, 54.797]\nRSI indicators (14\u2011Period): [72.271, 69.321, 57.061, 58.797, 65.422, 55.169, 53.319, 63.363, 58.841, 55.666]\nLonger\u2011term context (4\u2011hour timeframe):\n20\u2011Period EMA: 110471.291 vs. 50\u2011Period EMA: 111165.068\n3\u2011Period ATR: 1425.609 vs. 14\u2011Period ATR: 1834.257\nCurrent Volume: 31486722048.000 vs. Average Volume: 3233228275.164\nMACD indicators: [-372.076, -524.686, -801.614, -1112.828, -1196.580, -1174.885, -1125.595, -1003.156, -911.004, -894.924]\nRSI indicators (14\u2011Period): [34.393, 29.786, 23.054, 20.013, 28.131, 34.790, 37.551, 42.471, 37.650, 36.413]\nHERE IS YOUR ACCOUNT INFORMATION & PERFORMANCE\nCurrent Total Return (percent): 0.00%\nAvailable Cash: 10000.00\nCurrent Account Value: 10000.00\nCurrent live positions & performance: No open positions",
+          "system_prompt": "You are an expert stock trading AI.\n\nYour role is to analyze real-time market data for BTC and make trading decisions on 3m candles.\n\nOBJECTIVE: Maximize risk-adjusted returns on 3m timeframe.\n\nProvide your response in this format:\nSIGNAL: [BUY/SELL/HOLD]\nCONFIDENCE: [0-100]%\nREASONING: [your analysis]\n"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+STRATEGY_NAME: DivergenceConfirmation
+
+STRATEGY_DETAILS:
+This strategy combines RSI divergence patterns with MACD confirmation signals on Bitcoin's daily timeframe to identify high-probability reversal opportunities.
+
+KEY COMPONENTS:
+1. RSI (Relative Strength Index) - Set to 14 periods
+2. MACD (Moving Average Convergence Divergence) - Standard settings (12,26,9)
+3. Price action analysis for divergence identification
+4. Daily timeframe for reliable signal generation
+
+ENTRY RULES:
+LONG ENTRY:
+- RSI shows BULLISH DIVERGENCE (price makes lower low, RSI makes higher low)
+- MACD histogram shows upward momentum (rising bars above zero line)
+- MACD line crosses above signal line OR shows bullish crossover
+- Entry on next candle open after all conditions are met
+
+SHORT ENTRY:
+- RSI shows BEARISH DIVERGENCE (price makes higher high, RSI makes lower high)
+- MACD histogram shows downward momentum (falling bars below zero line)
+- MACD line crosses below signal line OR shows bearish crossover
+- Entry on next candle open after all conditions are met
+
+EXIT RULES:
+LONG EXIT:
+- RSI reaches overbought zone (above 70)
+- MACD shows bearish crossover
+- Stop loss hit
+- Take profit target reached (2:1 risk-reward ratio minimum)
+
+SHORT EXIT:
+- RSI reaches oversold zone (below 30)
+- MACD shows bullish crossover
+- Stop loss hit
+- Take profit target reached (2:1 risk-reward ratio minimum)
+
+RISK MANAGEMENT:
+- Position size: Maximum 2% of capital per trade
+- Stop loss: Place below recent swing low (long) or above recent swing high (short)
+- Risk-reward ratio: Minimum 1:2
+- Maximum consecutive losses: 3 trades before strategy review
+
+REQUIRED INDICATORS:
+1. RSI (14 periods) - For divergence detection
+2. MACD (12,26,9) - For momentum confirmation
+3. Price chart with swing point identification
+
+ADDITIONAL NOTES:
+- Wait for daily candle close before taking signals
+- Multiple timeframe confirmation (4H) can improve accuracy
+- Avoid trading during major news events
+- Backtest divergence patterns for better pattern recognition
+- Consider volume confirmation for stronger signals

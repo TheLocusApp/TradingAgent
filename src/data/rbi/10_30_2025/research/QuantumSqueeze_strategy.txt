@@ -1,0 +1,58 @@
+STRATEGY_NAME: QuantumSqueeze
+
+STRATEGY_DETAILS:
+This strategy combines Bollinger Band squeeze detection with momentum confirmation on BTC daily timeframe, focusing on capturing explosive price movements after periods of low volatility compression.
+
+KEY STRATEGY COMPONENTS:
+1. Bollinger Bands (20,2) - Identifies volatility compression when bands squeeze
+2. Keltner Channels (20,1.5) - Confirms squeeze when BBands are inside Keltner
+3. RSI (14) - Momentum confirmation filter
+4. Volume - Breakout validation
+5. MACD (12,26,9) - Additional momentum confirmation
+
+ENTRY RULES:
+LONG ENTRY:
+- Bollinger Bands width is at 6-month lows (squeeze condition)
+- Price breaks above upper Bollinger Band
+- RSI above 50 and rising
+- Volume increases by 50%+ from 20-day average
+- MACD histogram turns positive
+
+SHORT ENTRY:
+- Bollinger Bands width is at 6-month lows (squeeze condition)
+- Price breaks below lower Bollinger Band
+- RSI below 50 and falling
+- Volume increases by 50%+ from 20-day average
+- MACD histogram turns negative
+
+EXIT RULES:
+LONG EXIT:
+- Price closes below middle Bollinger Band (20 SMA)
+- RSI crosses below 70 (overbought)
+- Trailing stop: 2 ATR below highest high since entry
+
+SHORT EXIT:
+- Price closes above middle Bollinger Band (20 SMA)
+- RSI crosses above 30 (oversold)
+- Trailing stop: 2 ATR above lowest low since entry
+
+RISK MANAGEMENT:
+- Position size: 1-2% of capital per trade
+- Maximum 5% portfolio exposure to BTC
+- Stop loss: 2 ATR from entry price
+- No new entries if 3 consecutive losing trades
+- Wait for squeeze to reset (BBands width returns to normal) before next trade
+
+REQUIRED INDICATORS:
+- Bollinger Bands (20,2)
+- Keltner Channels (20,1.5)
+- RSI (14)
+- Volume (20-day average)
+- MACD (12,26,9)
+- ATR (14) for stop loss calculation
+
+SPECIAL CONSIDERATIONS FOR BTC:
+- Account for crypto market 24/7 operation (use UTC daily closes)
+- Be aware of weekend volatility patterns
+- Monitor Bitcoin dominance for broader market context
+- Consider halving cycles and major news events that may affect volatility compression periods

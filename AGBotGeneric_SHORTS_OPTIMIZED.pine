@@ -1,0 +1,302 @@
+//@version=5
+strategy("AGBot SHORTS OPTIMIZED - Downtrend Focus", 
+     overlay=true,
+     initial_capital=10000,
+     commission_type=strategy.commission.percent,
+     commission_value=0.0,
+     default_qty_type=strategy.percent_of_equity, 
+     default_qty_value=2.5,
+     calc_on_order_fills=true,
+     calc_on_every_tick=false,
+     pyramiding=0)
+
+// =============== LONGS = 100% META | SHORTS = SWING HIGH OPTIMIZED ===============
+// CRITICAL: Longs have ZERO regime filters - exact META clone
+// Shorts use: Swing High stops (5-bar) + EMA filter + regime-based sizing
+
+// =============== USER INPUTS ===============
+group_capital = "CAPITAL SETTINGS"
+riskPerTradePct = input.float(2.5, "Risk % per Trade", minval=0.01, maxval=10, step=0.01, group=group_capital)
+
+group_trading = "TRADING MODE"
+tradingMode = input.string("both", "Trading Mode", options=["longs_only", "shorts_only", "both"], group=group_trading)
+
+group_time = "SESSION (META EXACT)"
+sessStartHour = input.int(9, "Session Start Hour", minval=0, maxval=23, group=group_time)
+sessStartMinute = input.int(30, "Session Start Minute", minval=0, maxval=59, group=group_time)
+sessEndHour = input.int(16, "Session End Hour", minval=0, maxval=23, group=group_time)
+sessEndMinute = input.int(0, "Session End Minute", minval=0, maxval=59, group=group_time)
+enableEODClose = input.bool(true, "Flatten at End of Session", group=group_time)
+
+group_indicators = "INDICATORS (META EXACT)"
+maLength = input.int(100, "EMA Length", minval=1, group=group_indicators)
+keyValue = input.float(2.0, "UT Bot Key (×ATR)", minval=0.1, step=0.1, group=group_indicators)
+atrPeriodUT = input.int(1, "UT Bot ATR Period", minval=1, group=group_indicators)
+atrPeriod = input.int(14, "ATR Period (SL/Trail)", minval=1, group=group_indicators)
+
+group_longs = "LONGS (META EXACT - NO CHANGES)"
+stoplossType = input.string("atr", "Stoploss Type", options=["atr","swing"], group=group_longs)
+swingHighBars = input.int(10, "Swing High Bars", minval=1, group=group_longs)
+swingLowBars = input.int(10, "Swing Low Bars", minval=1, group=group_longs)
+adaptiveAtrMult = input.float(2.0, "ATR Mult (SL/Trail)", minval=0.1, step=0.1, group=group_longs)
+tp1RRLong = input.float(1.0, "TP1 R:R Long", step=0.1, group=group_longs)
+tp2RRLong = input.float(3.0, "TP2 R:R Long", step=0.1, group=group_longs)
+tp1Percent = input.float(35.0, "TP1 Close %", minval=0, maxval=100, step=1, group=group_longs)
+
+group_tp = "TAKE PROFIT (META EXACT)"
+useTP = input.bool(true, "Use Take Profits", group=group_tp)
+numTPs = input.int(2, "Number of TPs (1 or 2)", minval=1, maxval=2, group=group_tp)
+secondTPType = input.string("atr_trailing", "Second TP Type", options=["rr","atr_trailing"], group=group_tp)
+
+group_shorts = "SHORTS OPTIMIZATION (DOWNTREND FOCUS)"
+useEMAFilterShorts = input.bool(true, "Use EMA Filter for Shorts", group=group_shorts, tooltip="Only short when price < EMA13 < EMA48 < EMA200")
+useRegimeShorts = input.bool(true, "Use Regime Detection for Shorts", group=group_shorts, tooltip="Adapt stops/sizing based on bull/bear")
+useSwingHighShorts = input.bool(true, "Use Swing High Stop for Shorts", group=group_shorts, tooltip="Swing high instead of ATR in bear markets")
+swingHighBarsShorts = input.int(5, "Swing High Bars (Shorts)", minval=1, maxval=20, step=1, group=group_shorts, tooltip="Lookback for swing high in downtrends")
+tp1RRShort = input.float(1.5, "TP1 R:R Short", step=0.1, group=group_shorts)
+tp2RRShort = input.float(3.0, "TP2 R:R Short", step=0.1, group=group_shorts)
+tp1PercentShorts = input.float(70.0, "TP1 Close % Shorts", minval=0, maxval=100, step=1, group=group_shorts)
+bullMarketRiskReduction = input.float(0.5, "Bull Market Risk Reduction", minval=0.1, maxval=1.0, step=0.1, group=group_shorts, tooltip="Reduce risk by this % in bull markets")
+
+// =============== HELPER FUNCTION ===============
+pad2(n) =>
+    n < 10 ? "0" + str.tostring(n) : str.tostring(n)
+
+// Build session string (e.g., "0930-1600")
+sessStr = pad2(sessStartHour) + pad2(sessStartMinute) + "-" + pad2(sessEndHour) + pad2(sessEndMinute)
+
+// =============== INDICATORS (EXACT META) ===============
+emaVal = ta.ema(close, maLength)
+atr14 = ta.atr(atrPeriod)
+
+// UT Bot ATR Trailing Stop (EXACT META METHOD)
+float trueRangeUT = math.max(math.max(high - low, math.abs(high - close[1])), math.abs(low - close[1]))
+atrUT = ta.sma(trueRangeUT, atrPeriodUT)
+nLoss = keyValue * atrUT
+
+var float xATRTrail = na
+xATRTrail := na(xATRTrail[1]) ? close :
+     (close > xATRTrail[1] ? math.max(xATRTrail[1], close - nLoss) :
+      close < xATRTrail[1] ? math.min(xATRTrail[1], close + nLoss) :
+      (close[1] > xATRTrail[1] ? close - nLoss : close + nLoss))
+
+// Stop references (EXACT META for LONGS)
+longStopATR = close - atr14 * adaptiveAtrMult
+shortStopATR = close + atr14 * adaptiveAtrMult
+longStopSwing = ta.lowest(low, swingLowBars)
+shortStopSwing = ta.highest(high, swingHighBarsShorts)
+longStopChosen = stoplossType == "atr" ? longStopATR : longStopSwing
+
+// SHORTS: Dynamic stop selection (OPTIMIZED)
+shortStopChosen = if useSwingHighShorts and useRegimeShorts
+    shortStopSwing  // Always use swing high for shorts when enabled
+else
+    shortStopATR
+
+// Trend & signals (EXACT META)
+bullish = close > emaVal
+bearish = close < emaVal
+buySignal = ta.crossover(close, xATRTrail)
+sellSignal = ta.crossunder(close, xATRTrail)
+
+// =============== REGIME DETECTION (FOR SHORTS ONLY) ===============
+sma50 = useRegimeShorts ? ta.sma(close, 50) : na
+sma200 = useRegimeShorts ? ta.sma(close, 200) : na
+isBullRegime = useRegimeShorts ? sma50 > sma200 : true
+isBearRegime = useRegimeShorts ? sma50 < sma200 : false
+
+// EMA Ribbon filter (for shorts only)
+ema13 = useEMAFilterShorts ? ta.ema(close, 13) : na
+ema48 = useEMAFilterShorts ? ta.ema(close, 48) : na
+ema200 = useEMAFilterShorts ? ta.ema(close, 200) : na
+bearAlignment = useEMAFilterShorts ? (close < ema13 and ema13 < ema48 and ema48 < ema200) : true
+
+// Session logic (EXACT META)
+inSession = not na(time(timeframe.period, sessStr))
+justLeftSession = not inSession and inSession[1]
+
+// Trading mode flags
+allowLongs = tradingMode == "longs_only" or tradingMode == "both"
+allowShorts = tradingMode == "shorts_only" or tradingMode == "both"
+
+// =============== POSITION TRACKING ===============
+var float entryPrice = na
+var float initialSL = na
+var bool tp1Hit = false
+var float hiSince = na
+var float loSince = na
+
+float equity = strategy.equity
+float riskAmt = equity * (riskPerTradePct / 100.0)
+
+calcQtyLong(price, stop) =>
+    dist = math.max(price - stop, 0.0)
+    dist <= 0 ? 0.0 : (riskAmt / (dist * syminfo.pointvalue))
+
+calcQtyShort(price, stop) =>
+    if not useRegimeShorts
+        // No regime adjustment
+        dist = math.max(stop - price, 0.0)
+        dist <= 0 ? 0.0 : (riskAmt / (dist * syminfo.pointvalue))
+    else
+        // Reduce risk in bull markets
+        adjustedRisk = isBullRegime ? (riskAmt * bullMarketRiskReduction) : riskAmt
+        dist = math.max(stop - price, 0.0)
+        dist <= 0 ? 0.0 : (adjustedRisk / (dist * syminfo.pointvalue))
+
+// =============== EOD FLATTEN (EXACT META) ===============
+if enableEODClose and justLeftSession
+    if strategy.position_size != 0
+        strategy.close_all(comment="EOD Flat", when=barstate.isconfirmed)
+
+// =============== ENTRY LOGIC ===============
+havePos = strategy.position_size != 0
+isLongPos = strategy.position_size > 0
+isSrtPos = strategy.position_size < 0
+
+if inSession and not havePos
+    // LONG (100% META - NO FILTERS!)
+    if allowLongs and buySignal and bullish and not na(longStopChosen)
+        qtyL = calcQtyLong(close, longStopChosen)
+        if qtyL > 0
+            strategy.entry(id="Long", direction=strategy.long, qty=qtyL, comment="Long")
+            entryPrice := close
+            initialSL := longStopChosen
+            tp1Hit := false
+            hiSince := high
+            loSince := na
+    
+    // SHORT (with regime-aware filters)
+    if allowShorts and sellSignal and bearish and bearAlignment and not na(shortStopChosen)
+        qtyS = calcQtyShort(close, shortStopChosen)
+        if qtyS > 0
+            regimeText = useRegimeShorts ? (isBearRegime ? " (Bear)" : " (Bull-Red)") : ""
+            strategy.entry(id="Short", direction=strategy.short, qty=qtyS, comment="Short" + regimeText)
+            entryPrice := close
+            initialSL := shortStopChosen
+            tp1Hit := false
+            loSince := low
+            hiSince := na
+
+// =============== POSITION MANAGEMENT (EXACT META) ===============
+if havePos
+    // Update extremes FIRST (before TP checks) - CRITICAL!
+    hiSince := isLongPos ? (na(hiSince) ? high : math.max(hiSince, high)) : hiSince
+    loSince := isSrtPos ? (na(loSince) ? low : math.min(loSince, low)) : loSince
+
+    longSLDist = isLongPos and not na(entryPrice) and not na(initialSL) ? entryPrice - initialSL : na
+    shortSLDist = isSrtPos and not na(entryPrice) and not na(initialSL) ? initialSL - entryPrice : na
+
+    // ---- LONG management (EXACT META) ----
+    if isLongPos and not na(longSLDist)
+        tp1Long = entryPrice + longSLDist * tp1RRLong
+
+        if useTP and not tp1Hit and high >= tp1Long
+            qtyPct = math.min(math.max(tp1Percent, 0.0), 100.0)
+            strategy.close(id="Long", qty_percent=qtyPct, comment="TP1 Long")
+            tp1Hit := true
+
+        if useTP and numTPs == 2 and tp1Hit
+            if secondTPType == "rr"
+                tp2Long = entryPrice + longSLDist * tp2RRLong
+                if high >= tp2Long
+                    strategy.close(id="Long", comment="TP2 Long (RR)")
+            else
+                if not na(hiSince)
+                    trailStopL = hiSince - atr14 * adaptiveAtrMult
+                    if low <= trailStopL
+                        strategy.close(id="Long", comment="TP2 Long (ATR Trail)")
+
+        if not na(initialSL)
+            strategy.exit(id="LX", from_entry="Long", stop=initialSL)
+
+    // ---- SHORT management (OPTIMIZED) ----
+    if isSrtPos and not na(shortSLDist)
+        tp1Short = entryPrice - shortSLDist * tp1RRShort
+
+        if useTP and not tp1Hit and low <= tp1Short
+            qtyPct = math.min(math.max(tp1PercentShorts, 0.0), 100.0)
+            strategy.close(id="Short", qty_percent=qtyPct, comment="TP1 Short")
+            tp1Hit := true
+
+        if useTP and numTPs == 2 and tp1Hit
+            if secondTPType == "rr"
+                tp2Short = entryPrice - shortSLDist * tp2RRShort
+                if low <= tp2Short
+                    strategy.close(id="Short", comment="TP2 Short (RR)")
+            else
+                if not na(loSince)
+                    trailStopS = loSince + atr14 * adaptiveAtrMult
+                    if high >= trailStopS
+                        strategy.close(id="Short", comment="TP2 Short (ATR Trail)")
+
+        if not na(initialSL)
+            strategy.exit(id="SX", from_entry="Short", stop=initialSL)
+
+// =============== PLOTS ===============
+plot(emaVal, "EMA", color=color.new(color.teal, 0))
+plot(xATRTrail, "UT ATR Trail", color=color.new(color.orange, 0))
+plot(longStopChosen, "Long Stop", color=color.new(color.lime, 70))
+plot(shortStopChosen, "Short Stop", color=color.new(color.red, 70))
+
+// EMA Ribbon (only when shorts filter enabled)
+plot(useEMAFilterShorts ? ema13 : na, "EMA 13", color=color.new(color.green, 60), linewidth=1)
+plot(useEMAFilterShorts ? ema48 : na, "EMA 48", color=color.new(color.blue, 60), linewidth=1)
+plot(useEMAFilterShorts ? ema200 : na, "EMA 200", color=color.new(color.red, 60), linewidth=2)
+
+// Regime background
+bgcolor(useRegimeShorts and isBearRegime ? color.new(color.red, 95) : (useRegimeShorts and not isBearRegime ? color.new(color.green, 95) : na), title="Regime")
+
+plotshape(buySignal and bullish and allowLongs, title="Buy", style=shape.triangleup, location=location.belowbar, color=color.new(color.teal, 0), size=size.tiny, text="BUY")
+plotshape(sellSignal and bearish and allowShorts, title="Sell", style=shape.triangledown, location=location.abovebar, color=color.new(color.red, 0), size=size.tiny, text="SELL")
+
+// =============== OPTIONS TRADING TABLE ===============
+var table optionsTable = na
+if na(optionsTable)
+    optionsTable := table.new(position.top_right, 2, 10, bgcolor=color.new(color.gray, 85), border_color=color.white, border_width=1)
+
+table.cell(optionsTable, 0, 0, "OPTIONS TRADING GUIDE", text_color=color.lime, text_size=size.normal, bgcolor=color.new(color.gray, 70))
+table.cell(optionsTable, 1, 0, "", bgcolor=color.new(color.gray, 70))
+
+// Trend
+table.cell(optionsTable, 0, 1, "Trend:", text_color=color.white, text_size=size.small)
+trendText = useRegimeShorts ? (isBearRegime ? "BEAR" : "BULL") : "N/A"
+trendColor = useRegimeShorts ? (isBearRegime ? color.red : color.green) : color.gray
+table.cell(optionsTable, 1, 1, trendText, text_color=trendColor, text_size=size.small)
+
+// Contract Expiry (7 DTE for weeklies)
+table.cell(optionsTable, 0, 2, "Expiry:", text_color=color.white, text_size=size.small)
+table.cell(optionsTable, 1, 2, "7 DTE (Weekly)", text_color=color.yellow, text_size=size.small)
+
+// Strike Price (ATM or 1 strike OTM)
+table.cell(optionsTable, 0, 3, "Strike:", text_color=color.white, text_size=size.small)
+strikeText = "ATM or -1 OTM"
+table.cell(optionsTable, 1, 3, strikeText, text_color=color.orange, text_size=size.small)
+
+// Current Price
+table.cell(optionsTable, 0, 4, "Current Price:", text_color=color.white, text_size=size.small)
+table.cell(optionsTable, 1, 4, str.tostring(close, "#.##"), text_color=color.yellow, text_size=size.small)
+
+// Entry Signal
+table.cell(optionsTable, 0, 5, "Entry Signal:", text_color=color.white, text_size=size.small)
+entrySignalText = (sellSignal and bearish) ? "SELL (Short Put)" : (buySignal and bullish ? "BUY (Long Call)" : "NONE")
+entrySignalColor = (sellSignal and bearish) ? color.red : (buySignal and bullish ? color.green : color.gray)
+table.cell(optionsTable, 1, 5, entrySignalText, text_color=entrySignalColor, text_size=size.small)
+
+// TP1 Target
+table.cell(optionsTable, 0, 6, "TP1 Target:", text_color=color.white, text_size=size.small)
+table.cell(optionsTable, 1, 6, str.tostring(tp1RRShort, "#.#") + " R:R", text_color=color.yellow, text_size=size.small)
+
+// TP1 Close %
+table.cell(optionsTable, 0, 7, "Close at TP1:", text_color=color.white, text_size=size.small)
+table.cell(optionsTable, 1, 7, str.tostring(tp1PercentShorts, "#") + "%", text_color=color.yellow, text_size=size.small)
+
+// Regime Status
+table.cell(optionsTable, 0, 8, "Regime Filter:", text_color=color.white, text_size=size.small)
+filterStatus = useRegimeShorts ? (isBearRegime ? "BEAR✓" : "BULL✓") : "OFF"
+filterColor = useRegimeShorts ? (isBearRegime ? color.red : color.green) : color.gray
+table.cell(optionsTable, 1, 8, filterStatus, text_color=filterColor, text_size=size.small)
+
+// Risk per Trade
+table.cell(optionsTable, 0, 9, "Risk/Trade:", text_color=color.white, text_size=size.small)
+table.cell(optionsTable, 1, 9, str.tostring(riskPerTradePct) + "%", text_color=color.orange, text_size=size.small)

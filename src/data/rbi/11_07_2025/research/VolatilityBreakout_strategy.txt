@@ -1,0 +1,56 @@
+STRATEGY_NAME: VolatilityBreakout
+
+STRATEGY_DETAILS:
+This is a specialized 0DTE (Zero Days to Expiration) day trading strategy focused on QQQ using ATR (Average True Range) for volatility-based breakout trading. The strategy capitalizes on intraday volatility expansion in QQQ options with same-day expiration.
+
+KEY STRATEGY COMPONENTS:
+- Primary Instrument: QQQ options (0DTE only)
+- Timeframe: 1-minute and 5-minute charts
+- Trading Hours: 9:30 AM - 4:00 PM EST
+- Core Indicator: ATR (14-period) for volatility measurement
+- Secondary Confirmation: Volume profile and price action
+
+REQUIRED INDICATORS:
+1. ATR (14-period) - Primary volatility gauge
+2. EMA (9-period) - Short-term trend direction
+3. VWAP - Volume-weighted average price for intraday levels
+4. Volume - Confirmation of breakout strength
+
+ENTRY RULES:
+LONG ENTRY (Call Options):
+1. Price breaks above previous 30-minute high with expanding volume
+2. Current ATR value exceeds 1.5x the opening 30-minute ATR
+3. Price maintains above VWAP and 9-period EMA
+4. Entry on pullback to breakout level with volume confirmation
+
+SHORT ENTRY (Put Options):
+1. Price breaks below previous 30-minute low with expanding volume
+2. Current ATR value exceeds 1.5x the opening 30-minute ATR
+3. Price maintains below VWAP and 9-period EMA
+4. Entry on retrace to breakdown level with volume confirmation
+
+EXIT RULES:
+PROFIT TARGETS:
+- Primary: 1x ATR value from entry point
+- Secondary: 2x ATR value for extended moves
+- Time-based exit: 2:00 PM EST regardless of P/L
+
+STOP LOSS:
+- Fixed: 0.5x ATR value from entry point
+- Maximum risk: 2% of trading capital per trade
+- Time stop: Exit by 3:30 PM EST to avoid gamma risk
+
+RISK MANAGEMENT:
+1. Position Sizing: Maximum 2% of account per trade
+2. Daily Loss Limit: 5% of account capital
+3. Maximum Trades: 3 trades per day maximum
+4. No trading during first 30 minutes (9:30-10:00 AM EST)
+5. Avoid trading during Fed announcements or major economic events
+
+SPECIAL CONSIDERATIONS:
+- Monitor QQQ's relationship with TQQQ/SQQQ for momentum confirmation
+- Watch for unusual options flow in QQQ for additional confirmation
+- Be aware of gamma exposure changes throughout the trading day
+- Focus on high-volume breakout periods (10:00-11:30 AM and 1:00-2:30 PM EST)
+
+This strategy requires strict discipline in position sizing and exit timing due to the high-risk nature of 0DTE options trading. The ATR-based approach helps filter false breakouts while capturing meaningful intraday volatility expansions.

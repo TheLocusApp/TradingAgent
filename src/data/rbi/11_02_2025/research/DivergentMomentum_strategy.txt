@@ -1,0 +1,47 @@
+STRATEGY_NAME: DivergentMomentum
+
+STRATEGY_DETAILS:
+
+KEY STRATEGY COMPONENTS:
+This strategy combines RSI divergence patterns with MACD confirmation signals to identify potential trend reversals in Bitcoin's daily price action. The core approach focuses on detecting momentum divergences between price and RSI, then validating these signals with MACD crossovers and histogram patterns for higher probability entries.
+
+REQUIRED INDICATORS:
+1. RSI (Relative Strength Index) - Period 14, applied to closing prices
+2. MACD (Moving Average Convergence Divergence) - Standard settings (12,26,9)
+3. Price action analysis for swing highs/lows identification
+
+ENTRY RULES:
+LONG ENTRY:
+- Identify BULLISH RSI DIVERGENCE: Price makes lower lows while RSI makes higher lows
+- Wait for MACD CONFIRMATION: MACD line crosses above signal line OR MACD histogram turns positive
+- Enter long on the next candle after both conditions are met
+
+SHORT ENTRY:
+- Identify BEARISH RSI DIVERGENCE: Price makes higher highs while RSI makes lower highs
+- Wait for MACD CONFIRMATION: MACD line crosses below signal line OR MACD histogram turns negative
+- Enter short on the next candle after both conditions are met
+
+EXIT RULES:
+LONG EXIT:
+- When RSI reaches overbought territory (70+) OR
+- MACD line crosses below signal line OR
+- Trailing stop loss based on recent swing low
+
+SHORT EXIT:
+- When RSI reaches oversold territory (30-) OR
+- MACD line crosses above signal line OR
+- Trailing stop loss based on recent swing high
+
+RISK MANAGEMENT:
+- Position sizing: Maximum 2% of capital per trade
+- Initial stop loss: Place below recent swing low for longs, above recent swing high for shorts
+- Risk-to-reward ratio: Minimum 1:2
+- Maximum drawdown per trade: 1% of total capital
+- Avoid trading during major news events or extreme volatility periods
+
+ADDITIONAL CONSIDERATIONS:
+- Only trade clear, well-defined divergence patterns
+- Look for divergence occurring at key support/resistance levels for stronger signals
+- Consider volume confirmation for additional validation
+- Multiple timeframe analysis (check 4H for confluence) can improve signal quality
+- Be cautious of false divergences in strongly trending markets

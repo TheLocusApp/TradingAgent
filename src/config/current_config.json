@@ -1,0 +1,18 @@
+{
+  "models": [
+    "deepseek"
+  ],
+  "model_temperature": 0.7,
+  "model_max_tokens": 1024,
+  "system_prompt": "",
+  "asset_type": "crypto",
+  "ticker": "BTC",
+  "timeframe": "1m",
+  "cycle_interval": 180,
+  "use_simulation": true,
+  "initial_balance": 10000,
+  "position_size_percentage": 0.9,
+  "save_decisions": true,
+  "decisions_dir": "src/data/trading_decisions",
+  "use_live_data": false
+}

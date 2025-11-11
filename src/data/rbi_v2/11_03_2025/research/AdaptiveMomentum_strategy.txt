@@ -1,0 +1,50 @@
+STRATEGY_NAME: Adaptive Momentum
+
+STRATEGY_DETAILS:
+This strategy uses the 20-period and 200-period Exponential Moving Average (EMA) crossover on SPY hourly charts to identify significant trend changes and momentum shifts in the market.
+
+KEY STRATEGY COMPONENTS:
+- Primary Instrument: SPY (SPDR S&P 500 ETF Trust)
+- Timeframe: 1-hour charts
+- Core Indicators: 20-period EMA (fast) and 200-period EMA (slow)
+- Trend Identification: Uses the relationship between short-term and long-term moving averages
+
+ENTRY RULES:
+LONG ENTRY:
+- When the 20 EMA crosses ABOVE the 200 EMA
+- Enter on the close of the hourly candle where crossover occurs
+- Confirm with price action showing bullish momentum
+
+SHORT ENTRY:
+- When the 20 EMA crosses BELOW the 200 EMA
+- Enter on the close of the hourly candle where crossover occurs
+- Confirm with price action showing bearish momentum
+
+EXIT RULES:
+LONG EXIT:
+- When the 20 EMA crosses back below the 200 EMA
+- Exit on the close of the hourly candle where crossover occurs
+- Consider partial profit-taking if price deviates significantly from the 20 EMA
+
+SHORT EXIT:
+- When the 20 EMA crosses back above the 200 EMA
+- Exit on the close of the hourly candle where crossover occurs
+- Consider partial profit-taking if price deviates significantly from the 20 EMA
+
+RISK MANAGEMENT:
+- Position sizing: Risk no more than 1-2% of account per trade
+- Stop loss: Place 2-3% below entry for long positions, 2-3% above entry for short positions
+- Trailing stops: Consider moving stop to breakeven once trade moves 2-3% in your favor
+- Maximum drawdown: Limit to 5-8% of total account value
+
+REQUIRED INDICATORS:
+1. 20-period Exponential Moving Average (EMA)
+2. 200-period Exponential Moving Average (EMA)
+3. Optional: Volume confirmation to validate crossover strength
+4. Optional: RSI (14) to identify overbought/oversold conditions for entry timing
+
+ADDITIONAL CONSIDERATIONS:
+- This strategy works best in trending markets, may produce false signals in ranging markets
+- Consider filtering signals during major economic news events
+- Monitor overall market conditions and sector rotation for confirmation
+- Backtest thoroughly to understand typical holding periods and win rates

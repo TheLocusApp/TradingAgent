@@ -1,0 +1,43 @@
+STRATEGY_NAME: DivergentMomentum
+
+STRATEGY_DETAILS:
+This strategy combines RSI divergence patterns with MACD confirmation signals on Bitcoin's daily timeframe to identify high-probability trend reversal opportunities.
+
+KEY COMPONENTS:
+1. RSI (Relative Strength Index) - Set to 14 periods
+2. MACD (Moving Average Convergence Divergence) - Standard settings (12,26,9)
+3. Price action analysis for divergence identification
+4. Daily timeframe for reliable signals
+
+ENTRY RULES (Long Position):
+1. BULLISH RSI DIVERGENCE: Price makes lower lows while RSI makes higher lows
+2. MACD CONFIRMATION: MACD line crosses above signal line OR MACD histogram shows bullish momentum
+3. ENTRY: Enter long when both conditions are met on the same daily candle close
+
+ENTRY RULES (Short Position):
+1. BEARISH RSI DIVERGENCE: Price makes higher highs while RSI makes lower highs
+2. MACD CONFIRMATION: MACD line crosses below signal line OR MACD histogram shows bearish momentum
+3. ENTRY: Enter short when both conditions are met on the same daily candle close
+
+EXIT RULES:
+1. Take Profit: When RSI reaches overbought (70+) for long positions or oversold (30-) for short positions
+2. Stop Loss: Place below recent swing low for long positions, above recent swing high for short positions
+3. Alternative Exit: MACD reversal signal (opposite crossover)
+
+RISK MANAGEMENT:
+1. Position Size: Maximum 2% of capital per trade
+2. Stop Loss: 2-3% below/above entry price depending on volatility
+3. Risk-Reward Ratio: Minimum 1:2
+4. Avoid trading during major news events or extreme volatility periods
+
+REQUIRED INDICATORS:
+- RSI (14 periods)
+- MACD (12,26,9)
+- Price chart with visible swing highs/lows
+
+ADDITIONAL NOTES:
+- Wait for daily candle close to confirm signals
+- Higher timeframe confluence (weekly chart) increases signal reliability
+- Volume confirmation can enhance signal strength
+- Multiple divergence patterns (double/triple) provide stronger signals
+- Consider market structure and key support/resistance levels for additional confirmation

@@ -1,0 +1,48 @@
+STRATEGY_NAME: DualMomentum
+
+STRATEGY_DETAILS:
+This strategy utilizes a dual exponential moving average crossover system specifically designed for the QQQ ETF on 5-minute timeframes, focusing on capturing short-term momentum shifts.
+
+KEY STRATEGY COMPONENTS:
+- Instrument: QQQ (Invesco QQQ Trust tracking NASDAQ-100)
+- Timeframe: 5-minute charts exclusively
+- Primary Indicators: 8-period EMA and 13-period EMA
+- Core Concept: Capitalize on short-term momentum shifts when the faster EMA crosses the slower EMA
+
+ENTRY RULES:
+LONG ENTRY:
+- Trigger when 8-period EMA crosses ABOVE the 13-period EMA
+- Entry on the close of the candle where crossover occurs
+- Confirm with price action showing bullish momentum
+
+SHORT ENTRY:
+- Trigger when 8-period EMA crosses BELOW the 13-period EMA  
+- Entry on the close of the candle where crossover occurs
+- Confirm with price action showing bearish momentum
+
+EXIT RULES:
+LONG POSITION EXIT:
+- When 8-period EMA crosses below 13-period EMA
+- Exit on the close of the crossover candle
+
+SHORT POSITION EXIT:
+- When 8-period EMA crosses above 13-period EMA
+- Exit on the close of the crossover candle
+
+RISK MANAGEMENT:
+- Position sizing: Risk no more than 1-2% of account per trade
+- Stop loss: Place 0.5-1% below/above recent swing low/high
+- Maximum daily loss limit: 5% of account equity
+- Avoid trading during first 30 minutes of market open due to volatility
+- Consider reducing position size during high volatility periods
+
+REQUIRED INDICATORS:
+1. 8-period Exponential Moving Average (EMA)
+2. 13-period Exponential Moving Average (EMA)
+3. Optional: Volume confirmation for crossover validity
+
+OPTIMIZATION NOTES:
+- Best performance during regular market hours (9:30 AM - 4:00 PM EST)
+- Monitor for false signals during low-volume periods
+- Consider filtering trades during major economic announcements
+- Backtest optimal stop-loss levels for current market volatility conditions

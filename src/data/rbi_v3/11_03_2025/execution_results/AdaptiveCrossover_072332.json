@@ -1,0 +1,8 @@
+{
+  "success": false,
+  "return_code": 1,
+  "stdout": "",
+  "stderr": "  File \"C:\\Users\\ahmed\\CascadeProjects\\moon-dev-ai-agents\\src\\data\\rbi_v3\\11_03_2025\\backtests_optimized\\AdaptiveCrossover_OPT_v6.py\", line 1\n    ```python\n    ^\nSyntaxError: invalid syntax\n",
+  "execution_time": 0.100089,
+  "timestamp": "2025-11-03T07:23:32.572515"
+}

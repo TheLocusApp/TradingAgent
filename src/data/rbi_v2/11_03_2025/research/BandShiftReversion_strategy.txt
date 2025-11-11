@@ -1,0 +1,38 @@
+STRATEGY_NAME: BandShift Reversion
+
+STRATEGY_DETAILS:
+This mean-reversion strategy capitalizes on temporary price dislocations by identifying when Bollinger Bands signal oversold conditions while maintaining underlying trend strength, using ATR-based stops to capture multiple re-test opportunities.
+
+KEY COMPONENTS:
+- Bollinger Bands (20-period, 2 standard deviations)
+- 20-period Simple Moving Average (SMA)
+- Average True Range (ATR, 14-period)
+- Price action analysis for re-test confirmation
+
+ENTRY RULES:
+1. Primary Condition: Bollinger Band lower band must be trading ABOVE the 20-period SMA
+2. Confirmation: Price must touch or cross below the Bollinger Band lower band
+3. Entry Trigger: Enter long position on the first bullish candle following the touch/cross
+4. Timeframe: Best suited for 1-hour to 4-hour charts for optimal signal frequency
+
+EXIT RULES:
+1. Initial Stop Loss: Place stop loss at 2x ATR below entry price
+2. Re-test Management: If stopped out, re-enter on next bullish candle following another touch of the lower band
+3. Profit Taking: Take partial profits at 1x ATR above entry, move stop to breakeven
+4. Final Exit: Close remaining position when price touches Bollinger Band middle line (20 SMA) or after capturing 2x ATR profit
+
+RISK MANAGEMENT:
+- Position sizing: Risk no more than 1-2% of capital per trade
+- Maximum 2 re-entries allowed per setup to avoid over-trading
+- Daily loss limit: 5% of account equity
+- Avoid trading during major economic news events
+- Monitor for changing volatility conditions that may invalidate the strategy
+
+REQUIRED INDICATORS:
+1. Bollinger Bands (20,2)
+2. Simple Moving Average (20-period)
+3. Average True Range (14-period)
+4. Optional: Volume confirmation for entry validation
+
+SPECIAL CONSIDERATIONS:
+This strategy works best in ranging or mildly trending markets. Avoid using during strong trending conditions where mean-reversion setups have lower success rates. The unique "BandShift" condition (lower band above SMA) helps filter false signals by ensuring the underlying trend remains intact while capturing oversold bounces.

@@ -1,0 +1,70 @@
+STRATEGY_NAME: HourlyExponential Crossover
+
+STRATEGY_DETAILS:
+Key components:
+- Instrument and timeframe: SPY on 1-hour candles (prefer regular trading hours; disable extended hours for consistency).
+- Core signal: 20 EMA crossing the 50 EMA with candle-close confirmation.
+- Trend filter: Directional slope of the 50 EMA to align trades with prevailing trend.
+- Volatility and noise control: ATR-based stops and minimum separation between EMAs post-cross to reduce whipsaws.
+- Liquidity/confirmation: Optional volume confirmation versus a moving average of volume.
+
+Entry rules:
+- Long setup:
+  - Signal: On bar close, EMA20 crosses above EMA50.
+  - Confirmation:
+    - Close of the signal bar is above both EMAs.
+    - EMA50 slope > 0 (EMA50 > EMA50[1]).
+    - Optional: ADX(14) > 15 or Volume > 1.1 × SMA(20) of volume.
+    - Optional cross-strength: |EMA20 − EMA50| / Price ≥ 0.0005 (0.05%) on the next bar’s open.
+  - Entry: Next bar at market or limit near EMA20 with a 0.1% tolerance.
+- Short setup (if allowed):
+  - Signal: EMA20 crosses below EMA50 on bar close.
+  - Confirmation:
+    - Close below both EMAs.
+    - EMA50 slope < 0 (EMA50 < EMA50[1]).
+    - Optional: ADX(14) > 15 or Volume > 1.1 × SMA(20) of volume.
+    - Cross-strength as above.
+  - Entry: Next bar at market or limit near EMA20 with a 0.1% tolerance.
+- Time filter:
+  - Do not open new positions in the final trading hour on Fridays.
+  - Avoid entries within 1 hour before major Fed events (optional rule).
+
+Exit rules:
+- Primary exit: Opposite EMA cross confirmed on bar close (flip optional).
+- Protective stop (initial at entry):
+  - Longs: Stop = min(recent swing low of last 5 bars, Entry − 2 × ATR(14)).
+  - Shorts: Stop = max(recent swing high of last 5 bars, Entry + 2 × ATR(14)).
+- Trailing stop (once in profit ≥ 1R):
+  - Chandelier: Entry − 2.5 × ATR(14) for longs; Entry + 2.5 × ATR(14) for shorts, updated each bar.
+  - Or EMA50 buffer: Exit if close crosses beyond EMA50 ± 0.1% buffer against position.
+- Profit taking (optional):
+  - Scale out 50% at +1.5R, move stop to breakeven; trail remainder with Chandelier or EMA50 buffer.
+- Time stop:
+  - If after 20 bars unrealized P/L is between −0.5R and +0.5R, exit at market next bar (reduce stagnation risk).
+- Gap protection:
+  - If an overnight gap breaches stop, exit at open price and log slippage.
+
+Risk management:
+- Position sizing: Risk per trade ≤ 0.5–1.0% of account equity.
+  - Shares = floor((RiskAmount) / (Entry − StopDistance)).
+- Portfolio limits:
+  - Only one open SPY position at a time.
+  - Daily loss cap: 2R or 2% of equity; halt new entries for the day after breach.
+  - Max consecutive losses before pause: 4; then pause and reassess.
+- Slippage/fees assumptions for testing:
+  - Slippage: 1–2 bps; Commission: per-broker actuals.
+- Regime filter (optional but recommended):
+  - Long-only if SPY daily close > its 200-day SMA; allow shorts only if below.
+
+Required indicators and settings:
+- EMA(20) on close (hourly).
+- EMA(50) on close (hourly).
+- ATR(14) on close (hourly).
+- Optional: ADX(14) for trend strength filter.
+- Optional: Volume SMA(20) for confirmation.
+- Optional: SPY daily SMA(200) for regime filtering.
+
+Implementation notes:
+- Use bar-close signal logic to avoid lookahead bias.
+- Backtest over multiple regimes (2008–present), both RTH-only and with extended hours off, to validate robustness.
+- Optimize cautiously around EMA spacing threshold, ATR multipliers, and ADX/volume filters; avoid overfitting by walk-forward validation.

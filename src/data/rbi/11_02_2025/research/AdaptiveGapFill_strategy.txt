@@ -1,0 +1,46 @@
+STRATEGY_NAME: AdaptiveGapFill
+
+STRATEGY_DETAILS:
+This strategy focuses on identifying and trading gap fill opportunities in TSLA daily charts, using adaptive entry timing and momentum confirmation to improve success rates.
+
+KEY STRATEGY COMPONENTS:
+- Gap identification: TSLA must gap up/down by at least 1.5% from previous close
+- Gap fill definition: Price must retrace to within 0.5% of previous day's closing price
+- Volume confirmation: Gap fill moves require above-average volume for validation
+- Momentum filtering: Uses RSI and MACD to confirm gap fill momentum
+
+ENTRY RULES:
+1. GAP UP SCENARIO (Short entry):
+   - TSLA gaps up 1.5%+ from previous close
+   - Wait for price to retrace toward gap fill level
+   - Enter short when RSI(14) > 60 and MACD histogram turns negative
+   - Confirm with volume at least 20% above 20-day average
+
+2. GAP DOWN SCENARIO (Long entry):
+   - TSLA gaps down 1.5%+ from previous close
+   - Wait for price to retrace upward toward gap fill level
+   - Enter long when RSI(14) < 40 and MACD histogram turns positive
+   - Confirm with volume at least 20% above 20-day average
+
+EXIT RULES:
+- Target exit: When price reaches within 0.5% of gap fill level
+- Stop loss: 2% beyond entry price for both long and short positions
+- Time-based exit: Close position if gap not filled within 3 trading days
+
+RISK MANAGEMENT:
+- Position sizing: Maximum 2% of portfolio per trade
+- Daily maximum: No more than 2 gap fill trades per day
+- Correlation check: Avoid trading if major market events affecting TSLA
+- Gap size filter: Only trade gaps between 1.5% and 8% (avoid extreme gaps)
+
+REQUIRED INDICATORS:
+- RSI (14-period) for momentum confirmation
+- MACD (12,26,9) for trend direction
+- Volume (20-day average) for confirmation
+- Daily price chart with gap identification
+
+SPECIAL CONSIDERATIONS FOR TSLA:
+- Account for TSLA's high volatility with wider stops (2% vs typical 1.5%)
+- Monitor Tesla-specific news and events that may override technical signals
+- Consider earnings gaps separately (often don't fill immediately)
+- Be aware of gap-and-go patterns common in high-momentum stocks like TSLA

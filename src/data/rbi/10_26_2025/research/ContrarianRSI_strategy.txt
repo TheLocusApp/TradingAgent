@@ -1,0 +1,62 @@
+STRATEGY_NAME: Contrarian RSI
+
+STRATEGY_DETAILS:
+Overview
+- Approach: Mean-reversion, contrarian use of RSI thresholds
+- Market: SPY (SPDR S&P 500 ETF)
+- Timeframe: Daily bars (end-of-day signals, next-session execution)
+- Position bias: Long-only
+- Execution assumption: Enter/exit at next market open after signal confirmation on the daily close
+
+1) Key Strategy Components
+- Core indicator: RSI (Wilder’s) length 14 on adjusted close
+- Thresholds: Oversold < 30 for entries; Overbought > 70 for exits
+- Confirmation logic: Use cross-under/cross-over to reduce repeated triggers
+- Risk tools: ATR(14) for stop placement and position sizing; optional regime filter (SMA200) to avoid deep bear markets
+- Trade state: Single position at a time; no pyramiding by default
+
+2) Entry Rules
+- Signal definition: A long setup occurs when RSI(14) crosses below 30 (yesterday RSI >= 30 and today RSI < 30 on the daily close)
+- Order: Buy SPY at next session’s open after the signal day
+- If already in a position: Ignore new long signals until flat
+- Re-entry after exit/stop: Allowed only after a fresh cross-under below 30
+
+3) Exit Rules
+Primary exit
+- Signal definition: Exit when RSI(14) crosses above 70 (yesterday RSI <= 70 and today RSI > 70 on the daily close)
+- Order: Sell entire position at next session’s open after the signal day
+
+Protective exits
+- Initial stop-loss: Place at entry_price - max(2 x ATR(14), 5% of entry). This is a “soft” mean-reversion stop sized to SPY volatility
+- Trailing stop (optional): Trail at max(2 x ATR(14), 5%) from highest close since entry to protect gains if RSI doesn’t tag 70
+- Time stop (fail-safe): If RSI has not crossed above 70 within 20 trading days, exit at next open (or alternatively take partial exit at day 20 and final exit at day 40, whichever you prefer)
+
+Order-of-operations on exit days
+- If both protective stop and RSI>70 conditions occur at once due to gaps, prioritize the more favorable exit (whichever yields the better price based on your execution logic)
+
+4) Risk Management
+- Position sizing (volatility-based): Risk per trade = 0.5% to 1.0% of equity
+  - Stop distance = entry_price - stop_price
+  - Shares = floor((Equity x Risk%) / Stop distance)
+- Portfolio constraints: Max 100% allocation to SPY; max 1 open position; do not add to losers (no averaging down) unless you implement a pre-defined scale plan within total risk budget
+- Slippage/fees: Assume 1–2 bps slippage plus brokerage costs; include in backtests
+- Data: Use dividend/split-adjusted close for RSI; warm-up at least 200 bars before first signal
+
+5) Required Indicators
+- RSI(14) on adjusted close, Wilder’s smoothing
+- ATR(14) on true range for stop and sizing
+- Optional: SMA(200) on adjusted close for regime filter; VIX level or change as an additional risk overlay
+
+6) Optional Enhancements (use only if you wish to refine)
+- Regime filter: Only take longs when SPY close > SMA(200) to avoid catching knives in major downtrends
+- Scaling plan (if enabled): Enter 50% size on RSI cross-under < 30; add 50% if RSI < 25 or price declines another 1 x ATR from entry. Maintain total risk within your per-trade cap
+- Profit staging: Take partial profits (e.g., 50%) on RSI cross above 60; exit remainder at RSI > 70
+- Session timing: If you have intraday capability, confirm signals on the close and execute using MOC or next open market order to reduce slippage/variance
+
+7) Edge Cases and Practical Notes
+- Consecutive sub-30 days: Only the first cross-under triggers; subsequent sub-30 readings are ignored while in cash
+- Gaps: Large overnight gaps can bypass stops; consider a catastrophic hard stop (e.g., 10–12% from entry) for tail risk
+- Holidays/half days: If execution at the next open is not feasible, use MOC at signal day or earliest next session open per your brokerage
+- No shorting: The strategy is not designed for short entries when RSI > 70; it only exits longs
+
+This specification converts “Buy when RSI < 30, sell when RSI > 70 on SPY” into a robust, testable rule set with clear entries/exits, implementable risk controls, and minimal but sufficient indicators.

@@ -1,0 +1,48 @@
+STRATEGY_NAME: DivergenceConfirmation
+
+STRATEGY_DETAILS:
+
+KEY STRATEGY COMPONENTS:
+This strategy combines RSI divergence patterns with MACD confirmation signals specifically for SPY daily charts. The core approach identifies momentum divergences between price action and RSI, then requires MACD confirmation to validate entry signals. This dual-indicator approach reduces false signals and increases reliability by requiring both momentum and trend confirmation.
+
+REQUIRED INDICATORS:
+1. RSI (Relative Strength Index) - 14-period standard setting
+2. MACD (Moving Average Convergence Divergence) - Standard 12,26,9 settings
+3. Price action analysis on SPY daily chart
+
+ENTRY RULES:
+LONG ENTRY (Bullish Divergence):
+1. Price makes a lower low while RSI makes a higher low (bullish divergence)
+2. MACD histogram shows positive momentum (rising bars above zero line)
+3. MACD line crosses above signal line or shows upward momentum
+4. Enter on next candle close after all conditions are met
+
+SHORT ENTRY (Bearish Divergence):
+1. Price makes a higher high while RSI makes a lower high (bearish divergence)
+2. MACD histogram shows negative momentum (falling bars below zero line)
+3. MACD line crosses below signal line or shows downward momentum
+4. Enter on next candle close after all conditions are met
+
+EXIT RULES:
+LONG POSITIONS:
+1. Take profit when RSI reaches overbought territory (70+)
+2. Stop loss below the most recent swing low that created the divergence
+3. Exit if MACD histogram turns negative for two consecutive periods
+
+SHORT POSITIONS:
+1. Take profit when RSI reaches oversold territory (30-)
+2. Stop loss above the most recent swing high that created the divergence
+3. Exit if MACD histogram turns positive for two consecutive periods
+
+RISK MANAGEMENT:
+1. Position size: Maximum 2% risk per trade
+2. Stop loss placement: Based on the divergence swing point (low for longs, high for shorts)
+3. Risk-reward ratio: Minimum 1:2 ratio required
+4. Maximum concurrent positions: 3 trades to avoid overexposure
+5. Daily timeframe only - no intraday trading to maintain signal quality
+
+ADDITIONAL FILTERS:
+- Only trade during regular market hours (avoid overnight gaps)
+- Avoid trading during major economic announcements
+- Require at least 3-5 bars between divergence points for validity
+- Volume confirmation preferred but not required

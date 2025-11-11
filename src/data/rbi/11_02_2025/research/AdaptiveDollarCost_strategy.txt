@@ -1,0 +1,57 @@
+STRATEGY_NAME: AdaptiveDollarCost
+
+STRATEGY_DETAILS:
+This is a systematic dollar-cost averaging (DCA) strategy specifically designed for QQQ (Invesco QQQ Trust) that incorporates adaptive timing and position sizing based on market conditions.
+
+KEY STRATEGY COMPONENTS:
+1. Core DCA Foundation: Regular fixed-amount investments in QQQ regardless of price
+2. Adaptive Timing: Uses RSI and moving averages to identify optimal entry points
+3. Dynamic Position Sizing: Adjusts investment amounts based on market volatility
+4. Risk Management: Built-in stop-loss and profit-taking mechanisms
+
+REQUIRED INDICATORS:
+- 50-day Simple Moving Average (SMA)
+- 200-day Simple Moving Average (SMA)
+- 14-period Relative Strength Index (RSI)
+- Average True Range (ATR) for volatility measurement
+
+ENTRY RULES:
+1. BASE DCA ENTRY:
+   - Invest fixed amount (e.g., $500) on predetermined schedule (weekly/bi-weekly/monthly)
+   - Execute regardless of market conditions (core DCA principle)
+
+2. ENHANCED ENTRY (Adaptive Component):
+   - When RSI < 40 AND price > 50-day SMA: Increase position by 25%
+   - When RSI < 30 AND price > 200-day SMA: Increase position by 50%
+   - When both 50-day and 200-day SMA are trending upward: Consider additional allocation
+
+EXIT/PROFIT-TAKING RULES:
+1. Partial Profit Taking:
+   - Take 25% profits when position reaches 20% gain
+   - Take another 25% when RSI > 70 and price is 15% above 200-day SMA
+
+2. Full Exit Conditions:
+   - Exit entire position if QQQ closes below 200-day SMA for 3 consecutive days
+   - Exit if 50-day SMA crosses below 200-day SMA (death cross)
+
+RISK MANAGEMENT:
+1. Position Sizing:
+   - Base allocation: 70% of planned investment
+   - Enhanced allocation: 30% for opportunistic entries
+   - Maximum single position increase: 50% above base amount
+
+2. Stop-Loss Protection:
+   - 8% trailing stop on enhanced positions
+   - No stop on core DCA positions (maintains DCA philosophy)
+   - Reduce enhanced allocation during high volatility (ATR > 3%)
+
+3. Market Condition Adjustments:
+   - Reduce enhanced entries when 50-day SMA is below 200-day SMA
+   - Suspend enhanced allocations during market downturns (QQQ down >15% from highs)
+
+MONITORING AND ADJUSTMENT:
+- Weekly review of SMA alignment and RSI levels
+- Monthly assessment of volatility conditions using ATR
+- Quarterly rebalancing of profit-taking thresholds based on market performance
+
+This strategy maintains the disciplined approach of traditional DCA while incorporating adaptive elements to potentially enhance returns during favorable market conditions and protect capital during downturns.

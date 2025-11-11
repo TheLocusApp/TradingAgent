@@ -1,0 +1,58 @@
+{
+  "session_id": "20251102_085647",
+  "config": {
+    "models": [
+      "deepseek"
+    ],
+    "model_temperature": 0.7,
+    "model_max_tokens": 1024,
+    "system_prompt": "",
+    "asset_type": "crypto",
+    "ticker": "BTC",
+    "timeframe": "3m",
+    "cycle_interval": 180,
+    "use_simulation": true,
+    "initial_balance": 10000,
+    "position_size_percentage": 0.1,
+    "max_positions": 3,
+    "risk_per_trade": 0.02,
+    "monitored_assets": [
+      "BTC",
+      "ETH",
+      "SOL",
+      "DOGE"
+    ],
+    "agent_name": "Crypto Agent",
+    "agent_strategy": "You are an expert trader with deep knowledge of technical analysis, risk management, and market dynamics. Analyze real-time market data and make trading decisions based on technical indicators (EMA, MACD, RSI, ATR), price action, volume analysis, and risk management principles. Consider both intraday patterns and longer-term context. Maximize risk-adjusted returns while managing position sizing and drawdown.",
+    "save_decisions": true,
+    "decisions_dir": "src/data/trading_decisions",
+    "use_live_data": false
+  },
+  "session_start": "2025-11-02T08:56:47.685872",
+  "decisions_count": 1,
+  "decisions": [
+    {
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "DEEPSEEK",
+      "model_count": 1,
+      "models_used": [
+        "deepseek"
+      ],
+      "prompt": "It has been 0 minutes since you started trading. The current time is 2025-11-02 08:56:57.577840 and you've been invoked 1 times. Below, we are providing you with a variety of state data, price data, and predictive signals so you can discover alpha. Below that is your current account information, value, performance, positions, etc.\n\nALL OF THE PRICE OR SIGNAL DATA BELOW IS ORDERED: OLDEST \u2192 NEWEST\n\nTimeframes note: Unless stated otherwise in a section title, intraday series are provided at 3\u2011minute intervals.\n\nCURRENT MARKET STATE FOR ALL COINS\n\nALL BTC DATA\ncurrent_price = 110771.77, current_ema20 = 110699.44, current_macd = 72.853, current_rsi (7 period) = 46.96\nIntraday series (3\u2011minute intervals, oldest \u2192 latest):\nMid prices: [110778.391, 110758.797, 110787.328, 110714.992, 110771.219, 110714.391, 110719.805, 110760.023, 110753.406, 110771.766]\nEMA indicators (20\u2011period): [110624.861, 110637.617, 110651.875, 110657.886, 110668.680, 110673.033, 110677.488, 110685.348, 110691.830, 110699.443]\nMACD indicators: [115.692, 111.927, 109.979, 101.428, 98.059, 89.768, 82.681, 79.395, 75.388, 72.853]\nRSI indicators (7\u2011Period): [71.105, 67.616, 61.672, 54.988, 26.032, 27.997, 24.307, 46.710, 48.987, 46.960]\nRSI indicators (14\u2011Period): [57.282, 58.147, 65.342, 61.028, 63.154, 63.692, 63.116, 64.524, 62.662, 57.376]\nLonger\u2011term context (4\u2011hour timeframe):\n20\u2011Period EMA: 110376.289 vs. 50\u2011Period EMA: 110880.030\n3\u2011Period ATR: 500.419 vs. 14\u2011Period ATR: 762.946\nCurrent Volume: 3282978816.000 vs. Average Volume: 3646312783.548\nMACD indicators: [-823.125, -739.630, -678.305, -618.397, -554.465, -482.635, -444.004, -416.590, -319.222, -248.412]\nRSI indicators (14\u2011Period): [41.941, 47.744, 49.663, 47.389, 44.462, 53.202, 65.821, 78.501, 74.592, 67.399]\n\nHERE IS YOUR ACCOUNT INFORMATION & PERFORMANCE\nCurrent Total Return (percent): 0.00%\nAvailable Cash: 9000.00\nCurrent Account Value: 10000.00\nCurrent live positions & performance: - SPY: $1,000.00 @ $682.66 | Current: $682.66 | PnL: +$0.00 (+0.00%)\n",
+      "response": "SIGNAL: HOLD\nCONFIDENCE: 65%\nREASONING: Current price (110,771.77) is slightly above EMA20 (110,699.44), indicating mild bullish momentum. However, MACD is declining (72.853 down from 115.692) and RSI at 46.96 is neutral, suggesting weakening momentum. The 4-hour timeframe shows price between EMA20 (110,376) and EMA50 (110,880), indicating consolidation. Volume is below average, suggesting lack of conviction. With no clear directional bias and mixed signals across timeframes, waiting for clearer momentum or a better risk-reward setup is prudent. The SPY position is flat, so no immediate need to reallocate.",
+      "system_prompt": "You are an expert crypto trading AI.\n\nYour role is to analyze real-time market data for BTC/USD and make trading decisions on 3m candles.\n\nOBJECTIVE: Maximize risk-adjusted returns on 3m timeframe.\n\nTRADING RULES:\n- You can only BUY when you have NO open position\n- You can only SELL when you HAVE an open position\n- Use HOLD when conditions don't warrant action or when you're waiting for better entry/exit\n- Check \"Current live positions & performance\" section to see if you have open positions\n\nProvide your response in this format:\nSIGNAL: [BUY/SELL/HOLD]\nCONFIDENCE: [0-100]%\nREASONING: [your analysis]\n",
+      "timestamp": "2025-11-02T08:57:05.527590",
+      "individual_decisions": {
+        "deepseek": {
+          "signal": "HOLD",
+          "confidence": 65,
+          "reasoning": "Current price (110,771.77) is slightly above EMA20 (110,699.44), indicating mild bullish momentum. However, MACD is declining (72.853 down from 115.692) and RSI at 46.96 is neutral, suggesting weakening momentum. The 4-hour timeframe shows price between EMA20 (110,376) and EMA50 (110,880), indicating consolidation. Volume is below average, suggesting lack of conviction. With no clear directional bias and mixed signals across timeframes, waiting for clearer momentum or a better risk-reward setup is prudent. The SPY position is flat, so no immediate need to reallocate.",
+          "raw_response": "SIGNAL: HOLD\nCONFIDENCE: 65%\nREASONING: Current price (110,771.77) is slightly above EMA20 (110,699.44), indicating mild bullish momentum. However, MACD is declining (72.853 down from 115.692) and RSI at 46.96 is neutral, suggesting weakening momentum. The 4-hour timeframe shows price between EMA20 (110,376) and EMA50 (110,880), indicating consolidation. Volume is below average, suggesting lack of conviction. With no clear directional bias and mixed signals across timeframes, waiting for clearer momentum or a better risk-reward setup is prudent. The SPY position is flat, so no immediate need to reallocate.",
+          "prompt": "It has been 0 minutes since you started trading. The current time is 2025-11-02 08:56:57.577840 and you've been invoked 1 times. Below, we are providing you with a variety of state data, price data, and predictive signals so you can discover alpha. Below that is your current account information, value, performance, positions, etc.\n\nALL OF THE PRICE OR SIGNAL DATA BELOW IS ORDERED: OLDEST \u2192 NEWEST\n\nTimeframes note: Unless stated otherwise in a section title, intraday series are provided at 3\u2011minute intervals.\n\nCURRENT MARKET STATE FOR ALL COINS\n\nALL BTC DATA\ncurrent_price = 110771.77, current_ema20 = 110699.44, current_macd = 72.853, current_rsi (7 period) = 46.96\nIntraday series (3\u2011minute intervals, oldest \u2192 latest):\nMid prices: [110778.391, 110758.797, 110787.328, 110714.992, 110771.219, 110714.391, 110719.805, 110760.023, 110753.406, 110771.766]\nEMA indicators (20\u2011period): [110624.861, 110637.617, 110651.875, 110657.886, 110668.680, 110673.033, 110677.488, 110685.348, 110691.830, 110699.443]\nMACD indicators: [115.692, 111.927, 109.979, 101.428, 98.059, 89.768, 82.681, 79.395, 75.388, 72.853]\nRSI indicators (7\u2011Period): [71.105, 67.616, 61.672, 54.988, 26.032, 27.997, 24.307, 46.710, 48.987, 46.960]\nRSI indicators (14\u2011Period): [57.282, 58.147, 65.342, 61.028, 63.154, 63.692, 63.116, 64.524, 62.662, 57.376]\nLonger\u2011term context (4\u2011hour timeframe):\n20\u2011Period EMA: 110376.289 vs. 50\u2011Period EMA: 110880.030\n3\u2011Period ATR: 500.419 vs. 14\u2011Period ATR: 762.946\nCurrent Volume: 3282978816.000 vs. Average Volume: 3646312783.548\nMACD indicators: [-823.125, -739.630, -678.305, -618.397, -554.465, -482.635, -444.004, -416.590, -319.222, -248.412]\nRSI indicators (14\u2011Period): [41.941, 47.744, 49.663, 47.389, 44.462, 53.202, 65.821, 78.501, 74.592, 67.399]\n\nHERE IS YOUR ACCOUNT INFORMATION & PERFORMANCE\nCurrent Total Return (percent): 0.00%\nAvailable Cash: 9000.00\nCurrent Account Value: 10000.00\nCurrent live positions & performance: - SPY: $1,000.00 @ $682.66 | Current: $682.66 | PnL: +$0.00 (+0.00%)\n",
+          "system_prompt": "You are an expert crypto trading AI.\n\nYour role is to analyze real-time market data for BTC/USD and make trading decisions on 3m candles.\n\nOBJECTIVE: Maximize risk-adjusted returns on 3m timeframe.\n\nTRADING RULES:\n- You can only BUY when you have NO open position\n- You can only SELL when you HAVE an open position\n- Use HOLD when conditions don't warrant action or when you're waiting for better entry/exit\n- Check \"Current live positions & performance\" section to see if you have open positions\n\nProvide your response in this format:\nSIGNAL: [BUY/SELL/HOLD]\nCONFIDENCE: [0-100]%\nREASONING: [your analysis]\n"
+        }
+      }
+    }
+  ]
+}

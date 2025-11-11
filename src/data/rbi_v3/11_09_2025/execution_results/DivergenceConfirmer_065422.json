@@ -1,0 +1,8 @@
+{
+  "success": false,
+  "return_code": 1,
+  "stdout": "",
+  "stderr": "\nBacktest.run:   0%|          | 0/698 [00:00<?, ?bar/s]\n                                                      \nTraceback (most recent call last):\n  File \"C:\\Users\\ahmed\\CascadeProjects\\moon-dev-ai-agents\\src\\data\\rbi_v3\\11_09_2025\\backtests_package\\DivergenceConfirmer_PKG.py\", line 205, in <module>\n    stats = bt.run()\n            ^^^^^^^^\n  File \"C:\\Users\\ahmed\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\backtesting\\backtesting.py\", line 1339, in run\n    strategy.next()\n  File \"C:\\Users\\ahmed\\CascadeProjects\\moon-dev-ai-agents\\src\\data\\rbi_v3\\11_09_2025\\backtests_package\\DivergenceConfirmer_PKG.py\", line 51, in next\n    if len(self.positions) >= self.max_positions:\n           ^^^^^^^^^^^^^^\nAttributeError: 'DivergenceConfirmer' object has no attribute 'positions'. Did you mean: 'position'?\n",
+  "execution_time": 6.085561,
+  "timestamp": "2025-11-09T06:54:22.185522"
+}

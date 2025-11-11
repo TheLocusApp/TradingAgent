@@ -1,0 +1,48 @@
+STRATEGY_NAME: AdaptiveReversion
+
+STRATEGY_DETAILS:
+This is a sophisticated mean reversion strategy designed specifically for SPY on the 1-hour timeframe, combining multiple technical indicators to identify overbought/oversold conditions and potential reversal points.
+
+KEY STRATEGY COMPONENTS:
+- Primary mean reversion using Bollinger Bands (20,2)
+- Momentum confirmation with RSI (14)
+- Volume validation for entry signals
+- Dynamic stop-loss and profit-taking based on volatility
+
+REQUIRED INDICATORS:
+1. Bollinger Bands (20 periods, 2 standard deviations)
+2. RSI (14 periods)
+3. Volume (standard)
+4. ATR (14 periods) for risk management
+
+ENTRY RULES (LONG):
+1. Price touches or crosses below the lower Bollinger Band
+2. RSI reading below 30 (oversold condition)
+3. Volume must be above 20-period average (confirms selling pressure)
+4. Wait for price to close back inside the Bollinger Band
+5. Enter long on the next candle's open
+
+ENTRY RULES (SHORT):
+1. Price touches or crosses above the upper Bollinger Band
+2. RSI reading above 70 (overbought condition)
+3. Volume must be above 20-period average (confirms buying pressure)
+4. Wait for price to close back inside the Bollinger Band
+5. Enter short on the next candle's open
+
+EXIT RULES:
+- Take profit when price reaches the middle Bollinger Band (20-period SMA)
+- Alternative profit target: 1.5x ATR from entry price
+- Exit if RSI reaches opposite extreme (above 70 for long trades, below 30 for short trades)
+
+RISK MANAGEMENT:
+- Stop loss placed at 2x ATR below entry for long positions
+- Stop loss placed at 2x ATR above entry for short positions
+- Maximum risk per trade: 1% of account equity
+- No new trades if 3 consecutive losing trades occur (wait for reset)
+
+FILTERING CONDITIONS:
+- Avoid trading during first/last hour of market session
+- Higher probability during trending markets (confirmed by 50-period SMA slope)
+- Reduce position size during low volatility periods (ATR below 20-period average)
+
+This adaptive approach combines traditional mean reversion principles with dynamic risk management, making it particularly effective for SPY's characteristic mean-reverting behavior on hourly timeframes.

@@ -1,0 +1,82 @@
+[
+  {
+    "id": "20251110_081715",
+    "idea": "8 and 13 EMA crossover on QQQ 5 minute chart",
+    "timestamp": "2025-11-10T08:17:15.326401",
+    "status": "completed",
+    "strategy_name": "DualMomentum",
+    "rbi_version": "v1"
+  },
+  {
+    "id": "20251110_081158",
+    "idea": "A trend-following strategy that enters long when bullish divergence occurs with prices breaking above the upper Keltner Channel in conjunction with expanded Bollinger Bands volatility, and exits upon a price correction below the channel.",
+    "timestamp": "2025-11-10T08:11:58.978247",
+    "status": "completed",
+    "strategy_name": "VolatilityDivergence",
+    "rbi_version": "v1"
+  },
+  {
+    "id": "20251110_064358",
+    "idea": "bollinger band squeeze breakout strategy SPY 1h",
+    "timestamp": "2025-11-10T06:43:58.236744",
+    "status": "completed",
+    "strategy_name": "VolatilityBreakout",
+    "rbi_version": "v3"
+  },
+  {
+    "id": "20251107_141834",
+    "idea": "2m EMA riding on QQQ for trading 0dte",
+    "timestamp": "2025-11-07T14:18:34.831055",
+    "status": "completed",
+    "strategy_name": "MicroMomentum",
+    "rbi_version": "v1"
+  },
+  {
+    "id": "20251107_141655",
+    "idea": "ATR day trading 0dte on QQQ",
+    "timestamp": "2025-11-07T14:16:55.253015",
+    "status": "completed",
+    "strategy_name": "VolatilityBreakout",
+    "rbi_version": "v1"
+  },
+  {
+    "id": "20251107_141446",
+    "idea": "8 and 13 EMA crossover on QQQ 5 minute chart",
+    "timestamp": "2025-11-07T14:14:46.665646",
+    "status": "completed",
+    "strategy_name": "QuantumCrossover",
+    "rbi_version": "v1"
+  },
+  {
+    "id": "20251107_133535",
+    "idea": "8 and 13 EMA crossover on QQQ 5 minute chart",
+    "timestamp": "2025-11-07T13:35:35.930447",
+    "status": "completed",
+    "strategy_name": "DualCrossover",
+    "rbi_version": "v1"
+  },
+  {
+    "id": "20251107_133345",
+    "idea": "13 and 48 Moving average crossover on QQQ 5 minute chart",
+    "timestamp": "2025-11-07T13:33:45.624409",
+    "status": "completed",
+    "strategy_name": "DualCrossover",
+    "rbi_version": "v1"
+  },
+  {
+    "id": "20251107_131802",
+    "idea": "support/resistance bounce with volume confirmation on SPY 5 minutes",
+    "timestamp": "2025-11-07T13:18:02.458690",
+    "status": "completed",
+    "strategy_name": "VolumeBounce",
+    "rbi_version": "v1"
+  },
+  {
+    "id": "20251107_090105",
+    "idea": "support/resistance bounce with volume confirmation on SPY 5 minutes",
+    "timestamp": "2025-11-07T09:01:05.938484",
+    "status": "completed",
+    "strategy_name": "VolumeBounce",
+    "rbi_version": "v1"
+  }
+]

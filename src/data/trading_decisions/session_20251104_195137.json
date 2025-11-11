@@ -1,0 +1,40 @@
+{
+  "session_id": "20251104_195137",
+  "config": {
+    "models": [
+      "deepseek"
+    ],
+    "model_temperature": 0.7,
+    "model_max_tokens": 1024,
+    "system_prompt": "",
+    "asset_type": "options",
+    "ticker": "BTC",
+    "timeframe": "3m",
+    "cycle_interval": 180,
+    "use_simulation": true,
+    "initial_balance": 100000,
+    "position_size_percentage": 0.1,
+    "max_positions": 3,
+    "risk_per_trade": 0.02,
+    "monitored_assets": [
+      "QQQ"
+    ],
+    "agent_name": "QQQ Options Agent",
+    "agent_strategy": "You are an expert scalper/day trading AI with deep knowledge of technical analysis, risk management, and market dynamics.\n\nYour role is to analyze real-time market data and make trading decisions.\n\nOBJECTIVE: Maximize risk-adjusted returns while managing position sizing and drawdown.\n\nTRADING RULES:\n- You can BUY to open new positions or add to existing positions (scale in)\n- You can SELL to close positions or reduce position size (scale out)\n- Use HOLD when conditions don't warrant action or when waiting for better entry/exit\n- Consider position sizing - you don't need to use all capital at once\n- Check \"Current live positions & performance\" section to see existing positions and available capital\n- Manage risk by scaling in/out based on conviction and market conditions\n\nProvide your response in this format:\nSIGNAL: [BUY/SELL/HOLD]\nCONFIDENCE: [0-100]%\nREASONING: [your analysis]",
+    "save_decisions": true,
+    "decisions_dir": "src/data/trading_decisions",
+    "use_live_data": false
+  },
+  "session_start": "2025-11-04T19:51:37.324823",
+  "decisions_count": 1,
+  "decisions": [
+    {
+      "signal": "HOLD",
+      "confidence": 0,
+      "reasoning": "No models available",
+      "models_used": [],
+      "timestamp": "2025-11-04T19:51:55.014707",
+      "individual_decisions": {}
+    }
+  ]
+}

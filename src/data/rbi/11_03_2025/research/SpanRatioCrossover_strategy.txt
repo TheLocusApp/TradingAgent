@@ -1,0 +1,66 @@
+STRATEGY_NAME: SpanRatio Crossover
+
+STRATEGY_DETAILS:
+Key strategy components
+- Market and timeframe: SPY on 1-hour candles (RTH preferred: 09:30–16:00 ET)
+- Core logic: Trend-following using a mid-term vs long-term span ratio via EMA(48) crossing EMA(200)
+- Confirmation filters (optional but recommended):
+  - 200 EMA slope filter to reduce whipsaws
+  - Minimum cross margin to avoid micro-crosses
+  - Trend strength filter (ADX) or volatility guard (ATR%)
+
+Entry rules
+- Long entry
+  - Signal: On bar close, EMA(48) crosses above EMA(200)
+  - Confirmations:
+    - Price closes above both EMAs
+    - 200 EMA slope > 0: EMA200 - EMA200[5 bars ago] > 0
+    - Cross margin: (EMA48 - EMA200) / Close >= 0.001 (0.10%) to avoid tiny flips
+    - Optional trend strength: ADX(14) >= 18
+  - Execution: Enter next bar at market, or place a stop order at the high of the signal bar to filter immediate reversals
+- Short entry (optional, given SPY’s long bias)
+  - Signal: On bar close, EMA(48) crosses below EMA(200)
+  - Confirmations mirror long entry inversely
+  - Execution same as long
+
+Exit rules
+- Protective stop (initial)
+  - Long: Stop = Entry - 1.5 × ATR(14)
+  - Short: Stop = Entry + 1.5 × ATR(14)
+- Regime/logic exit
+  - Long: Exit if EMA(48) crosses below EMA(200) on close, or if price closes below EMA(200) for 2 consecutive bars
+  - Short: Opposite conditions
+- Trailing exit (after reaching 1R)
+  - Long: Trail at max(EMA(48) - 1×ATR(14), breakeven after first scale-out)
+  - Short: Trail at min(EMA(48) + 1×ATR(14), breakeven accordingly)
+- Profit-taking
+  - Scale out 50% at +2R; move stop to breakeven on remainder; let trailing stop manage the rest
+- Time/quality exit (optional)
+  - If ADX(14) < 15 for 10 consecutive bars, flatten the position at next bar open to avoid dead trends
+
+Risk management
+- Position sizing
+  - Risk per trade: 0.5%–1.0% of account equity
+  - Shares = floor((Account_Equity × Risk%) / |Entry − Stop|)
+- Portfolio constraints
+  - Max concurrent positions: 1 (SPY only)
+  - Max daily new risk: 1.5% of equity; pause new entries after 3 consecutive losses in 10 days
+- Volatility and session guards
+  - Trade only when ATR%(14) = ATR(14)/Close is between 0.5% and 3.0%
+  - No new entries in the last 2 trading hours on Fridays; manage exits as usual
+  - Use RTH data to avoid thin pre/post-market noise; if using extended hours, widen stops by 0.25×ATR
+- Slippage/commission assumptions for testing
+  - Commission: realistic broker rate
+  - Slippage: at least $0.01 per share, apply gap logic for stop fills
+
+Required indicators and calculations
+- EMA(48) and EMA(200) on 1-hour bars
+- ATR(14) in price units
+- 200 EMA slope: EMA200 − EMA200[5] > 0 for long bias
+- ADX(14) optional for trend-strength filtering
+- Cross margin: abs(EMA48 − EMA200)/Close to validate significance
+
+Implementation notes
+- Use bar-close signals only; enter on next bar to prevent repainting
+- Enforce a 3-bar cooldown after an exit before taking a new trade in the opposite direction to avoid immediate whip-saws
+- Handle gaps: if stop is skipped due to an opening gap, exit at market open; record actual slippage in backtests for realism

@@ -1,0 +1,49 @@
+STRATEGY_NAME: DynamicCrossover
+
+STRATEGY_DETAILS:
+This strategy implements a systematic approach using Simple Moving Average crossovers on SPY daily charts with specific entry, exit, and risk management rules.
+
+KEY STRATEGY COMPONENTS:
+- Primary Instrument: SPY (SPDR S&P 500 ETF Trust)
+- Timeframe: Daily charts
+- Core Indicator: 20-period Simple Moving Average (SMA)
+- Crossover-based entry/exit signals
+- Trend-following methodology
+
+REQUIRED INDICATORS:
+- 20-period Simple Moving Average (SMA)
+- Price action (Open, High, Low, Close)
+
+ENTRY RULES:
+LONG ENTRY:
+- When price closes ABOVE the 20-period SMA
+- Previous close must have been below the 20-period SMA
+- Enter long position on next trading day's open
+
+SHORT ENTRY:
+- When price closes BELOW the 20-period SMA
+- Previous close must have been above the 20-period SMA
+- Enter short position on next trading day's open
+
+EXIT RULES:
+LONG EXIT:
+- When price closes below the 20-period SMA
+- Exit long position on next trading day's open
+
+SHORT EXIT:
+- When price closes above the 20-period SMA
+- Exit short position on next trading day's open
+
+RISK MANAGEMENT:
+- Position sizing: Allocate no more than 2-5% of total capital per trade
+- Stop loss: Set at 2% below entry price for long positions, 2% above entry price for short positions
+- Maximum drawdown limit: Cease trading if account experiences 10% drawdown from peak
+- Trade only during regular market hours (9:30 AM - 4:00 PM EST)
+- Avoid trading during major economic announcements or high volatility periods
+
+ADDITIONAL CONSIDERATIONS:
+- Monitor for false signals during sideways/choppy markets
+- Consider using volume confirmation to validate crossover signals
+- Backtest strategy performance across different market conditions
+- Maintain trading journal to track performance and refine approach
+- Be aware of whipsaws during periods of low volatility

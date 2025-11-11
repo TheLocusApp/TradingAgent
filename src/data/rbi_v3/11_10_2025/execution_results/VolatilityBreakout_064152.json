@@ -1,0 +1,8 @@
+{
+  "success": false,
+  "return_code": 1,
+  "stdout": "\ud83c\udf19 MOON DEV: Loaded 0 bars of SPY data\n",
+  "stderr": "$SPY: possibly delisted; no price data found  (period=2y)\nTraceback (most recent call last):\n  File \"C:\\Users\\ahmed\\CascadeProjects\\moon-dev-ai-agents\\src\\data\\rbi_v3\\11_10_2025\\backtests_final\\VolatilityBreakout_BTFinal_v5.py\", line 186, in <module>\n    print(f\"\ud83c\udf19 MOON DEV: Data range: {data.index[0]} to {data.index[-1]}\")\n                                      ~~~~~~~~~~^^^\n  File \"C:\\Users\\ahmed\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\pandas\\core\\indexes\\base.py\", line 5365, in __getitem__\n    return getitem(key)\n           ^^^^^^^^^^^^\n  File \"C:\\Users\\ahmed\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\pandas\\core\\arrays\\datetimelike.py\", line 376, in __getitem__\n    result = cast(\"Union[Self, DTScalarOrNaT]\", super().__getitem__(key))\n                                                ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\ahmed\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\pandas\\core\\arrays\\_mixins.py\", line 276, in __getitem__\n    result = self._ndarray[key]\n             ~~~~~~~~~~~~~^^^^^\nIndexError: index 0 is out of bounds for axis 0 with size 0\n",
+  "execution_time": 18.687244,
+  "timestamp": "2025-11-10T06:41:52.738106"
+}

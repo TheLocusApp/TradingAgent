@@ -1,0 +1,8 @@
+{
+  "ticker": "QQQ",
+  "timeframe": "1h",
+  "optimization_type": "shorts_only",
+  "timestamp": "2025-11-07T20:32:32.900661",
+  "total_combinations_tested": 0,
+  "best_results": []
+}

@@ -1,0 +1,49 @@
+STRATEGY_NAME: VolumeBounce
+
+STRATEGY_DETAILS:
+This strategy combines support/resistance level analysis with volume confirmation to identify high-probability bounce trades on SPY 5-minute charts.
+
+KEY STRATEGY COMPONENTS:
+1. Support/Resistance Identification: Identify clear horizontal support and resistance levels using recent price action highs and lows
+2. Volume Confirmation: Use volume analysis to validate the strength of bounces at key levels
+3. Price Action Patterns: Look for specific candlestick patterns indicating rejection at support/resistance
+4. SPY-Specific Context: Consider market hours, news events, and overall market sentiment affecting SPY
+
+REQUIRED INDICATORS:
+- Volume indicator (standard volume bars)
+- Horizontal support/resistance lines
+- Optional: 20-period EMA for additional context
+
+ENTRY RULES:
+LONG ENTRY (Support Bounce):
+1. Price approaches a clearly defined support level
+2. Volume increases significantly as price tests support
+3. Bullish reversal candlestick pattern forms (hammer, bullish engulfing, doji with confirmation)
+4. Entry on break above the high of the reversal candle
+5. Stop loss placed below the support level
+
+SHORT ENTRY (Resistance Rejection):
+1. Price approaches a clearly defined resistance level
+2. Volume increases as price tests resistance
+3. Bearish reversal candlestick pattern forms (shooting star, bearish engulfing, evening star)
+4. Entry on break below the low of the reversal candle
+5. Stop loss placed above the resistance level
+
+EXIT RULES:
+- Take profit at next significant support/resistance level
+- Alternative: Use 2:1 risk-reward ratio minimum
+- Exit if volume decreases significantly during the move
+- Exit if price fails to maintain momentum beyond entry candle
+
+RISK MANAGEMENT:
+- Position size: Maximum 2% of account per trade
+- Stop loss: 0.10-0.20 points below support (long) or above resistance (short)
+- Only trade during high-volume periods (first 2 hours and last hour of trading day)
+- Avoid trading during major news events or low-volume periods
+- Maximum 3 concurrent positions
+
+ADDITIONAL FILTERS:
+- Wait for at least 2 touches of the support/resistance level for validation
+- Prefer trades where volume is 1.5x above average during the bounce/rejection
+- Avoid trading in choppy, range-bound markets without clear levels
+- Consider overall market trend for higher probability setups

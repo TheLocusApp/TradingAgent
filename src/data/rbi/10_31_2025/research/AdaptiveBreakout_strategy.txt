@@ -1,0 +1,50 @@
+STRATEGY_NAME: AdaptiveBreakout
+
+STRATEGY_DETAILS:
+This strategy combines moving average crossover signals with breakout confirmation on the QQQ ETF using 4-hour timeframes. The core approach adapts to market conditions by requiring price confirmation beyond the moving average crossover signals.
+
+KEY COMPONENTS:
+- Primary Instruments: QQQ ETF
+- Timeframe: 4-hour charts exclusively
+- Moving Averages: 20-period SMA (fast) and 200-period SMA (slow)
+- Confirmation: Price breakout above/below recent swing highs/lows
+
+REQUIRED INDICATORS:
+1. Simple Moving Average (20-period)
+2. Simple Moving Average (200-period)
+3. Price action analysis for swing high/low identification
+
+ENTRY RULES:
+LONG ENTRY (All conditions must be met):
+1. 20 SMA crosses above 200 SMA (bullish crossover)
+2. Price breaks above the most recent swing high
+3. Enter on the first 4-hour candle that closes above the swing high level
+
+SHORT ENTRY (All conditions must be met):
+1. 20 SMA crosses below 200 SMA (bearish crossover)
+2. Price breaks below the most recent swing low
+3. Enter on the first 4-hour candle that closes below the swing low level
+
+EXIT RULES:
+LONG POSITION EXIT:
+- When 20 SMA crosses below 200 SMA (crossover exit)
+- OR price closes below the 200 SMA (trend failure exit)
+
+SHORT POSITION EXIT:
+- When 20 SMA crosses above 200 SMA (crossover exit)
+- OR price closes above the 200 SMA (trend failure exit)
+
+RISK MANAGEMENT:
+- Position sizing: Maximum 2% of account capital per trade
+- Stop loss: Place 2% below entry price for long positions, 2% above for short positions
+- Trailing stops: Consider moving stop to breakeven when trade reaches 1:1 risk-reward ratio
+- Maximum concurrent positions: 3 trades maximum to avoid overexposure
+
+ADDITIONAL CONSIDERATIONS:
+- Wait for candle close confirmation on all signals
+- Avoid trading during major economic announcements
+- Monitor overall market conditions (SPY correlation)
+- The 200 SMA serves as primary trend filter
+- Strategy works best in trending market conditions, may underperform in range-bound markets
+
+This adaptive approach ensures entries only occur when both the moving average alignment and price momentum confirm the directional bias, reducing false signals common with basic crossover strategies.

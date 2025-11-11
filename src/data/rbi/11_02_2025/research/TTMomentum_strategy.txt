@@ -1,0 +1,59 @@
+STRATEGY_NAME: TTMomentum
+
+STRATEGY_DETAILS:
+This strategy focuses on using TTM Squeeze momentum indicators specifically for TSLA on hourly timeframes to capture momentum breakouts from consolidation periods.
+
+KEY STRATEGY COMPONENTS:
+- Primary Instrument: TSLA (Tesla) stock
+- Timeframe: Hourly charts exclusively
+- Core Indicator: TTM Squeeze system
+- Focus: Momentum breakouts from squeeze conditions
+- Market Condition: Works best during trending markets with periodic consolidation
+
+REQUIRED INDICATORS:
+1. TTM Squeeze Indicator (primary)
+   - Shows squeeze conditions (dots between Bollinger Bands and Keltner Channels)
+   - Momentum histogram bars (red/green)
+2. Volume confirmation
+3. Price action confirmation
+
+ENTRY RULES:
+LONG ENTRY:
+1. Wait for TTM Squeeze to show compression (multiple dots between bands)
+2. Look for first green momentum histogram bar after compression
+3. Confirm with bullish price action (break above recent high)
+4. Enter on next candle after confirmation
+5. Volume should be increasing on breakout
+
+SHORT ENTRY:
+1. Wait for TTM Squeeze compression period
+2. Look for first red momentum histogram bar after compression
+3. Confirm with bearish price action (break below recent low)
+4. Enter on next candle after confirmation
+5. Volume should confirm the move
+
+EXIT RULES:
+LONG EXIT:
+- When momentum histogram turns red
+- When price closes below recent swing low
+- When TTM Squeeze shows new compression forming
+- Target: 2:1 risk-reward ratio minimum
+
+SHORT EXIT:
+- When momentum histogram turns green
+- When price closes above recent swing high
+- When TTM Squeeze shows new compression forming
+- Target: 2:1 risk-reward ratio minimum
+
+RISK MANAGEMENT:
+- Position size: Maximum 2% of account per trade
+- Stop loss: Place below recent swing low (long) or above recent swing high (short)
+- Risk-reward: Minimum 1:2 ratio required
+- Maximum daily trades: 3 to avoid overtrading
+- Avoid trading during major TSLA news events or earnings
+
+SPECIAL CONSIDERATIONS FOR TSLA:
+- TSLA exhibits high volatility - adjust position sizing accordingly
+- Monitor overall market sentiment as TSLA is momentum-sensitive
+- Be aware of Elon Musk-related news that can cause sudden price movements
+- Consider higher timeframes (4H/Daily) for overall trend context

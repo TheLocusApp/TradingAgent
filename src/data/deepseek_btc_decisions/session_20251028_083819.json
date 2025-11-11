@@ -1,0 +1,43 @@
+{
+  "session_id": "20251028_083819",
+  "session_start": "2025-10-28T08:38:19.720988",
+  "decisions_count": 4,
+  "decisions": [
+    {
+      "timestamp": "2025-10-28T08:38:26.508079",
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Price is trading slightly above EMA(20) with RSI(7) at neutral 53.61, indicating balanced momentum. MACD remains negative but is improving from recent lows, suggesting potential stabilization. No clear directional bias on the 3-minute timeframe warrants waiting for stronger confirmation.",
+      "risk_level": "LOW",
+      "next_levels": "Wait for break above $113,850 for bullish entry or below $113,700 for bearish momentum",
+      "raw_response": "SIGNAL: HOLD\nCONFIDENCE: 65%\nREASONING: Price is trading slightly above EMA(20) with RSI(7) at neutral 53.61, indicating balanced momentum. MACD remains negative but is improving from recent lows, suggesting potential stabilization. No clear directional bias on the 3-minute timeframe warrants waiting for stronger confirmation.\nRISK_LEVEL: LOW\nNEXT_LEVELS: Wait for break above $113,850 for bullish entry or below $113,700 for bearish momentum"
+    },
+    {
+      "timestamp": "2025-10-28T08:41:32.524153",
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Price is trading slightly above EMA(20) with RSI(7) at neutral 53.61, indicating balanced momentum. MACD remains negative but is improving from deeper lows, suggesting potential stabilization rather than strong directional bias.",
+      "risk_level": "MEDIUM",
+      "next_levels": "Wait for clear break above $114,000 for entry or below $113,500 for short opportunity",
+      "raw_response": "SIGNAL: HOLD\nCONFIDENCE: 65%\nREASONING: Price is trading slightly above EMA(20) with RSI(7) at neutral 53.61, indicating balanced momentum. MACD remains negative but is improving from deeper lows, suggesting potential stabilization rather than strong directional bias.\nRISK_LEVEL: MEDIUM\nNEXT_LEVELS: Wait for clear break above $114,000 for entry or below $113,500 for short opportunity"
+    },
+    {
+      "timestamp": "2025-10-28T08:44:37.649512",
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Price is trading slightly above EMA(20) with RSI(7) at neutral 53.61, showing no strong directional bias. MACD remains negative but is improving, suggesting weakening bearish momentum without clear bullish confirmation.",
+      "risk_level": "LOW",
+      "next_levels": "Wait for clearer breakout above $113,850 or breakdown below $113,700",
+      "raw_response": "SIGNAL: HOLD\nCONFIDENCE: 65%\nREASONING: Price is trading slightly above EMA(20) with RSI(7) at neutral 53.61, showing no strong directional bias. MACD remains negative but is improving, suggesting weakening bearish momentum without clear bullish confirmation.\nRISK_LEVEL: LOW\nNEXT_LEVELS: Wait for clearer breakout above $113,850 or breakdown below $113,700"
+    },
+    {
+      "timestamp": "2025-10-28T08:47:51.296394",
+      "signal": "HOLD",
+      "confidence": 65,
+      "reasoning": "Price is trading slightly above EMA(20) with RSI(7) at neutral 53.61, showing no strong directional bias. MACD remains negative but is improving from deeper lows, suggesting potential momentum shift but not yet confirmed. The 4-hour trend remains bullish with price above key EMAs, supporting a wait-and-see approach.",
+      "risk_level": "LOW",
+      "next_levels": "Wait for clear break above $114,000 for long entry or below $113,500 for short consideration",
+      "raw_response": "SIGNAL: HOLD\nCONFIDENCE: 65%\nREASONING: Price is trading slightly above EMA(20) with RSI(7) at neutral 53.61, showing no strong directional bias. MACD remains negative but is improving from deeper lows, suggesting potential momentum shift but not yet confirmed. The 4-hour trend remains bullish with price above key EMAs, supporting a wait-and-see approach.\nRISK_LEVEL: LOW\nNEXT_LEVELS: Wait for clear break above $114,000 for long entry or below $113,500 for short consideration"
+    }
+  ]
+}
