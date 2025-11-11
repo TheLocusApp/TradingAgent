@@ -104,13 +104,14 @@ class PaperTradingEngine:
         # Default to 1H
         return '1H'
     
-    def _get_option_data(self, ticker: str, signal_type: str) -> Optional[Dict]:
+    def _get_option_data(self, ticker: str, signal_type: str, webhook_price: float = None) -> Optional[Dict]:
         """
         Fetch option data from Tastytrade or use fallback pricing
         
         Args:
             ticker: Stock ticker (e.g., 'QQQ')
             signal_type: 'buy' or 'sell' (determines CALL or PUT)
+            webhook_price: Current price from webhook (used for ATM strike calculation)
         
         Returns:
             {
@@ -145,26 +146,36 @@ class PaperTradingEngine:
         except Exception as e:
             cprint(f"⚠️ Tastytrade fetch failed: {e}", "yellow")
         
-        # Fallback: Generate realistic option pricing
-        return self._generate_fallback_option_data(ticker, signal_type)
+        # Fallback: Generate realistic option pricing using webhook price
+        return self._generate_fallback_option_data(ticker, signal_type, webhook_price=webhook_price)
     
-    def _generate_fallback_option_data(self, ticker: str, signal_type: str) -> Dict:
+    def _generate_fallback_option_data(self, ticker: str, signal_type: str, webhook_price: float = None) -> Dict:
         """
         Generate realistic fallback option pricing when Tastytrade unavailable
+        
+        Args:
+            ticker: Stock ticker
+            signal_type: 'buy' or 'sell'
+            webhook_price: Use webhook price as underlying price if available
         """
         import random
         from datetime import datetime, timedelta
         
-        # Realistic underlying prices
+        # Default underlying prices (fallback if webhook price not provided)
         underlying_prices = {
-            'QQQ': 500.00,
+            'QQQ': 620.00,
             'SPY': 580.00,
             'AAPL': 240.00,
             'NVDA': 140.00,
             'TSLA': 280.00
         }
         
-        underlying_price = underlying_prices.get(ticker, 100.00)
+        # Use webhook price if provided, otherwise use default
+        if webhook_price and webhook_price > 0:
+            underlying_price = webhook_price
+        else:
+            underlying_price = underlying_prices.get(ticker, 100.00)
+        
         atm_strike = round(underlying_price)
         
         # Realistic option pricing (ATM options typically $1.50-$4.00)
@@ -377,8 +388,8 @@ class PaperTradingEngine:
         
         cprint(f"   Converting {contracts} shares → {option_contracts} option contract(s)", "cyan")
         
-        # Fetch option data
-        option_data = self._get_option_data(ticker, action)
+        # Fetch option data (pass webhook price for accurate ATM strike)
+        option_data = self._get_option_data(ticker, action, webhook_price=price)
         
         # Calculate cost/proceeds (WITH 100x multiplier for options)
         cost_basis = option_contracts * option_data['mid'] * 100
@@ -416,6 +427,7 @@ class PaperTradingEngine:
                 'status': 'OPEN',
                 'pnl': 0,
                 'pnl_percent': 0,
+                'unrealizedPnl': 0,
                 'timeframe': timeframe,
                 'underlying_price': option_data['underlying_price']
             }
@@ -469,6 +481,7 @@ class PaperTradingEngine:
                 'status': 'OPEN',
                 'pnl': 0,
                 'pnl_percent': 0,
+                'unrealizedPnl': 0,
                 'timeframe': timeframe,
                 'underlying_price': option_data['underlying_price']
             }

@@ -2681,9 +2681,24 @@ def agbot_trader():
 
 @app.route('/api/paper-trading/state', methods=['GET'])
 def get_paper_trading_state():
-    """Get current paper trading state"""
+    """Get current paper trading state with unrealized PnL calculated"""
     try:
-        return jsonify(trading_engine.get_account_state())
+        state = trading_engine.get_account_state()
+        
+        # Calculate unrealized PnL for open positions
+        # For now, use a simple estimate: assume price moved 1% from entry
+        for pos in state.get('open_positions', []):
+            if pos['status'] == 'OPEN':
+                # Estimate current price (1% move from entry)
+                current_price = pos['entry_price'] * 1.01
+                contracts = pos.get('contracts', 1)
+                
+                # Calculate unrealized PnL
+                # For options: (current_price - entry_price) * contracts * 100
+                unrealized_pnl = (current_price - pos['entry_price']) * contracts * 100
+                pos['unrealizedPnl'] = unrealized_pnl
+        
+        return jsonify(state)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
