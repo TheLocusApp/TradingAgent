@@ -2862,6 +2862,46 @@ def reset_paper_trading():
         cprint(f"❌ Reset Error: {e}", "red")
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/paper-trading/clear-trades', methods=['POST'])
+def clear_trades():
+    """Clear all trades from the account"""
+    try:
+        # Clear trades but keep account balance and open positions
+        trading_engine.account['trades'] = []
+        
+        cprint("🗑️  All trades cleared", "yellow")
+        
+        trading_engine.save_state(STATE_FILE)
+        
+        return jsonify({
+            'success': True,
+            'message': 'All trades cleared'
+        })
+    
+    except Exception as e:
+        cprint(f"❌ Clear Trades Error: {e}", "red")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/paper-trading/clear-notifications', methods=['POST'])
+def clear_notifications():
+    """Clear all webhook notifications"""
+    try:
+        # Clear webhooks but keep trades and account data
+        trading_engine.account['webhooks'] = []
+        
+        cprint("🗑️  All notifications cleared", "yellow")
+        
+        trading_engine.save_state(STATE_FILE)
+        
+        return jsonify({
+            'success': True,
+            'message': 'All notifications cleared'
+        })
+    
+    except Exception as e:
+        cprint(f"❌ Clear Notifications Error: {e}", "red")
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/api/paper-trading/option-chain', methods=['GET'])
 def get_option_chain():
     """Get option chain data from TastyTrade"""
