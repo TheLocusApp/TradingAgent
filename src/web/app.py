@@ -10,10 +10,12 @@ import sys
 import json
 from pathlib import Path
 from flask import Flask, render_template, request, jsonify, send_from_directory
+from flask_socketio import SocketIO, emit, join_room, leave_room
 from threading import Thread
 import time
 from datetime import datetime, timedelta
 from termcolor import cprint
+import asyncio
 
 # Add project root to path
 project_root = str(Path(__file__).parent.parent.parent)
@@ -27,6 +29,7 @@ from src.config.trading_config import (
 from src.agents.universal_trading_agent import UniversalTradingAgent
 from src.config.trading_config import TradingConfig
 from src.agents.agent_manager import agent_manager
+from src.realtime import initialize_realtime, start_realtime_streaming
 
 # Legacy support (for backward compatibility)
 current_agent = None
@@ -40,9 +43,16 @@ app.config['SECRET_KEY'] = 'moon-dev-trading-agent'
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
+# Initialize SocketIO for real-time updates
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
+
 # Initialize optimization results storage
 app.optimization_results = {}
 app.optimization_results_by_ticker = {}
+
+# Initialize realtime components
+quote_streamer = None
+mtm_engine = None
 
 def load_latest_optimization_results():
     """Load the latest optimization results from disk on startup"""
@@ -2711,6 +2721,21 @@ def receive_webhook():
         # Add timestamp
         data['timestamp'] = datetime.now().isoformat()
         
+        # Extract signal/comment if present (for TP1, TP2, etc tracking)
+        signal = data.get('comment') or data.get('signal') or data.get('action', 'unknown')
+        data['signal'] = signal
+        
+        # Auto-detect TP/SL/Exit signals in comment and convert action to 'close'
+        if signal:
+            exit_keywords = [
+                'TP1', 'TP2', 'TP3', 'SL', 'STOP LOSS', 'EXIT', 'CLOSE',
+                'LX', 'SX', 'EOD FLAT', 'END OF DAY FLAT', 'EOD'
+            ]
+            normalized_signal = signal.upper()
+            if any(keyword in normalized_signal for keyword in exit_keywords):
+                data['action'] = 'close'
+                cprint(f"   🎯 Detected {signal} - Converting to CLOSE action", "yellow")
+        
         # Check for duplicate webhooks (same action/ticker/contracts within 1 second)
         if trading_engine.account['webhooks']:
             last_webhook = trading_engine.account['webhooks'][0]
@@ -2738,6 +2763,15 @@ def receive_webhook():
         
         # Persist state
         trading_engine.save_state(STATE_FILE)
+        
+        # Subscribe to symbol for real-time quotes (if trade was opened)
+        if result['success'] and result.get('trade') and mtm_engine:
+            trade = result['trade']
+            if trade.get('status') == 'OPEN':
+                symbol = trade.get('option_symbol') if trade.get('asset_type') == 'OPTION' else trade.get('ticker')
+                if symbol and quote_streamer:
+                    quote_streamer.subscribe_to_symbols([symbol])
+                    cprint(f"   📡 Subscribed to {symbol} for real-time quotes", "cyan")
         
         # Return result
         if result['success']:
@@ -2865,6 +2899,62 @@ def get_option_chain():
         cprint(f"❌ Option Chain Error: {e}", "red")
         return jsonify({'error': str(e)}), 500
 
+# ==================== WEBSOCKET EVENTS ====================
+
+@socketio.on('connect')
+def handle_connect():
+    """Handle client connection"""
+    cprint(f"✅ Client connected: {request.sid}", "green")
+    emit('connection_response', {'data': 'Connected to trading server'})
+
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    """Handle client disconnection"""
+    cprint(f"❌ Client disconnected: {request.sid}", "yellow")
+
+
+@socketio.on('subscribe_pnl')
+def handle_subscribe_pnl():
+    """Subscribe to real-time PnL updates"""
+    join_room('pnl_updates')
+    cprint(f"📊 Client subscribed to PnL updates", "cyan")
+    emit('subscription_response', {'message': 'Subscribed to PnL updates'})
+
+
+def broadcast_pnl_updates():
+    """Broadcast PnL updates to all connected clients"""
+    global mtm_engine
+    
+    if not mtm_engine:
+        return
+    
+    try:
+        pnl_updates = mtm_engine.get_all_pnl_updates()
+        
+        if pnl_updates:
+            socketio.emit('pnl_update', {
+                'updates': pnl_updates,
+                'timestamp': datetime.now().isoformat()
+            }, room='pnl_updates')
+    
+    except Exception as e:
+        cprint(f"⚠️ Error broadcasting PnL: {e}", "yellow")
+
+
+def pnl_broadcast_thread():
+    """Background thread to broadcast PnL updates"""
+    while True:
+        try:
+            broadcast_pnl_updates()
+            time.sleep(1)  # Update every 1 second
+        except Exception as e:
+            cprint(f"⚠️ Broadcast thread error: {e}", "yellow")
+            time.sleep(1)
+
+
+# ==================== MAIN ====================
+
 if __name__ == '__main__':
     print("\n" + "="*70)
     print("🌙 Moon Dev's Trading Agent Web UI")
@@ -2872,5 +2962,32 @@ if __name__ == '__main__':
     print("\n🚀 Starting server...")
     print("📱 Open http://localhost:5000 in your browser\n")
     
-    # Use use_reloader=False to prevent watchdog from interrupting requests
-    app.run(debug=True, host='0.0.0.0', port=5000, use_reloader=False)
+    # Initialize realtime components
+    try:
+        # Use module-level globals (declared at line 54-55)
+        import sys
+        current_module = sys.modules[__name__]
+        current_module.quote_streamer, current_module.mtm_engine = initialize_realtime()
+        cprint("✅ Real-time quote streamer initialized", "green")
+        
+        # Start streaming in background
+        start_realtime_streaming()
+        cprint("✅ Quote streaming started", "green")
+        
+        # Load open positions and subscribe to their symbols
+        open_positions = trading_engine.account.get('open_positions', [])
+        if open_positions:
+            current_module.mtm_engine.set_open_positions(open_positions)
+            cprint(f"✅ Loaded {len(open_positions)} open positions for PnL tracking", "green")
+        
+        # Start PnL broadcast thread
+        broadcast_thread = Thread(target=pnl_broadcast_thread, daemon=True)
+        broadcast_thread.start()
+        cprint("✅ PnL broadcast thread started", "green")
+        
+    except Exception as e:
+        cprint(f"⚠️ Real-time initialization error: {e}", "yellow")
+        cprint("   App will run without live PnL updates", "yellow")
+    
+    # Run Flask-SocketIO
+    socketio.run(app, debug=True, host='0.0.0.0', port=5000, use_reloader=False, allow_unsafe_werkzeug=True)

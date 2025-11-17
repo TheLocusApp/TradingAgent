@@ -1,0 +1,39 @@
+✅ Free market data provider initialized (with caching)
+✅ Agent Manager initialized
+✅ Loaded optimization: TSLA (swing)
+✅ Loaded optimization: TSLA (daytrade)
+✅ Loaded optimization: SPY (swing)
+✅ Loaded optimization: SPY (daytrade)
+✅ Loaded optimization: SPX (swing)
+✅ Loaded optimization: QQQ (swing)
+✅ Loaded optimization: QQQ (shorts)
+✅ Loaded optimization: QQQ (longs)
+✅ Loaded optimization: QQQ (daytrade)
+✅ Loaded optimization: QQQ (bb)
+✅ Loaded optimization: NVDA (swing)
+✅ Loaded optimization: META (swing)
+✅ Loaded optimization: MARA (swing)
+✅ Loaded optimization: INTC (swing)
+✅ Loaded optimization: HIMS (swing)
+✅ Loaded optimization: BABA (swing)
+✅ Loaded optimization: ASTS (swing)
+✅ Loaded optimization: AMD (swing)
+✅ Loaded optimization: AAPL (swing)
+✅ Tastytrade Options Provider initialized
+✅ Tastytrade provider initialized
+✅ Loaded trading state from C:\Users\LENOVO\CascadeProjects\TradingAgent\src\web\..\..\data\agbot_trading_state.json
+✅ Loaded persisted trading state
+
+======================================================================
+🌙 Moon Dev's Trading Agent Web UI
+======================================================================
+
+🚀 Starting server...
+📱 Open http://localhost:5000 in your browser
+
+✅ Real-time quote streamer initialized
+✅ Quote streamer thread started
+✅ Quote streaming started
+✅ PnL broadcast thread started
+ * Serving Flask app 'app'
+ * Debug mode: on

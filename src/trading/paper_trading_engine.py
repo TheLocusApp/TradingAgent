@@ -7,8 +7,9 @@ Supports both stock and options trading with per-timeframe accounts
 
 import json
 import os
+import math
 from datetime import datetime
-from typing import Dict, Optional, List
+from typing import Dict, Optional, List, Tuple
 from termcolor import cprint
 
 
@@ -49,6 +50,182 @@ class PaperTradingEngine:
         except Exception as e:
             cprint(f"⚠️ Tastytrade not available: {e}", "yellow")
             cprint("   Using fallback option pricing", "yellow")
+    
+    def _parse_position_size(self, value) -> Optional[float]:
+        """Safely convert TradingView position size fields to float"""
+        if value is None:
+            return None
+        try:
+            if isinstance(value, (int, float)):
+                return float(value)
+            if isinstance(value, str):
+                stripped = value.strip().replace(',', '')
+                if stripped == '':
+                    return None
+                return float(stripped)
+        except (ValueError, TypeError):
+            return None
+        return None
+    
+    def _normalize_action(self, action: str, webhook_data: Dict) -> Tuple[str, Optional[str]]:
+        """
+        Normalize TradingView action based on comment + position fields.
+        Returns (normalized_action, reason_for_change)
+        """
+        normalized = (action or '').lower().strip()
+        if normalized in ['close', 'exit', 'tp1', 'tp2', 'tp3', 'sl']:
+            return 'close', 'explicit close action'
+        
+        # Comment-based exit detection (TradingView uses LX/SX for exits)
+        comment_sources = [
+            webhook_data.get('comment'),
+            webhook_data.get('signal'),
+            webhook_data.get('alert_message'),
+            webhook_data.get('note')
+        ]
+        comment_text = ' '.join(str(item) for item in comment_sources if item)
+        comment_upper = comment_text.upper()
+        exit_keywords = [
+            'TP1', 'TP2', 'TP3', 'SL', 'STOP LOSS', 'STOP', 'EXIT', 'CLOSE',
+            'LX', 'SX', 'EOD FLAT', 'END OF DAY FLAT'
+        ]
+        for keyword in exit_keywords:
+            if keyword in comment_upper:
+                return 'close', f'comment keyword "{keyword}"'
+        
+        market_position = (webhook_data.get('market_position') or '').lower().strip()
+        prev_market_position = (webhook_data.get('prev_market_position') or '').lower().strip()
+        market_position_size = self._parse_position_size(webhook_data.get('market_position_size'))
+        prev_market_position_size = self._parse_position_size(webhook_data.get('prev_market_position_size'))
+        
+        def is_flat(position: str, size: Optional[float]) -> bool:
+            if position == 'flat':
+                return True
+            if size is not None and abs(size) < 1e-9:
+                return True
+            return False
+        
+        became_flat = is_flat(market_position, market_position_size)
+        was_positioned = prev_market_position in ['long', 'short'] or (
+            prev_market_position_size is not None and abs(prev_market_position_size) > 0
+        )
+        if normalized in ['buy', 'sell'] and was_positioned and became_flat:
+            return 'close', 'position flattened'
+        
+        size_reduced = (
+            prev_market_position_size is not None and
+            market_position_size is not None and
+            market_position_size < prev_market_position_size
+        )
+        
+        if normalized == 'sell' and prev_market_position == 'long':
+            if market_position != 'short' and (became_flat or size_reduced):
+                return 'close', 'long position reduced'
+        
+        if normalized == 'buy' and prev_market_position == 'short':
+            if market_position != 'long' and (became_flat or size_reduced):
+                return 'close', 'short position reduced'
+        
+        return normalized, None
+    
+    def _get_desired_position_direction(self, webhook_data: Dict) -> Optional[str]:
+        """
+        Infer whether the close signal should target a LONG (CALL) or SHORT (PUT) position.
+        Returns 'long', 'short', or None if unknown.
+        """
+        comment_sources = [
+            webhook_data.get('comment'),
+            webhook_data.get('signal'),
+            webhook_data.get('alert_message'),
+            webhook_data.get('note')
+        ]
+        comment_text = ' '.join(str(item) for item in comment_sources if item)
+        comment_upper = comment_text.upper()
+        
+        if 'SHORT' in comment_upper or 'SX' in comment_upper:
+            return 'short'
+        if 'LONG' in comment_upper or 'LX' in comment_upper:
+            return 'long'
+        
+        prev_market_position = (webhook_data.get('prev_market_position') or '').lower().strip()
+        market_position = (webhook_data.get('market_position') or '').lower().strip()
+        
+        if prev_market_position in ['long', 'short']:
+            return prev_market_position
+        if market_position in ['long', 'short']:
+            return market_position
+        
+        prev_size = self._parse_position_size(webhook_data.get('prev_market_position_size'))
+        curr_size = self._parse_position_size(webhook_data.get('market_position_size'))
+        if prev_size and prev_size > 0:
+            size_diff = prev_size - (curr_size or 0)
+            # Positive diff indicates reduction of existing exposure
+            if size_diff > 0:
+                # If strategy previously long (size positive) assume long
+                return 'long'
+        
+        return None
+    
+    def _shares_to_option_contracts(self, shares) -> Optional[int]:
+        """Convert TradingView share counts to option contracts (1 contract = 100 shares)"""
+        size = self._parse_position_size(shares)
+        if size is None:
+            return None
+        if size <= 0:
+            return 0
+        contracts = math.ceil(size / 100.0)
+        return max(contracts, 1)
+    
+    def _determine_close_contracts(self, share_value, webhook_data: Dict, open_pos: Dict) -> int:
+        """Determine how many option contracts to close for partial exits"""
+        requested_contracts = self._shares_to_option_contracts(share_value)
+        
+        prev_size = self._parse_position_size(webhook_data.get('prev_market_position_size'))
+        curr_size = self._parse_position_size(webhook_data.get('market_position_size'))
+        size_based_contracts = None
+        if prev_size is not None:
+            diff = prev_size - (curr_size or 0)
+            if diff > 0:
+                size_based_contracts = self._shares_to_option_contracts(diff)
+        
+        close_contracts = size_based_contracts or requested_contracts
+        remaining = open_pos.get('remaining_contracts', 0) or open_pos.get('contracts', 0)
+        if remaining <= 0:
+            remaining = open_pos.get('initial_contracts') or 0
+        if not close_contracts or close_contracts <= 0:
+            close_contracts = remaining or 1
+        
+        close_contracts = min(close_contracts, remaining or close_contracts)
+        return max(close_contracts, 1)
+    
+    def _get_option_close_price(self, open_pos: Dict, fallback_price: float) -> float:
+        """
+        Determine an exit option price.
+        Priority: live Tastytrade quote → webhook price if it looks like an option quote → delta-adjusted estimate.
+        """
+        option_symbol = open_pos.get('option_symbol')
+        
+        # Try live quote
+        if option_symbol and self.tastytrade_provider:
+            quote = self.tastytrade_provider.get_option_quote(option_symbol)
+            if quote and quote.get('mid'):
+                return quote['mid']
+        
+        # If webhook price already looks like an option premium (< $50), use it
+        if fallback_price and fallback_price < 50:
+            return round(fallback_price, 2)
+        
+        entry_option_price = open_pos.get('entry_price', 1.0) or 1.0
+        entry_underlying = open_pos.get('underlying_price')
+        
+        if fallback_price and entry_underlying and entry_underlying > 0:
+            ratio = fallback_price / entry_underlying
+            if ratio > 0:
+                estimate = round(entry_option_price * ratio, 2)
+                if estimate > 0:
+                    return estimate
+        
+        return round(entry_option_price, 2)
     
     def _detect_asset_type(self, webhook_data: Dict) -> str:
         """
@@ -219,12 +396,26 @@ class PaperTradingEngine:
             # Extract data
             ticker = webhook_data.get('ticker', 'QQQ')
             action = webhook_data.get('action', '').lower()
-            contracts = int(webhook_data.get('contracts', 0))
-            price = float(webhook_data.get('price', 0))
+            contracts_value = self._parse_position_size(webhook_data.get('contracts'))
+            contracts = int(contracts_value) if contracts_value is not None else 0
+            try:
+                price = float(webhook_data.get('price', 0))
+            except (TypeError, ValueError):
+                price = 0.0
             timeframe = self._get_timeframe(webhook_data)
             asset_type = self._detect_asset_type(webhook_data)
             
+            # Extract comment/signal for TP tracking
+            comment = webhook_data.get('comment') or webhook_data.get('signal') or ''
+            
+            normalized_action, normalization_reason = self._normalize_action(action, webhook_data)
+            if normalization_reason:
+                cprint(f"   🔄 Normalized action {action.upper()} → {normalized_action.upper()} ({normalization_reason})", "yellow")
+            action = normalized_action
+            
             cprint(f"\n📡 Webhook: {action.upper()} {contracts} {ticker} @ ${price} ({timeframe})", "cyan")
+            if comment:
+                cprint(f"   Signal: {comment}", "yellow")
             cprint(f"   Asset Type: {asset_type.upper()}", "cyan")
             
             # Normalize close/exit/TP actions
@@ -245,11 +436,11 @@ class PaperTradingEngine:
             # Execute based on asset type
             if asset_type == 'stock':
                 return self._execute_stock_trade(
-                    ticker, action, contracts, price, timeframe
+                    ticker, action, contracts, price, timeframe, comment
                 )
             else:
                 return self._execute_options_trade(
-                    ticker, action, contracts, price, timeframe
+                    ticker, action, contracts_value, price, timeframe, comment, webhook_data
                 )
         
         except Exception as e:
@@ -265,7 +456,7 @@ class PaperTradingEngine:
             }
     
     def _execute_stock_trade(self, ticker: str, action: str, 
-                            contracts: int, price: float, timeframe: str) -> Dict:
+                            contracts: int, price: float, timeframe: str, comment: str = '') -> Dict:
         """Execute stock trade (no 100x multiplier)"""
         
         # Calculate cost/proceeds (NO 100x multiplier for stocks)
@@ -300,7 +491,8 @@ class PaperTradingEngine:
                 'status': 'OPEN',
                 'pnl': 0,
                 'pnl_percent': 0,
-                'timeframe': timeframe
+                'timeframe': timeframe,
+                'signal': comment
             }
             
             self.account['open_positions'].append(trade)
@@ -375,18 +567,20 @@ class PaperTradingEngine:
             }
     
     def _execute_options_trade(self, ticker: str, action: str,
-                              contracts: int, price: float, timeframe: str) -> Dict:
+                              contracts_value, price: float, timeframe: str, comment: str = '',
+                              webhook_data: Optional[Dict] = None) -> Dict:
         """Execute options trade (with 100x multiplier)
         
         Note: Strategy sends shares (e.g., 100), we convert to option contracts (e.g., 1)
         """
         
         # Convert shares to option contracts (1 contract = 100 shares)
-        option_contracts = int(contracts / 100)
-        if option_contracts < 1:
+        option_contracts = self._shares_to_option_contracts(contracts_value)
+        if not option_contracts:
             option_contracts = 1  # Minimum 1 contract
         
-        cprint(f"   Converting {contracts} shares → {option_contracts} option contract(s)", "cyan")
+        share_display = contracts_value if contracts_value is not None else 'unknown'
+        cprint(f"   Converting {share_display} shares → {option_contracts} option contract(s)", "cyan")
         
         # Fetch option data (pass webhook price for accurate ATM strike)
         option_data = self._get_option_data(ticker, action, webhook_price=price)
@@ -411,6 +605,7 @@ class PaperTradingEngine:
             self.account['account_balance'] -= cost_basis
             
             # Create position
+            trade_direction = 'long'
             trade = {
                 'id': f"{option_data['option_symbol']}_{timeframe}_{datetime.now().timestamp()}",
                 'type': 'BUY',
@@ -421,15 +616,20 @@ class PaperTradingEngine:
                 'strike': option_data['strike'],
                 'expiry': option_data['expiry'],
                 'contracts': option_contracts,  # Converted from shares
+                'initial_contracts': option_contracts,
+                'remaining_contracts': option_contracts,
                 'entry_price': option_data['mid'],
                 'cost_basis': cost_basis,
+                'remaining_cost_basis': cost_basis,
                 'entry_time': datetime.now().strftime('%b %d, %Y, %H:%M:%S'),
                 'status': 'OPEN',
                 'pnl': 0,
                 'pnl_percent': 0,
                 'unrealizedPnl': 0,
                 'timeframe': timeframe,
-                'underlying_price': option_data['underlying_price']
+                'underlying_price': option_data['underlying_price'],
+                'signal': comment,
+                'direction': trade_direction
             }
             
             self.account['open_positions'].append(trade)
@@ -465,6 +665,7 @@ class PaperTradingEngine:
             self.account['account_balance'] -= cost_basis
             
             # Create PUT position
+            trade_direction = 'short'
             trade = {
                 'id': f"{option_data['option_symbol']}_{timeframe}_{datetime.now().timestamp()}",
                 'type': 'SELL',
@@ -475,15 +676,20 @@ class PaperTradingEngine:
                 'strike': option_data['strike'],
                 'expiry': option_data['expiry'],
                 'contracts': option_contracts,  # Converted from shares
+                'initial_contracts': option_contracts,
+                'remaining_contracts': option_contracts,
                 'entry_price': option_data['mid'],
                 'cost_basis': cost_basis,
+                'remaining_cost_basis': cost_basis,
                 'entry_time': datetime.now().strftime('%b %d, %Y, %H:%M:%S'),
                 'status': 'OPEN',
                 'pnl': 0,
                 'pnl_percent': 0,
                 'unrealizedPnl': 0,
                 'timeframe': timeframe,
-                'underlying_price': option_data['underlying_price']
+                'underlying_price': option_data['underlying_price'],
+                'signal': comment,
+                'direction': trade_direction
             }
             
             self.account['open_positions'].append(trade)
@@ -503,13 +709,13 @@ class PaperTradingEngine:
         
         elif action == 'close':
             # CLOSE/EXIT/TP1/TP2/SL = Close the most recent open position for this ticker
-            open_pos = None
-            for pos in reversed(self.account['open_positions']):
-                if pos.get('ticker') == ticker and pos['status'] == 'OPEN':
-                    open_pos = pos
-                    break
+            desired_direction = self._get_desired_position_direction(webhook_data or {})
+            open_candidates = [
+                pos for pos in self.account['open_positions']
+                if pos.get('ticker') == ticker and pos['status'] == 'OPEN'
+            ]
             
-            if not open_pos:
+            if not open_candidates:
                 cprint(f"⚠️ No open position for {ticker} to close", "yellow")
                 return {
                     'success': False,
@@ -520,21 +726,57 @@ class PaperTradingEngine:
                     'timeframe': timeframe
                 }
             
-            # Calculate P&L
-            proceeds = option_contracts * price * 100
-            pnl = proceeds - open_pos['cost_basis']
-            pnl_percent = (pnl / open_pos['cost_basis'] * 100) if open_pos['cost_basis'] > 0 else 0
+            def _matches_direction(pos):
+                if not desired_direction:
+                    return True
+                direction = (pos.get('direction') or '').lower()
+                option_type = (pos.get('option_type') or '').lower()
+                if desired_direction == 'long':
+                    return direction == 'long' or option_type == 'call'
+                if desired_direction == 'short':
+                    return direction == 'short' or option_type == 'put'
+                return True
             
-            # Update open position
-            open_pos['exit_price'] = price
+            directional_matches = [pos for pos in open_candidates if _matches_direction(pos)]
+            target_list = directional_matches if directional_matches else open_candidates
+            open_pos = target_list[-1]
+            
+            close_contracts = self._determine_close_contracts(contracts_value, webhook_data or {}, open_pos)
+            option_exit_price = self._get_option_close_price(open_pos, price)
+            
+            remaining_contracts = open_pos.get('remaining_contracts', open_pos.get('contracts', close_contracts))
+            remaining_contracts = max(remaining_contracts, close_contracts)
+            remaining_cost_basis = open_pos.get('remaining_cost_basis', open_pos.get('cost_basis', 0))
+            cost_per_contract = (remaining_cost_basis / remaining_contracts) if remaining_contracts > 0 else (open_pos.get('entry_price', 0) * 100)
+            cost_basis_closed = cost_per_contract * close_contracts
+            
+            proceeds = close_contracts * option_exit_price * 100
+            pnl = proceeds - cost_basis_closed
+            entry_price = open_pos.get('entry_price', 0)
+            pnl_percent = ((option_exit_price - entry_price) / entry_price * 100) if entry_price > 0 else 0
+            
+            remaining_after = max(remaining_contracts - close_contracts, 0)
+            open_pos['remaining_contracts'] = remaining_after
+            open_pos['contracts'] = remaining_after
+            open_pos['remaining_cost_basis'] = max(remaining_cost_basis - cost_basis_closed, 0)
             open_pos['exit_time'] = datetime.now().strftime('%b %d, %Y, %H:%M:%S')
-            open_pos['status'] = 'CLOSED'
-            open_pos['pnl'] = pnl
+            open_pos['realized_pnl'] = open_pos.get('realized_pnl', 0) + pnl
             open_pos['pnl_percent'] = pnl_percent
             
-            # Create closed trade record
+            if remaining_after <= 0:
+                open_pos['status'] = 'CLOSED'
+                open_pos['exit_price'] = option_exit_price
+                open_pos['pnl'] = open_pos['realized_pnl']
+            else:
+                open_pos['status'] = 'OPEN'
+                open_pos['exit_price'] = option_exit_price
+                open_pos['pnl'] = open_pos.get('realized_pnl', 0)
+            
+            trade_status = 'CLOSED' if remaining_after <= 0 else 'PARTIAL'
+            trade_id = open_pos['id'] if trade_status == 'CLOSED' else f"{open_pos['id']}_partial_{datetime.now().timestamp()}"
+            
             trade = {
-                'id': open_pos['id'],
+                'id': trade_id,
                 'type': open_pos['type'],
                 'asset_type': 'OPTION',
                 'option_symbol': open_pos.get('option_symbol'),
@@ -542,30 +784,33 @@ class PaperTradingEngine:
                 'ticker': ticker,
                 'strike': open_pos.get('strike'),
                 'expiry': open_pos.get('expiry'),
-                'contracts': option_contracts,
+                'contracts': close_contracts,
                 'entry_price': open_pos['entry_price'],
-                'exit_price': price,
+                'exit_price': option_exit_price,
                 'entry_time': open_pos['entry_time'],
                 'exit_time': open_pos['exit_time'],
-                'cost_basis': open_pos['cost_basis'],
+                'cost_basis': cost_basis_closed,
                 'proceeds': proceeds,
                 'pnl': pnl,
                 'pnl_percent': pnl_percent,
-                'status': 'CLOSED',
-                'timeframe': timeframe
+                'status': trade_status,
+                'timeframe': timeframe,
+                'signal': comment,
+                'remaining_contracts': remaining_after,
+                'direction': open_pos.get('direction')
             }
             self.account['trades'].append(trade)
             
             # Update balance
             self.account['account_balance'] += proceeds
             
-            cprint(f"✅ OPTION CLOSE: {option_contracts} {open_pos.get('option_type')} {ticker} @ ${price} = ${proceeds:.2f}", "green")
-            cprint(f"   P&L: ${pnl:+.2f} ({pnl_percent:+.2f}%)", "green")
+            cprint(f"✅ OPTION CLOSE: Closed {close_contracts} contract(s) @ ${option_exit_price:.2f} = ${proceeds:.2f}", "green")
+            cprint(f"   P&L: ${pnl:+.2f} ({pnl_percent:+.2f}%) | Remaining contracts: {remaining_after}", "green")
             cprint(f"   Balance: ${self.account['account_balance']:.2f}", "green")
             
             return {
                 'success': True,
-                'message': f'Option CLOSE executed',
+                'message': f'Option {trade_status} exit executed',
                 'trade': trade,
                 'account_balance': self.account['account_balance'],
                 'error': None,

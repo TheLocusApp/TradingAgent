@@ -67,7 +67,7 @@ class TastytradeOptionsProvider:
             if not self.session:
                 asyncio.run(self._init_session())
             
-            from tastytrade import Quote
+            from tastytrade.dxfeed import Quote
             
             # Get current quote
             quote = asyncio.run(self._get_quote(symbol))
@@ -81,7 +81,7 @@ class TastytradeOptionsProvider:
     async def _get_quote(self, symbol: str):
         """Get quote for a symbol"""
         try:
-            from tastytrade import Quote
+            from tastytrade.dxfeed import Quote
             
             if not self.streamer:
                 await self._init_streamer()
@@ -89,12 +89,17 @@ class TastytradeOptionsProvider:
             # Subscribe to quote
             await self.streamer.subscribe(Quote, [symbol])
             
-            # Listen for quote
-            async for quote in self.streamer.listen(Quote):
-                if quote.event_symbol == symbol:
-                    return quote
+            # Listen for quote with timeout
+            try:
+                async with asyncio.timeout(2):  # 2 second timeout
+                    async for quote in self.streamer.listen(Quote):
+                        if quote.event_symbol == symbol:
+                            return quote
+            except asyncio.TimeoutError:
+                cprint(f"⚠️ Quote timeout for {symbol} (market may be closed)", "yellow")
+                return None
         except Exception as e:
-            cprint(f"⚠️ Error getting quote: {e}", "yellow")
+            cprint(f"⚠️ Error getting quote for {symbol}: {e}", "yellow")
             return None
     
     def get_0dte_expiration(self) -> str:
@@ -131,7 +136,7 @@ class TastytradeOptionsProvider:
     async def _get_option_quote_async(self, option_ticker: str):
         """Get option quote asynchronously"""
         try:
-            from tastytrade import Quote
+            from tastytrade.dxfeed import Quote
             
             if not self.streamer:
                 await self._init_streamer()
@@ -139,12 +144,17 @@ class TastytradeOptionsProvider:
             # Subscribe to option quote
             await self.streamer.subscribe(Quote, [option_ticker])
             
-            # Listen for quote
-            async for quote in self.streamer.listen(Quote):
-                if quote.event_symbol == option_ticker:
-                    return quote
+            # Listen for quote with timeout
+            try:
+                async with asyncio.timeout(2):  # 2 second timeout
+                    async for quote in self.streamer.listen(Quote):
+                        if quote.event_symbol == option_ticker:
+                            return quote
+            except asyncio.TimeoutError:
+                cprint(f"⚠️ Quote timeout for {option_ticker} (market may be closed)", "yellow")
+                return None
         except Exception as e:
-            cprint(f"⚠️ Error in async quote fetch: {e}", "yellow")
+            cprint(f"⚠️ Error in async quote fetch for {option_ticker}: {e}", "yellow")
             return None
     
     def get_atm_options_data(self, underlying: str) -> Optional[Dict]:

@@ -12,6 +12,9 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- WebSocket for real-time PnL updates -->
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="{{ url_for('static', filename='realtime-pnl.js') }}"></script>
     <style>
         .trade-row {
             display: grid;
@@ -542,7 +545,17 @@
                 // Map backend field names to frontend expectations
                 const exitTime = trade.exit_time || trade.exitTime || trade.entry_time || 'N/A';
                 const signal = trade.signal || trade.type || trade.action || 'N/A';
-                const optionType = trade.option_type || trade.option || 'Call';
+                const direction = (trade.direction || '').toLowerCase();
+                let optionType = trade.option_type || trade.option || '';
+                if (!optionType) {
+                    if (direction === 'long') optionType = 'CALL';
+                    else if (direction === 'short') optionType = 'PUT';
+                } else if (direction) {
+                    // Trust direction over stale option_type when they disagree
+                    if (direction === 'long') optionType = 'CALL';
+                    else if (direction === 'short') optionType = 'PUT';
+                }
+                if (!optionType) optionType = 'Call';
                 const optionClass = optionType.toLowerCase().includes('call') ? 'trade-option-call' : 'trade-option-put';
                 const price = trade.exit_price || trade.entry_price || trade.price || 0;
                 const strike = trade.strike || 0;
@@ -558,7 +571,7 @@
                 const tfCumPnLClass = tfCumPnL >= 0 ? 'profit-positive' : 'profit-negative';
                 
                 html += `
-                    <div class="trade-row">
+                    <div class="trade-row" data-position-id="${trade.id || trade.option_symbol || trade.ticker}">
                         <div>${actualIndex}</div>
                         <div>${exitTime}</div>
                         <div>${timeframe}</div>
@@ -566,11 +579,11 @@
                         <div class="${optionClass}">${optionType}</div>
                         <div>$${Math.round(strike).toLocaleString('en-US')}</div>
                         <div>${expiry}</div>
-                        <div>$${price.toFixed(2)}</div>
+                        <div data-field="mark_price">$${price.toFixed(2)}</div>
                         <div>${contracts}</div>
-                        <div class="${realizedPnlClass}">${realizedPnl >= 0 ? '+' : ''}$${Math.round(Math.abs(realizedPnl)).toLocaleString('en-US')}</div>
-                        <div class="${unrealizedPnlClass}">${unrealizedPnl >= 0 ? '+' : ''}$${Math.round(Math.abs(unrealizedPnl)).toLocaleString('en-US')}</div>
-                        <div class="${tfCumPnLClass}">${tfCumPnL >= 0 ? '+' : ''}$${Math.round(Math.abs(tfCumPnL)).toLocaleString('en-US')}</div>
+                        <div class="${realizedPnlClass}" data-field="pnl">${realizedPnl >= 0 ? '+' : ''}$${Math.round(Math.abs(realizedPnl)).toLocaleString('en-US')}</div>
+                        <div class="${unrealizedPnlClass}" data-field="pnl_percent" title="Unrealized P&L %">${unrealizedPnl >= 0 ? '+' : ''}${(unrealizedPnl || 0).toFixed(2)}%</div>
+                        <div class="${tfCumPnLClass}" data-field="update_time">${tfCumPnL >= 0 ? '+' : ''}$${Math.round(Math.abs(tfCumPnL)).toLocaleString('en-US')}</div>
                     </div>
                 `;
             });
