@@ -8,6 +8,7 @@ import subprocess
 import time
 import sys
 import os
+import webbrowser
 from pathlib import Path
 import requests
 from termcolor import cprint
@@ -15,9 +16,12 @@ import threading
 from datetime import datetime
 
 # Add project root to path
-project_root = str(Path(__file__).parent)
-if project_root not in sys.path:
-    sys.path.append(project_root)
+project_root = Path(__file__).resolve().parents[1]
+project_root_str = str(project_root)
+if project_root_str not in sys.path:
+    sys.path.append(project_root_str)
+
+APP_PORT = 5000
 
 
 class AGBotController:
@@ -106,7 +110,7 @@ class AGBotController:
         try:
             cprint("🤖 Starting Trading Agent App...", "cyan")
             
-            app_path = Path(__file__).parent / "src" / "web" / "app.py"
+            app_path = project_root / "src" / "web" / "app.py"
             
             if not app_path.exists():
                 cprint(f"❌ App file not found: {app_path}", "red")
@@ -125,6 +129,12 @@ class AGBotController:
             
             if self.agent_process.poll() is None:
                 self.agent_running = True
+                agent_url = f"http://localhost:{APP_PORT}/agbot-trader"
+                try:
+                    webbrowser.open(agent_url)
+                    cprint(f"🌐 Opened browser at {agent_url}", "green")
+                except Exception as browser_error:
+                    cprint(f"⚠️ Unable to open browser automatically: {browser_error}", "yellow")
                 cprint("✅ Trading Agent App started", "green")
                 return True
             else:

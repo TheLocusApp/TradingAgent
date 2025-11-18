@@ -9,7 +9,13 @@ from typing import Dict, List, Optional, Callable
 from datetime import datetime, date
 from termcolor import cprint
 import threading
-from tastytrade.dxfeed import EventType
+
+try:
+    from tastytrade.dxfeed import EventType
+    DXFEED_AVAILABLE = True
+except ImportError:
+    EventType = None  # type: ignore[assignment]
+    DXFEED_AVAILABLE = False
 
 
 class RealtimeQuoteStreamer:
@@ -26,9 +32,18 @@ class RealtimeQuoteStreamer:
         self.username = os.getenv('TASTYTRADE_USERNAME')
         self.password = os.getenv('TASTYTRADE_PASSWORD')
         self._quote_count = 0
+
+        if not DXFEED_AVAILABLE:
+            cprint(
+                "⚠️ tastytrade.dxfeed not available - realtime streaming features disabled",
+                "yellow",
+            )
         
     def _init_session(self):
         """Initialize Tastytrade session (called synchronously in thread)"""
+        if not DXFEED_AVAILABLE:
+            return False
+
         try:
             from tastytrade import Session
             
@@ -47,6 +62,10 @@ class RealtimeQuoteStreamer:
     
     async def _maintain_connection(self):
         """Maintain persistent DXLink connection with automatic reconnection"""
+        if not DXFEED_AVAILABLE:
+            cprint("⚠️ DXLink streaming unavailable (missing dxfeed dependency)", "yellow")
+            return
+
         try:
             if not self._init_session():
                 cprint("⚠️ Cannot start streaming without Tastytrade session", "yellow")
@@ -100,6 +119,8 @@ class RealtimeQuoteStreamer:
     
     async def _subscription_manager(self):
         """Periodically check for new symbols to subscribe"""
+        if not DXFEED_AVAILABLE:
+            return
         from tastytrade.dxfeed import EventType
         
         while self.is_running and self.streamer:
@@ -116,7 +137,11 @@ class RealtimeQuoteStreamer:
         """Subscribe to all pending symbols"""
         if not self.pending_symbols or not self.streamer:
             return
-        
+
+        if not DXFEED_AVAILABLE:
+            self.pending_symbols.clear()
+            return
+
         # Defensive import in case module reload happens before global import executes
         from tastytrade.dxfeed import EventType as DXEventType
         
@@ -189,6 +214,8 @@ class RealtimeQuoteStreamer:
     
     async def _quote_receiver(self):
         """Listen for quotes after subscriptions are in place"""
+        if not DXFEED_AVAILABLE:
+            return
         from tastytrade.dxfeed import EventType
         
         try:
@@ -218,7 +245,11 @@ class RealtimeQuoteStreamer:
         if self.is_running:
             cprint("⚠️ Streaming already running", "yellow")
             return
-        
+
+        if not DXFEED_AVAILABLE:
+            cprint("⚠️ DXLink streaming disabled - missing tastytrade.dxfeed", "yellow")
+            return
+
         self.is_running = True
         thread = threading.Thread(
             target=self._run_streaming_loop,
@@ -377,6 +408,8 @@ def initialize_realtime():
 def start_realtime_streaming():
     """Start the streaming service"""
     global quote_streamer
-    
-    if quote_streamer:
+
+    if quote_streamer and DXFEED_AVAILABLE:
         quote_streamer.start_streaming_thread()
+    elif quote_streamer:
+        cprint("⚠️ Skipping realtime streaming - tastytrade.dxfeed not available", "yellow")
