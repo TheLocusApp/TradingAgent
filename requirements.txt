@@ -42,6 +42,7 @@ schedule==1.2.0  # For scheduled tasks
 psutil==5.9.8  # System and process utilities
 asyncio  # Built-in, but noting for async support
 httpx==0.28.1  # Modern HTTP client
+pyngrok==7.2.3  # ngrok Python wrapper for AGBot tunnel management
 
 # ========== Media Processing ==========
 # For real-time clips and video agents
@@ -69,6 +70,11 @@ twikit==2.2.1  # Twitter API client
 # ========== Notes ==========
 # Python version: 3.10.9 recommended
 # Environment: Use conda environment 'tflow'
+#
+# AGBot Requirements:
+# - ngrok binary must be installed separately (pyngrok is the Python wrapper)
+#   Download from: https://ngrok.com/download
+#   Or install via: choco install ngrok (Windows), brew install ngrok (Mac), apt-get install ngrok (Linux)
 #
 # API Keys Required (in .env file):
 # - ANTHROPIC_KEY (Claude)
