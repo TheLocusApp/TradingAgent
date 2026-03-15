@@ -23,6 +23,9 @@ web3==6.20.1
 # TastyTrade (Stocks & Options)
 tastytrade==8.3
 
+# Alpaca Markets (US Stocks & ETFs — via TradingView-Claw integration)
+alpaca-trade-api>=3.0.0
+
 # ========== Data & Analysis ==========
 pandas==2.1.4
 numpy==1.26.2

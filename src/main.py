@@ -21,6 +21,7 @@ from src.agents.risk_agent import RiskAgent
 from src.agents.strategy_agent import StrategyAgent
 from src.agents.copybot_agent import CopyBotAgent
 from src.agents.sentiment_agent import SentimentAgent
+from src.agents.mirofish_agent import MiroFishAgent
 
 # Load environment variables
 load_dotenv()
@@ -32,6 +33,7 @@ ACTIVE_AGENTS = {
     'strategy': False,  # Strategy-based trading agent
     'copybot': False,   # CopyBot agent
     'sentiment': False, # Run sentiment_agent.py directly instead
+    'mirofish': False,  # MiroFish daily regime bias (set MIROFISH_ENABLED=true in .env)
     # whale_agent is run from whale_agent.py
     # Add more agents here as we build them:
     # 'portfolio': False,  # Future portfolio optimization agent
@@ -46,9 +48,15 @@ def run_agents():
         strategy_agent = StrategyAgent() if ACTIVE_AGENTS['strategy'] else None
         copybot_agent = CopyBotAgent() if ACTIVE_AGENTS['copybot'] else None
         sentiment_agent = SentimentAgent() if ACTIVE_AGENTS['sentiment'] else None
+        mirofish_agent = MiroFishAgent() if ACTIVE_AGENTS['mirofish'] else None
 
         while True:
             try:
+                # Run MiroFish regime update FIRST (no-ops if cache is fresh)
+                if mirofish_agent:
+                    cprint("\n🐟 Running MiroFish Regime Check...", "cyan")
+                    mirofish_agent.run()
+
                 # Run Risk Management
                 if risk_agent:
                     cprint("\n🛡️ Running Risk Management...", "cyan")

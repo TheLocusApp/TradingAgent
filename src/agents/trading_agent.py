@@ -152,6 +152,19 @@ SAVE_OHLCV_DATA = False          # True = save data permanently, False = temp da
 slippage = 199                   # Slippage tolerance (199 = ~2%)
 SLEEP_BETWEEN_RUNS_MINUTES = 15  # Minutes between trading cycles
 
+# 🐟 MIROFISH REGIME SETTINGS
+# MiroFish runs once daily and caches a market regime (bull/bear/sideways).
+# The trading agent reads the cache each cycle — zero extra API cost.
+# Set MIROFISH_ENABLED=true in .env and deploy MiroFish via Docker first.
+MIROFISH_ENABLED       = os.getenv("MIROFISH_ENABLED", "false").lower() == "true"
+MIROFISH_REGIME_FILE   = "src/data/mirofish_regime.json"
+# Regime → (position_size_multiplier, min_consensus_fraction)
+MIROFISH_REGIME_CONFIG = {
+    "bull":     (1.0,  0.51),   # normal
+    "bear":     (0.5,  0.67),   # half size, strong consensus required
+    "sideways": (0.70, 0.60),   # reduced size, moderate consensus
+}
+
 # 🎯 TOKEN CONFIGURATION
 
 # For SOLANA exchange: Use contract addresses
@@ -288,14 +301,28 @@ elif EXCHANGE == "HYPERLIQUID":
 elif EXCHANGE == "SOLANA":
     from src import nice_funcs as n
     cprint("🏦 Exchange: Solana (On-chain DEX)", "cyan", attrs=['bold'])
+elif EXCHANGE == "ALPACA":
+    from src import nice_funcs_alpaca as n
+    cprint("🏦 Exchange: Alpaca Markets (US Stocks & ETFs)", "cyan", attrs=['bold'])
 else:
     cprint(f"❌ Unknown exchange: {EXCHANGE}", "red")
-    cprint("Available exchanges: ASTER, HYPERLIQUID, SOLANA", "yellow")
+    cprint("Available exchanges: ASTER, HYPERLIQUID, SOLANA, ALPACA", "yellow")
     sys.exit(1)
 
 from src.data.ohlcv_collector import collect_all_tokens
 from src.models.model_factory import model_factory
 from src.agents.swarm_agent import SwarmAgent
+
+# MiroFish regime (imported lazily so missing install doesn't break startup)
+def _load_mirofish_regime() -> dict | None:
+    """Read cached MiroFish regime; return None if disabled/stale/missing."""
+    if not MIROFISH_ENABLED:
+        return None
+    try:
+        from src.agents.mirofish_agent import load_mirofish_regime
+        return load_mirofish_regime()
+    except Exception:
+        return None
 
 # Load environment variables
 load_dotenv()
@@ -447,6 +474,30 @@ def calculate_position_size(account_balance):
 
         return position_size
 
+def get_confidence_tier(agreement_pct: float) -> tuple:
+    """Classify swarm consensus into signal tiers (inspired by TradingView-Claw tiering).
+
+    With 6 swarm models, natural breakpoints are:
+      6/6 = 100%  →  S1
+      5/6 = 83%   →  S1
+      4/6 = 67%   →  S2
+      3/6 = 50%   →  filtered (no majority)
+
+    Args:
+        agreement_pct: Fraction 0-1 (confidence / 100)
+
+    Returns:
+        (tier_label, position_multiplier)
+    """
+    if agreement_pct >= 0.80:   # 5+ of 6 models agree
+        return ("S1", 1.0)
+    if agreement_pct >= 0.60:   # 4 of 6 models agree
+        return ("S2", 0.70)
+    if agreement_pct >= 0.51:   # thin majority (edge cases / abstentions)
+        return ("S3", 0.50)
+    return ("filtered", 0.0)    # no majority — skip trade
+
+
 # ============================================================================
 # TRADING AGENT CLASS
 # ============================================================================
@@ -480,6 +531,7 @@ class TradingAgent:
             cprint(f"✅ Using model: {self.model.model_name}", "green")
 
         self.recommendations_df = pd.DataFrame(columns=['token', 'action', 'confidence', 'reasoning'])
+        self.mirofish_regime = None  # loaded each cycle from cached JSON
 
         # Show which tokens will be analyzed based on exchange
         cprint("\n🎯 Active Tokens for Trading:", "yellow", attrs=['bold'])
@@ -908,7 +960,15 @@ Example format:
                         account_balance = get_account_balance()
                         position_size = calculate_position_size(account_balance)
 
+                        # Apply confidence tier multiplier
+                        tier, tier_multiplier = get_confidence_tier(row['confidence'] / 100)
+                        if tier_multiplier == 0.0:
+                            cprint(f"🚫 Signal tier: {tier} ({row['confidence']}% consensus) — skipping short (below 51% threshold)", "yellow", attrs=['bold'])
+                            continue
+                        position_size = position_size * tier_multiplier
+
                         cprint(f"📉 SELL signal with no position - OPENING SHORT", "white", "on_red")
+                        cprint(f"🎯 Signal Tier: {tier} ({row['confidence']}% consensus) → Scaled position: ${position_size:,.2f}", "cyan", attrs=['bold'])
                         cprint(f"⚡ {EXCHANGE} mode: Opening ${position_size:,.2f} short position", "yellow")
                         try:
                             # Check if we have the open_short function (Aster/HyperLiquid)
@@ -931,9 +991,36 @@ Example format:
                     if USE_PORTFOLIO_ALLOCATION:
                         cprint(f"📊 Portfolio allocation will handle entry", "white", "on_cyan")
                     else:
-                        # Simple mode: Open position at MAX_POSITION_PERCENTAGE
+                        # Simple mode: Open position at MAX_POSITION_PERCENTAGE scaled by confidence tier
                         account_balance = get_account_balance()
                         position_size = calculate_position_size(account_balance)
+
+                        # Apply MiroFish regime consensus gate (if enabled)
+                        if self.mirofish_regime:
+                            direction = self.mirofish_regime.get("direction", "sideways")
+                            regime_pos_mult, regime_min_consensus = MIROFISH_REGIME_CONFIG.get(
+                                direction, (1.0, 0.51)
+                            )
+                            if (row['confidence'] / 100) < regime_min_consensus:
+                                cprint(
+                                    f"🐟 MiroFish {direction.upper()} regime requires ≥{regime_min_consensus:.0%} "
+                                    f"consensus — got {row['confidence']}% — skipping",
+                                    "yellow", attrs=["bold"]
+                                )
+                                continue
+                            position_size = position_size * regime_pos_mult
+                            cprint(
+                                f"🐟 MiroFish {direction.upper()} regime → position ×{regime_pos_mult}: ${position_size:,.2f}",
+                                "cyan"
+                            )
+
+                        # Apply confidence tier multiplier (TradingView-Claw signal tiering)
+                        tier, tier_multiplier = get_confidence_tier(row['confidence'] / 100)
+                        if tier_multiplier == 0.0:
+                            cprint(f"🚫 Signal tier: {tier} ({row['confidence']}% consensus) — skipping trade (below 51% threshold)", "yellow", attrs=['bold'])
+                            continue
+                        position_size = position_size * tier_multiplier
+                        cprint(f"🎯 Signal Tier: {tier} ({row['confidence']}% consensus) → Scaled position: ${position_size:,.2f}", "cyan", attrs=['bold'])
 
                         cprint(f"💰 Opening position at MAX_POSITION_PERCENTAGE", "white", "on_green")
                         try:
@@ -1102,6 +1189,25 @@ Example format:
             cprint("\n📊 Moon Dev's Trading Recommendations:", "white", "on_blue")
             summary_df = self.recommendations_df[['token', 'action', 'confidence']].copy()
             print(summary_df.to_string(index=False))
+
+            # ── MiroFish regime bias ───────────────────────────────────────────
+            # Read cached daily regime (no API call — just reads a JSON file)
+            self.mirofish_regime = _load_mirofish_regime()
+            if self.mirofish_regime:
+                direction  = self.mirofish_regime.get("direction", "sideways")
+                confidence = self.mirofish_regime.get("confidence", 0.5)
+                narrative  = self.mirofish_regime.get("narrative", "")[:150]
+                cfg = MIROFISH_REGIME_CONFIG.get(direction, MIROFISH_REGIME_CONFIG["sideways"])
+                cprint(
+                    f"\n🐟 MiroFish Regime: {direction.upper()} "
+                    f"({confidence:.0%} confidence) → "
+                    f"position ×{cfg[0]}, min consensus ≥{cfg[1]:.0%}",
+                    "cyan", attrs=["bold"]
+                )
+                if narrative:
+                    cprint(f"   {narrative}", "white")
+            else:
+                self.mirofish_regime = None
 
             # Handle exits first (always runs - manages SELL recommendations)
             self.handle_exits()

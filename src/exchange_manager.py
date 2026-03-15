@@ -58,6 +58,17 @@ class ExchangeManager:
             except Exception as e:
                 cprint(f"❌ Failed to initialize Solana: {str(e)}", "red")
                 raise
+
+        elif self.exchange.lower() == 'alpaca':
+            try:
+                from src import nice_funcs_alpaca as alpaca
+                self.alpaca = alpaca
+                cprint(f"✅ Initialized Alpaca exchange manager ({alpaca.ALPACA_BASE_URL})", "green")
+
+            except Exception as e:
+                cprint(f"❌ Failed to initialize Alpaca: {str(e)}", "red")
+                raise
+
         else:
             raise ValueError(f"Unknown exchange: {self.exchange}")
 
@@ -74,6 +85,8 @@ class ExchangeManager:
         """
         if self.exchange.lower() == 'hyperliquid':
             return self.hl.market_buy(symbol_or_token, usd_amount, self.account)
+        elif self.exchange.lower() == 'alpaca':
+            return self.alpaca.market_buy(symbol_or_token, usd_amount)
         else:
             return self.solana.market_buy(symbol_or_token, usd_amount)
 
@@ -91,6 +104,8 @@ class ExchangeManager:
         if self.exchange.lower() == 'hyperliquid':
             # HyperLiquid expects USD amount
             return self.hl.market_sell(symbol_or_token, usd_amount_or_percent, self.account)
+        elif self.exchange.lower() == 'alpaca':
+            return self.alpaca.market_sell(symbol_or_token, usd_amount_or_percent)
         else:
             # Solana expects percentage (0-100)
             return self.solana.market_sell(symbol_or_token, usd_amount_or_percent)
@@ -193,6 +208,8 @@ class ExchangeManager:
         """
         if self.exchange.lower() == 'hyperliquid':
             return self.hl.kill_switch(symbol_or_token, self.account)
+        elif self.exchange.lower() == 'alpaca':
+            return self.alpaca.close_position(symbol_or_token)
         else:
             # Use chunk_kill for Solana
             from src.config import max_usd_order_size, slippage
@@ -240,6 +257,8 @@ class ExchangeManager:
         """
         if self.exchange.lower() == 'hyperliquid':
             return self.hl.get_current_price(symbol_or_token)
+        elif self.exchange.lower() == 'alpaca':
+            return self.alpaca.get_current_price(symbol_or_token)
         else:
             return self.solana.token_price(symbol_or_token)
 
