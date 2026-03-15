@@ -22,6 +22,14 @@ CHECK_INTERVAL_MINUTES = 15  # How often to run sentiment analysis
 # Sentiment settings
 SENTIMENT_ANNOUNCE_THRESHOLD = 0.4  # Announce vocally if abs(sentiment) > this value (-1 to 1 scale)
 
+# ── Multi-source settings (from MAHORAGA) ────────────────────────────────────
+MIN_SENTIMENT_THRESHOLD = 0.3    # Only record/signal if abs(sentiment) exceeds this
+MIN_CONFIDENCE          = 0.6    # Only fire if model confidence > 60 %
+STOCKTWITS_ENABLED      = True   # Fetch StockTwits public API (no auth required)
+REDDIT_ENABLED          = True   # Fetch Reddit public JSON API (no PRAW required)
+REDDIT_SUBREDDITS       = ['wallstreetbets', 'investing', 'stocks', 'CryptoCurrency']
+DISCORD_WEBHOOK_URL     = ''  # populated after load_dotenv() below
+
 # Voice settings (copied from whale agent)
 VOICE_MODEL = "tts-1"  # or tts-1-hd for higher quality
 VOICE_NAME = "nova"   # Options: alloy, echo, fable, onyx, nova, shimmer
@@ -50,6 +58,9 @@ pathlib.Path(DATA_FOLDER).mkdir(parents=True, exist_ok=True)
 
 # Load environment variables
 load_dotenv()
+
+# Resolve env-dependent config after dotenv is loaded
+DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL', '')
 
 # Get OpenAI key for voice
 openai.api_key = os.getenv("OPENAI_KEY")
@@ -189,13 +200,18 @@ class SentimentAgent:
         except Exception as e:
             print(f"❌ Error in text-to-speech: {str(e)}")
 
-    def save_sentiment_score(self, sentiment_score, num_tweets):
-        """Save sentiment score to history"""
+    def save_sentiment_score(self, sentiment_score, num_tweets, source='twitter', token='', confidence=None):
+        """Save sentiment score to history — now with source + token columns"""
         try:
+            if confidence is None:
+                confidence = min(1.0, abs(sentiment_score))
             new_data = pd.DataFrame([{
                 'timestamp': datetime.now().isoformat(),
                 'sentiment_score': sentiment_score,
-                'num_tweets': num_tweets
+                'num_tweets': num_tweets,
+                'source': source,
+                'token': token,
+                'confidence': round(confidence, 4),
             }])
             
             # Load existing data
@@ -330,6 +346,65 @@ class SentimentAgent:
                 cprint("🔄 Please run twitter_login.py again", "yellow")
             sys.exit(1)
 
+    # ── Multi-source methods (MAHORAGA-inspired) ──────────────────────────
+
+    def get_stocktwits_posts(self, symbol: str) -> list:
+        """Fetch public StockTwits stream for a cashtag — no auth required."""
+        if not STOCKTWITS_ENABLED:
+            return []
+        import requests as _req
+        # StockTwits uses uppercase cashtags: BTC, ETH, SOL
+        cashtag = symbol.upper().replace('BITCOIN', 'BTC').replace('ETHEREUM', 'ETH').replace('SOLANA', 'SOL')
+        url = f"https://api.stocktwits.com/api/2/streams/symbol/{cashtag}.json"
+        try:
+            resp = _req.get(url, timeout=8, headers={'User-Agent': 'Mozilla/5.0'})
+            if resp.status_code != 200:
+                cprint(f"⚠️ StockTwits {cashtag}: HTTP {resp.status_code}", "yellow")
+                return []
+            data = resp.json()
+            messages = data.get('messages', [])
+            texts = [m.get('body', '') for m in messages if m.get('body')]
+            cprint(f"📊 StockTwits: {len(texts)} posts for ${cashtag}", "cyan")
+            return texts
+        except Exception as e:
+            cprint(f"⚠️ StockTwits error for {cashtag}: {e}", "yellow")
+            return []
+
+    def get_reddit_posts(self, token: str) -> list:
+        """Fetch recent Reddit posts across MAHORAGA subreddits — no PRAW needed."""
+        if not REDDIT_ENABLED:
+            return []
+        import requests as _req
+        texts = []
+        headers = {'User-Agent': 'TradingAgent/1.0 sentiment-scraper'}
+        for sub in REDDIT_SUBREDDITS:
+            try:
+                url = f"https://www.reddit.com/r/{sub}/search.json?q={token}&sort=new&limit=15&restrict_sr=1"
+                resp = _req.get(url, timeout=8, headers=headers)
+                if resp.status_code != 200:
+                    continue
+                posts = resp.json().get('data', {}).get('children', [])
+                for p in posts:
+                    d = p.get('data', {})
+                    text = f"{d.get('title', '')} {d.get('selftext', '')}".strip()
+                    if text:
+                        texts.append(text)
+            except Exception as e:
+                cprint(f"⚠️ Reddit r/{sub} error: {e}", "yellow")
+        cprint(f"📊 Reddit: {len(texts)} posts for {token}", "cyan")
+        return texts
+
+    def notify_discord(self, message: str):
+        """Post a signal notification to Discord via webhook (if configured)."""
+        if not DISCORD_WEBHOOK_URL:
+            return
+        import requests as _req
+        try:
+            payload = {'content': message, 'username': 'GRU Sentiment'}
+            _req.post(DISCORD_WEBHOOK_URL, json=payload, timeout=5)
+        except Exception as e:
+            cprint(f"⚠️ Discord webhook error: {e}", "yellow")
+
     async def get_tweets(self, query):
         """Get tweets with proper error handling"""
         collected_tweets = []
@@ -459,34 +534,79 @@ class SentimentAgent:
             cprint(f"❌ Error saving to CSV: {str(e)}", "red")
 
     async def run_async(self):
-        """Async function to run sentiment analysis"""
-        cprint("🤖 Moon Dev's Sentiment Analysis running...", "cyan")
-        
-        # Initialize client if not already done
+        """Async function to run multi-source sentiment analysis (Twitter + StockTwits + Reddit)"""
+        cprint("🤖 GRU Multi-Source Sentiment Analysis running...", "cyan")
+
+        # Initialize Twitter client if not already done
+        twitter_ok = True
         if not self.client:
-            self.client = self.init_twitter_client()
-        
-        all_tweets = []
+            try:
+                self.client = self.init_twitter_client()
+            except SystemExit:
+                twitter_ok = False
+                cprint("⚠️ Twitter client unavailable — skipping Twitter source", "yellow")
+
         for token in TOKENS_TO_TRACK:
             try:
-                cprint(f"🔍 Analyzing sentiment for {token}...", "cyan")
-                tweets = await self.get_tweets(token)
-                if tweets:
-                    self.save_tweets(tweets, token)
-                    all_tweets.extend(tweets)
-                    cprint(f"✅ Saved {len(tweets)} tweets for {token}", "green")
-                else:
-                    cprint(f"⚠️ No tweets found for {token}", "yellow")
-                    
+                cprint(f"\n🔍 Analyzing {token} across all sources...", "cyan")
+                source_results: list[tuple[str, list, str]] = []  # (source_name, texts, display_label)
+
+                # ── Twitter / X ───────────────────────────────────────────
+                if twitter_ok:
+                    try:
+                        tweets = await self.get_tweets(token)
+                        if tweets:
+                            self.save_tweets(tweets, token)
+                            texts = [t.text for t in tweets]
+                            source_results.append(('twitter', texts, 'Twitter/X'))
+                    except Exception as e:
+                        cprint(f"⚠️ Twitter error for {token}: {e}", "yellow")
+
+                # ── StockTwits ────────────────────────────────────────────
+                try:
+                    st_texts = self.get_stocktwits_posts(token)
+                    if st_texts:
+                        source_results.append(('stocktwits', st_texts, 'StockTwits'))
+                except Exception as e:
+                    cprint(f"⚠️ StockTwits error for {token}: {e}", "yellow")
+
+                # ── Reddit ────────────────────────────────────────────────
+                try:
+                    rd_texts = self.get_reddit_posts(token)
+                    if rd_texts:
+                        source_results.append(('reddit', rd_texts, 'Reddit'))
+                except Exception as e:
+                    cprint(f"⚠️ Reddit error for {token}: {e}", "yellow")
+
+                # ── Analyse & record each source separately ───────────────
+                for src_key, texts, src_label in source_results:
+                    if not texts:
+                        continue
+                    score = self.analyze_sentiment(texts)
+                    confidence = min(1.0, abs(score))
+
+                    # Threshold gate (MAHORAGA: only save/signal if meaningful)
+                    if abs(score) < MIN_SENTIMENT_THRESHOLD or confidence < MIN_CONFIDENCE:
+                        cprint(f"  ⏭️  {src_label} {token}: score={score:.2f} below threshold — skipping", "yellow")
+                        continue
+
+                    self.save_sentiment_score(score, len(texts), source=src_key, token=token, confidence=confidence)
+                    direction = 'bullish' if score > 0 else 'bearish'
+                    cprint(f"  ✅ {src_label} {token}: {direction} ({score:.2f})", "green" if score > 0 else "red")
+
+                    # Discord notification for strong signals
+                    if DISCORD_WEBHOOK_URL and abs(score) > SENTIMENT_ANNOUNCE_THRESHOLD:
+                        msg = (f"🔔 **{src_label}** | **{token.upper()}** | "
+                               f"{'🟢 BULLISH' if score > 0 else '🔴 BEARISH'} "
+                               f"({score:+.2f}, conf {confidence:.0%}) "
+                               f"| {len(texts)} posts")
+                        self.notify_discord(msg)
+
             except Exception as e:
                 cprint(f"❌ Error processing {token}: {str(e)}", "red")
                 continue
 
-        # Analyze sentiment for all collected tweets
-        if all_tweets:
-            self.analyze_and_announce_sentiment(all_tweets)
-
-        cprint("🌙 Moon Dev's Sentiment Analysis complete! 🚀", "green")
+        cprint("\n🌙 GRU Multi-Source Sentiment Analysis complete! 🚀", "green")
 
     def run(self):
         """Main function to run sentiment analysis"""

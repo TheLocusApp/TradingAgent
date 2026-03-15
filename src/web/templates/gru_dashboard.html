@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GRU — Autonomous Trading HUD</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='gru-hud.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+</head>
+<body>
+
+<!-- ── Header ─────────────────────────────────────────────── -->
+<header class="gru-header">
+  <div class="gru-logo">
+    <span class="gru-logo-text">GRU</span>
+    <span class="gru-logo-version">v1.0</span>
+    <div style="display:flex;align-items:center;gap:6px;margin-left:8px;">
+      <div class="market-status-dot" id="mktDot"></div>
+      <span class="hud-dim" style="font-size:10px;" id="mktLabel">CHECKING</span>
+    </div>
+  </div>
+
+  <div class="gru-header-right">
+    <!-- MiroFish regime chip -->
+    <div id="regimeChip" class="regime-chip sideways" title="MiroFish daily regime">⬤ SIDEWAYS</div>
+
+    <!-- LLM cost tracker -->
+    <span class="hud-dim">API CALLS <span class="hud-cyan" id="apiCallCount">—</span></span>
+    <span class="hud-dim">COST <span class="hud-cyan" id="totalCost">$—</span></span>
+
+    <!-- Live clock -->
+    <span class="hud-clock" id="liveClock">00:00:00</span>
+  </div>
+</header>
+
+<!-- ── Navigation ─────────────────────────────────────────── -->
+<nav class="gru-nav">
+  <a href="/" class="active">LIVE AGENTS</a>
+  <a href="/analyst">ANALYST</a>
+  <a href="/strategy-lab">BACKTEST LAB</a>
+  <a href="/swarm">SWARM</a>
+  <a href="/portfolio">PORTFOLIO</a>
+  <a href="/screener">SCREENER</a>
+  <a href="/agbot-trader">OPTIONS</a>
+</nav>
+
+<!-- ── TradingView Ticker Tape ────────────────────────────── -->
+<div class="gru-ticker-wrap">
+  <div class="tradingview-widget-container">
+    <div class="tradingview-widget-container__widget" id="tv-ticker"></div>
+    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
+    {
+      "symbols": [
+        {"proName":"BINANCE:BTCUSDT","title":"BTC"},
+        {"proName":"BINANCE:ETHUSDT","title":"ETH"},
+        {"proName":"BINANCE:SOLUSDT","title":"SOL"},
+        {"proName":"FOREXCOM:SPXUSD","title":"SPX"},
+        {"proName":"NASDAQ:QQQ","title":"QQQ"},
+        {"proName":"AMEX:IWM","title":"IWM"}
+      ],
+      "showSymbolLogo": true,
+      "colorTheme": "dark",
+      "isTransparent": true,
+      "displayMode": "adaptive",
+      "locale": "en"
+    }
+    </script>
+  </div>
+</div>
+
+<!-- ── Main Layout ────────────────────────────────────────── -->
+<div class="gru-layout">
+
+  <!-- ROW 1: Account · Positions · LLM Activity -->
+  <div class="gru-row gru-row-3">
+
+    <!-- Account Overview -->
+    <div class="gru-panel">
+      <div class="gru-panel-title"><div class="dot"></div>ACCOUNT OVERVIEW</div>
+      <div class="hud-big-num" id="equityVal">$—</div>
+      <div class="hud-label" style="margin-bottom:12px;">TOTAL EQUITY</div>
+      <div class="hud-metrics">
+        <div class="hud-metric">
+          <span class="hud-label">CASH</span>
+          <span class="hud-value" id="cashVal">$—</span>
+        </div>
+        <div class="hud-metric">
+          <span class="hud-label">TODAY P&amp;L</span>
+          <span class="hud-value" id="todayPnl">—</span>
+        </div>
+        <div class="hud-metric">
+          <span class="hud-label">EXCHANGE</span>
+          <span class="hud-cyan" id="exchangeVal">—</span>
+        </div>
+        <div class="hud-metric">
+          <span class="hud-label">OPEN POSITIONS</span>
+          <span class="hud-value" id="openPosCount">—</span>
+        </div>
+        <div class="hud-metric">
+          <span class="hud-label">REGIME MULTIPLIER</span>
+          <span class="hud-cyan" id="regimeMult">×1.0</span>
+        </div>
+        <div class="hud-metric">
+          <span class="hud-label">CONFIDENCE GATE</span>
+          <span class="hud-cyan" id="regimeGate">≥51%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Positions Table -->
+    <div class="gru-panel">
+      <div class="gru-panel-title"><div class="dot"></div>OPEN POSITIONS</div>
+      <div class="panel-scroll" style="max-height:260px;">
+        <table class="hud-table">
+          <thead>
+            <tr>
+              <th>SYMBOL</th>
+              <th>QTY</th>
+              <th>VALUE</th>
+              <th>P&amp;L %</th>
+              <th>ENTRY</th>
+              <th>TIER</th>
+            </tr>
+          </thead>
+          <tbody id="positionsBody">
+            <tr><td colspan="6" class="hud-empty">NO OPEN POSITIONS</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- LLM Activity -->
+    <div class="gru-panel">
+      <div class="gru-panel-title"><div class="dot"></div>LLM SWARM ACTIVITY</div>
+      <div class="hud-metrics">
+        <div class="hud-metric">
+          <span class="hud-label">PRIMARY MODEL</span>
+          <span class="hud-cyan" id="primaryModel">—</span>
+        </div>
+        <div class="hud-metric">
+          <span class="hud-label">SWARM MODELS</span>
+          <span class="hud-value" id="swarmCount">6</span>
+        </div>
+        <div class="hud-metric">
+          <span class="hud-label">LAST CONSENSUS</span>
+          <span class="hud-value" id="lastConsensus">—</span>
+        </div>
+        <div class="hud-metric">
+          <span class="hud-label">LAST CONFIDENCE</span>
+          <span class="hud-cyan" id="lastConfidence">—%</span>
+        </div>
+        <div class="hud-metric">
+          <span class="hud-label">SIGNAL TIER</span>
+          <span id="lastTierBadge" class="hud-badge skip">—</span>
+        </div>
+      </div>
+      <div style="margin-top:14px;">
+        <div class="gru-panel-title" style="margin-bottom:8px;"><div class="dot"></div>LAST SWARM VOTE</div>
+        <div id="swarmVoteList" class="panel-scroll" style="max-height:100px;font-size:11px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW 2: Portfolio Chart · Position Performance -->
+  <div class="gru-row gru-row-2">
+
+    <!-- Portfolio Performance Chart -->
+    <div class="gru-panel" style="min-height:300px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div class="gru-panel-title" style="margin-bottom:0;"><div class="dot"></div>PORTFOLIO PERFORMANCE</div>
+        <div style="display:flex;gap:6px;">
+          <button class="period-btn active" data-period="1D" onclick="setPeriod('1D',this)">1D</button>
+          <button class="period-btn"        data-period="1W" onclick="setPeriod('1W',this)">1W</button>
+          <button class="period-btn"        data-period="1M" onclick="setPeriod('1M',this)">1M</button>
+        </div>
+      </div>
+      <div class="chart-wrap" style="height:240px;">
+        <canvas id="portfolioChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Position Performance -->
+    <div class="gru-panel" style="min-height:300px;">
+      <div class="gru-panel-title"><div class="dot"></div>POSITION PERFORMANCE</div>
+      <div class="chart-wrap" style="height:240px;">
+        <canvas id="positionChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW 3: Active Signals · Activity Feed · Signal Research -->
+  <div class="gru-row gru-row-3eq">
+
+    <!-- Active Signals (Twitter + StockTwits + Reddit) -->
+    <div class="gru-panel">
+      <div class="gru-panel-title"><div class="dot"></div>ACTIVE SIGNALS</div>
+      <div class="panel-scroll" id="signalsFeed">
+
+        <!-- Signals injected by JS -->
+        <div class="hud-empty">SCANNING SOURCES…</div>
+      </div>
+
+      <!-- Source legend -->
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;padding-top:8px;border-top:1px solid var(--hud-border);">
+        <span class="source-tag twitter">Twitter/X</span>
+        <span class="source-tag stocktwits">StockTwits</span>
+        <span class="source-tag reddit">Reddit</span>
+      </div>
+    </div>
+
+    <!-- Activity Feed -->
+    <div class="gru-panel">
+      <div class="gru-panel-title"><div class="dot"></div>ACTIVITY FEED</div>
+      <div class="panel-scroll" id="activityFeed" style="max-height:320px;">
+        <div class="hud-empty">AWAITING AGENT ACTIONS…</div>
+      </div>
+    </div>
+
+    <!-- Signal Research Panel -->
+    <div class="gru-panel">
+      <div class="gru-panel-title"><div class="dot"></div>SIGNAL RESEARCH</div>
+      <div class="panel-scroll" id="researchPanel" style="max-height:320px;">
+        <div class="hud-empty">NO RESEARCH YET</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /gru-layout -->
+
+<!-- ── Styles: period buttons ─────────────────────────────── -->
+<style>
+.period-btn {
+  background: transparent;
+  border: 1px solid var(--hud-border);
+  color: var(--hud-text-dim);
+  padding: 3px 10px;
+  border-radius: 3px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition: all 0.15s;
+}
+.period-btn:hover { border-color: var(--hud-primary); color: var(--hud-primary); }
+.period-btn.active { border-color: var(--hud-primary); color: var(--hud-primary); background: rgba(0,229,255,0.08); }
+</style>
+
+<!-- ── Scripts ────────────────────────────────────────────── -->
+<script>
+// ── Clock ────────────────────────────────────────────────────
+function tickClock() {
+  const now = new Date();
+  document.getElementById('liveClock').textContent =
+    now.toUTCString().slice(17, 25) + ' UTC';
+}
+setInterval(tickClock, 1000);
+tickClock();
+
+// ── Market open check (rough UTC hours) ─────────────────────
+function checkMarket() {
+  const now = new Date();
+  const day = now.getUTCDay(); // 0=Sun,6=Sat
+  const h = now.getUTCHours() + now.getUTCMinutes() / 60;
+  const open = day >= 1 && day <= 5 && h >= 13.5 && h < 20; // 9:30–4pm ET
+  const dot = document.getElementById('mktDot');
+  const lbl = document.getElementById('mktLabel');
+  dot.className = 'market-status-dot' + (open ? '' : ' closed');
+  lbl.textContent = open ? 'MARKET OPEN' : 'MARKET CLOSED';
+}
+checkMarket();
+setInterval(checkMarket, 60000);
+
+// ── Chart defaults ───────────────────────────────────────────
+Chart.defaults.color = '#5a7a8a';
+Chart.defaults.font.family = "'JetBrains Mono', monospace";
+Chart.defaults.font.size = 10;
+Chart.defaults.borderColor = 'rgba(0,229,255,0.08)';
+
+// ── Portfolio chart ──────────────────────────────────────────
+const portfolioCtx = document.getElementById('portfolioChart').getContext('2d');
+let portfolioChart = new Chart(portfolioCtx, {
+  type: 'line',
+  data: {
+    labels: [],
+    datasets: [{
+      label: 'Portfolio',
+      data: [],
+      borderColor: '#00e5ff',
+      backgroundColor: 'rgba(0,229,255,0.06)',
+      borderWidth: 1.5,
+      fill: true,
+      tension: 0.3,
+      pointRadius: 0,
+      pointHoverRadius: 4,
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: { duration: 400 },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: ctx => '$' + ctx.parsed.y.toLocaleString('en-US', {minimumFractionDigits:2})
+        }
+      }
+    },
+    scales: {
+      x: { grid: { color: 'rgba(0,229,255,0.04)' }, ticks: { maxTicksLimit: 6 } },
+      y: {
+        grid: { color: 'rgba(0,229,255,0.04)' },
+        ticks: { callback: v => '$' + v.toLocaleString() }
+      }
+    }
+  }
+});
+
+// ── Position chart ───────────────────────────────────────────
+const posCtx = document.getElementById('positionChart').getContext('2d');
+let positionChart = new Chart(posCtx, {
+  type: 'line',
+  data: { labels: [], datasets: [] },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: { duration: 400 },
+    plugins: {
+      legend: {
+        display: true,
+        labels: { boxWidth: 8, padding: 10, color: '#5a7a8a' }
+      }
+    },
+    scales: {
+      x: { grid: { color: 'rgba(0,229,255,0.04)' }, ticks: { maxTicksLimit: 6 } },
+      y: {
+        grid: { color: 'rgba(0,229,255,0.04)' },
+        ticks: { callback: v => v.toFixed(1) + '%' }
+      }
+    }
+  }
+});
+
+const POS_COLORS = ['#00e5ff','#00ff88','#ffcc00','#a78bfa','#ff3b5c'];
+
+// ── Period selector ──────────────────────────────────────────
+let activePeriod = '1D';
+function setPeriod(p, btn) {
+  activePeriod = p;
+  document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  fetchAgentData();
+}
+
+// ── Format helpers ───────────────────────────────────────────
+const fmt$ = n => '$' + Number(n).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+const fmtPct = n => (n >= 0 ? '+' : '') + Number(n).toFixed(2) + '%';
+const pnlClass = n => n >= 0 ? 'hud-green' : 'hud-red';
+
+function tierBadge(confidence) {
+  if (confidence >= 80) return ['S1','s1'];
+  if (confidence >= 60) return ['S2','s2'];
+  if (confidence >= 51) return ['S3','s3'];
+  return ['—','skip'];
+}
+
+// ── Load MiroFish regime from cached JSON ────────────────────
+async function loadRegime() {
+  try {
+    const r = await fetch('/api/mirofish/regime');
+    if (!r.ok) return;
+    const d = await r.json();
+    const dir = (d.direction || 'sideways').toLowerCase();
+    const chip = document.getElementById('regimeChip');
+    chip.className = 'regime-chip ' + dir;
+    chip.textContent = '⬤ ' + dir.toUpperCase();
+
+    const mults = { bull: ['×1.0','≥51%'], bear: ['×0.5','≥67%'], sideways: ['×0.7','≥60%'] };
+    const [m, g] = mults[dir] || mults.sideways;
+    document.getElementById('regimeMult').textContent = m;
+    document.getElementById('regimeGate').textContent = g;
+  } catch (_) {}
+}
+
+// ── Fetch agent data from existing APIs ──────────────────────
+async function fetchAgentData() {
+  try {
+    const r = await fetch('/api/agents/performance');
+    if (!r.ok) return;
+    const data = await r.json();
+
+    // Account overview
+    if (data.account) {
+      const acc = data.account;
+      const eq = document.getElementById('equityVal');
+      const pnl = acc.today_pnl || 0;
+      eq.textContent = fmt$(acc.equity || 0);
+      eq.className = 'hud-big-num ' + (pnl >= 0 ? 'positive' : 'negative');
+      document.getElementById('cashVal').textContent = fmt$(acc.cash || 0);
+      const pnlEl = document.getElementById('todayPnl');
+      pnlEl.textContent = fmtPct(pnl);
+      pnlEl.className = 'hud-value ' + pnlClass(pnl);
+      document.getElementById('exchangeVal').textContent = (acc.exchange || 'ASTER').toUpperCase();
+    }
+
+    // Positions
+    if (data.positions && data.positions.length) {
+      document.getElementById('openPosCount').textContent = data.positions.length;
+      const tbody = document.getElementById('positionsBody');
+      tbody.innerHTML = data.positions.map((p, i) => {
+        const pnl = p.pnl_pct || 0;
+        const [tl, tc] = tierBadge(p.confidence || 0);
+        return `<tr>
+          <td class="hud-cyan" style="font-weight:600;">${p.symbol}${p.is_crypto ? ' ₿' : ''}</td>
+          <td class="hud-dim">${p.qty}</td>
+          <td>${fmt$(p.market_value || 0)}</td>
+          <td class="${pnlClass(pnl)}">${fmtPct(pnl)}</td>
+          <td class="hud-dim">${fmt$(p.entry_price || 0)}</td>
+          <td><span class="hud-badge ${tc}">${tl}</span></td>
+        </tr>`;
+      }).join('');
+
+      // Position chart datasets
+      const labels = data.positions[0].history_labels || [];
+      positionChart.data.labels = labels;
+      positionChart.data.datasets = data.positions.slice(0,5).map((p, i) => ({
+        label: p.symbol,
+        data: p.history_pct || [],
+        borderColor: POS_COLORS[i],
+        borderWidth: 1.5,
+        pointRadius: 0,
+        tension: 0.3,
+        fill: false,
+      }));
+      positionChart.update('none');
+    } else {
+      document.getElementById('openPosCount').textContent = '0';
+    }
+
+    // Portfolio chart
+    if (data.equity_history) {
+      const isPnl = (data.equity_history.values || []).length;
+      portfolioChart.data.labels = data.equity_history.labels || [];
+      portfolioChart.data.datasets[0].data = data.equity_history.values || [];
+      const last = (data.equity_history.values || []).slice(-1)[0] || 0;
+      const first = (data.equity_history.values || [])[0] || last;
+      const up = last >= first;
+      portfolioChart.data.datasets[0].borderColor = up ? '#00ff88' : '#ff3b5c';
+      portfolioChart.data.datasets[0].backgroundColor = up ? 'rgba(0,255,136,0.06)' : 'rgba(255,59,92,0.06)';
+      portfolioChart.update('none');
+    }
+
+    // LLM activity
+    if (data.llm) {
+      document.getElementById('primaryModel').textContent = data.llm.model || '—';
+      document.getElementById('apiCallCount').textContent = data.llm.api_calls || '—';
+      document.getElementById('totalCost').textContent = data.llm.total_cost ? '$' + data.llm.total_cost.toFixed(4) : '$—';
+      const conf = data.llm.last_confidence || 0;
+      document.getElementById('lastConsensus').textContent = data.llm.last_consensus || '—';
+      document.getElementById('lastConfidence').textContent = conf + '%';
+      const [tl, tc] = tierBadge(conf);
+      document.getElementById('lastTierBadge').textContent = tl;
+      document.getElementById('lastTierBadge').className = 'hud-badge ' + tc;
+
+      if (data.llm.swarm_votes) {
+        const agentColors = { claude: 'hud-purple', gpt: 'hud-cyan', grok: 'hud-yellow', deepseek: 'hud-green', qwen: 'hud-dim' };
+        document.getElementById('swarmVoteList').innerHTML = Object.entries(data.llm.swarm_votes)
+          .map(([model, vote]) => {
+            const col = Object.entries(agentColors).find(([k]) => model.toLowerCase().includes(k))?.[1] || 'hud-dim';
+            const vc = vote === 'Buy' ? 'hud-green' : vote === 'Sell' ? 'hud-red' : 'hud-dim';
+            return `<div style="display:flex;justify-content:space-between;padding:2px 0;">
+              <span class="${col}">${model}</span>
+              <span class="${vc}">${vote}</span>
+            </div>`;
+          }).join('');
+      }
+    }
+
+  } catch (e) {
+    console.warn('fetchAgentData:', e);
+  }
+}
+
+// ── Fetch sentiment signals from GRU multi-source endpoint ───
+async function fetchSignals() {
+  try {
+    const r = await fetch('/api/gru/signals');
+    if (!r.ok) return;
+    const signals = await r.json();
+
+    if (!signals.length) return;
+
+    document.getElementById('signalsFeed').innerHTML = signals.map(s => {
+      const sentPct = Math.round((s.sentiment + 1) * 50);
+      const barCls  = s.sentiment > 0.1 ? 'pos' : s.sentiment < -0.1 ? 'neg' : 'neu';
+      const verdict = s.sentiment > 0.3 ? 'buy' : s.sentiment < -0.3 ? 'sell' : 'hold';
+      return `<div style="padding:8px 0;border-bottom:1px solid rgba(0,229,255,0.06);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
+          <span style="font-weight:600;color:var(--hud-text);">${s.symbol || s.token}</span>
+          <div style="display:flex;gap:5px;align-items:center;">
+            <span class="source-tag ${s.source}">${s.source}</span>
+            <span class="hud-badge ${verdict}">${verdict.toUpperCase()}</span>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--hud-text-dim);">
+          <span>Sentiment: <span class="${barCls==='pos'?'hud-green':barCls==='neg'?'hud-red':'hud-dim'}">${sentPct}%</span></span>
+          <span>${s.volume || 0} posts · ${s.time || ''}</span>
+        </div>
+        <div class="sentiment-bar-wrap"><div class="sentiment-bar ${barCls}" style="width:${sentPct}%;"></div></div>
+      </div>`;
+    }).join('');
+  } catch (e) {
+    console.warn('fetchSignals:', e);
+  }
+}
+
+// ── Fetch activity feed ──────────────────────────────────────
+async function fetchActivity() {
+  try {
+    const r = await fetch('/api/agents/decisions?limit=30');
+    if (!r.ok) return;
+    const items = await r.json();
+    if (!items.length) return;
+
+    const agentClass = name => {
+      const n = (name || '').toLowerCase();
+      if (n.includes('analyst') || n.includes('rbi') || n.includes('mirofish')) return 'analyst';
+      if (n.includes('executor') || n.includes('trading')) return 'executor';
+      if (n.includes('risk')) return 'risk';
+      if (n.includes('sentiment')) return 'sentiment';
+      return 'executor';
+    };
+
+    document.getElementById('activityFeed').innerHTML = items.map(item => {
+      const ac = agentClass(item.agent_name);
+      return `<div class="activity-item">
+        <span class="activity-time">${(item.timestamp||'').slice(11,16)}</span>
+        <span class="activity-agent ${ac}">${(item.agent_name||'AGENT').toUpperCase().slice(0,10)}</span>
+        <span class="activity-text">${item.decision || item.action || ''} — ${(item.token||item.symbol||'')}</span>
+      </div>`;
+    }).join('');
+  } catch (e) {
+    console.warn('fetchActivity:', e);
+  }
+}
+
+// ── Fetch research cards ─────────────────────────────────────
+async function fetchResearch() {
+  try {
+    const r = await fetch('/api/gru/research');
+    if (!r.ok) return;
+    const cards = await r.json();
+    if (!cards.length) return;
+
+    document.getElementById('researchPanel').innerHTML = cards.map(c => {
+      const verdict = (c.verdict || 'SKIP').toUpperCase();
+      const vClass  = verdict === 'BUY' ? 'buy' : verdict === 'SKIP' ? 'skip' : 'hold';
+      const conf    = Math.round((c.confidence || 0) * 100);
+      return `<div class="research-card">
+        <div class="research-card-header">
+          <div>
+            <span class="research-symbol">${c.symbol}</span>
+            <div style="font-size:10px;color:var(--hud-text-dim);margin-top:2px;">${c.source || ''} · ${c.time || ''}</div>
+          </div>
+          <span class="hud-badge ${vClass}">${verdict}</span>
+        </div>
+        ${c.catalyst ? `<div style="font-size:10px;color:var(--hud-success);margin-bottom:3px;">↑ ${c.catalyst}</div>` : ''}
+        ${c.risk     ? `<div style="font-size:10px;color:var(--hud-error);  margin-bottom:3px;">↓ ${c.risk}</div>` : ''}
+        <div class="confidence-bar"><div class="confidence-fill" style="width:${conf}%;"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--hud-text-dim);margin-top:3px;">
+          <span>CONFIDENCE</span><span>${conf}%</span>
+        </div>
+      </div>`;
+    }).join('');
+  } catch (e) {
+    console.warn('fetchResearch:', e);
+  }
+}
+
+// ── Socket.IO live updates ───────────────────────────────────
+const socket = io({ transports: ['websocket', 'polling'] });
+
+socket.on('agent_decision', data => {
+  const feed = document.getElementById('activityFeed');
+  const empty = feed.querySelector('.hud-empty');
+  if (empty) empty.remove();
+
+  const div = document.createElement('div');
+  div.className = 'activity-item';
+  const now = new Date().toISOString().slice(11,16);
+  div.innerHTML = `
+    <span class="activity-time">${now}</span>
+    <span class="activity-agent executor">${(data.agent||'AGENT').toUpperCase().slice(0,10)}</span>
+    <span class="activity-text">${data.decision || data.action || ''} — ${data.token || data.symbol || ''}</span>`;
+  feed.prepend(div);
+  // keep max 40 entries
+  while (feed.children.length > 40) feed.lastChild.remove();
+});
+
+socket.on('sentiment_update', data => {
+  fetchSignals();
+});
+
+// ── Poll on interval ─────────────────────────────────────────
+function refreshAll() {
+  fetchAgentData();
+  fetchSignals();
+  fetchActivity();
+  fetchResearch();
+  loadRegime();
+}
+
+refreshAll();
+setInterval(refreshAll, 15000); // every 15 s
+
+</script>
+</body>
+</html>

@@ -1,0 +1,410 @@
+/* ============================================================
+   GRU HUD — Design System
+   Inspired by MAHORAGA's dark HUD aesthetic
+   JetBrains Mono · black base · cyan / green / red / yellow
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+
+/* ── Reset & Base ─────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* palette */
+  --hud-bg:        #000000;
+  --hud-bg-panel:  #080c10;
+  --hud-bg-card:   #0c1117;
+  --hud-border:    rgba(0, 255, 255, 0.12);
+  --hud-border-hover: rgba(0, 255, 255, 0.35);
+
+  --hud-primary:   #00e5ff;   /* cyan */
+  --hud-success:   #00ff88;   /* green */
+  --hud-error:     #ff3b5c;   /* red */
+  --hud-warning:   #ffcc00;   /* yellow — crypto */
+  --hud-purple:    #a78bfa;   /* AI / analyst */
+
+  --hud-text:      #d4e4f0;
+  --hud-text-dim:  #5a7a8a;
+  --hud-text-muted:#2a4050;
+
+  /* font */
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+
+  /* spacing */
+  --gap: 12px;
+  --radius: 4px;
+}
+
+html, body {
+  background: var(--hud-bg);
+  color: var(--hud-text);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.5;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── Scrollbar ────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: var(--hud-bg); }
+::-webkit-scrollbar-thumb { background: var(--hud-border); border-radius: 2px; }
+
+/* ── Typography helpers ───────────────────────────────────── */
+.hud-label   { color: var(--hud-text-dim); font-size: 10px; text-transform: uppercase; letter-spacing: 1.2px; }
+.hud-value   { color: var(--hud-text);     font-size: 14px; font-weight: 500; }
+.hud-cyan    { color: var(--hud-primary);  }
+.hud-green   { color: var(--hud-success);  }
+.hud-red     { color: var(--hud-error);    }
+.hud-yellow  { color: var(--hud-warning);  }
+.hud-purple  { color: var(--hud-purple);   }
+.hud-dim     { color: var(--hud-text-dim); }
+
+/* ── Header ───────────────────────────────────────────────── */
+.gru-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--hud-border);
+  background: var(--hud-bg-panel);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.gru-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.gru-logo-text {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: var(--hud-primary);
+  text-shadow: 0 0 20px rgba(0, 229, 255, 0.4);
+}
+
+.gru-logo-version {
+  font-size: 10px;
+  color: var(--hud-text-dim);
+  border: 1px solid var(--hud-border);
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.market-status-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--hud-success);
+  box-shadow: 0 0 8px var(--hud-success);
+  animation: pulse-green 2s infinite;
+}
+
+.market-status-dot.closed { background: var(--hud-error); box-shadow: 0 0 8px var(--hud-error); animation: none; }
+
+@keyframes pulse-green {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+.gru-header-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  font-size: 11px;
+  color: var(--hud-text-dim);
+}
+
+.hud-clock { color: var(--hud-primary); font-weight: 500; letter-spacing: 1px; }
+
+/* ── Navigation ───────────────────────────────────────────── */
+.gru-nav {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--hud-border);
+  background: var(--hud-bg-panel);
+  padding: 0 20px;
+  overflow-x: auto;
+}
+
+.gru-nav a {
+  color: var(--hud-text-dim);
+  text-decoration: none;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 10px 16px;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+
+.gru-nav a:hover { color: var(--hud-text); }
+.gru-nav a.active { color: var(--hud-primary); border-bottom-color: var(--hud-primary); }
+
+/* ── Layout Grid ──────────────────────────────────────────── */
+.gru-layout {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+}
+
+.gru-row {
+  display: grid;
+  gap: var(--gap);
+}
+
+.gru-row-3 { grid-template-columns: 3fr 5fr 4fr; }
+.gru-row-2 { grid-template-columns: 2fr 1fr; }
+.gru-row-3eq { grid-template-columns: 1fr 1fr 1fr; }
+
+@media (max-width: 1100px) {
+  .gru-row-3, .gru-row-2, .gru-row-3eq { grid-template-columns: 1fr; }
+}
+
+/* ── Panel ────────────────────────────────────────────────── */
+.gru-panel {
+  background: var(--hud-bg-panel);
+  border: 1px solid var(--hud-border);
+  border-radius: var(--radius);
+  padding: 14px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+.gru-panel:hover { border-color: var(--hud-border-hover); }
+
+/* corner accent */
+.gru-panel::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 20px; height: 2px;
+  background: var(--hud-primary);
+}
+
+.gru-panel-title {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--hud-text-dim);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.gru-panel-title .dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--hud-primary);
+}
+
+/* ── Metric row ───────────────────────────────────────────── */
+.hud-metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.hud-metric {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--hud-text-muted);
+}
+
+.hud-metric:last-child { border-bottom: none; }
+
+/* ── Big number display ───────────────────────────────────── */
+.hud-big-num {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--hud-primary);
+  letter-spacing: 1px;
+  line-height: 1;
+}
+
+.hud-big-num.positive { color: var(--hud-success); }
+.hud-big-num.negative { color: var(--hud-error); }
+
+/* ── Table ────────────────────────────────────────────────── */
+.hud-table { width: 100%; border-collapse: collapse; }
+
+.hud-table th {
+  font-size: 9px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--hud-text-dim);
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--hud-border);
+  text-align: left;
+  font-weight: 500;
+}
+
+.hud-table td {
+  padding: 7px 8px;
+  border-bottom: 1px solid rgba(0, 255, 255, 0.04);
+  font-size: 12px;
+  vertical-align: middle;
+}
+
+.hud-table tr:hover td { background: rgba(0, 229, 255, 0.03); }
+
+/* ── Badge / Verdict ─────────────────────────────────────── */
+.hud-badge {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 3px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.hud-badge.buy      { background: rgba(0, 255, 136, 0.15); color: var(--hud-success); border: 1px solid rgba(0, 255, 136, 0.3); }
+.hud-badge.sell     { background: rgba(255, 59, 92, 0.15);  color: var(--hud-error);   border: 1px solid rgba(255, 59, 92, 0.3); }
+.hud-badge.skip     { background: rgba(90, 122, 138, 0.15); color: var(--hud-text-dim);border: 1px solid var(--hud-border); }
+.hud-badge.hold     { background: rgba(255, 204, 0, 0.12);  color: var(--hud-warning); border: 1px solid rgba(255, 204, 0, 0.3); }
+.hud-badge.s1       { background: rgba(0, 229, 255, 0.15);  color: var(--hud-primary); border: 1px solid rgba(0, 229, 255, 0.3); }
+.hud-badge.s2       { background: rgba(0, 229, 255, 0.07);  color: var(--hud-primary); border: 1px solid rgba(0, 229, 255, 0.15); }
+.hud-badge.s3       { background: rgba(0, 229, 255, 0.03);  color: var(--hud-text-dim);border: 1px solid var(--hud-border); }
+
+/* ── Signal source tag ───────────────────────────────────── */
+.source-tag {
+  font-size: 8px;
+  padding: 1px 5px;
+  border-radius: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  font-weight: 600;
+}
+
+.source-tag.twitter    { background: rgba(29, 161, 242, 0.2); color: #1da1f2; }
+.source-tag.stocktwits { background: rgba(68, 205, 111, 0.2); color: #44cd6f; }
+.source-tag.reddit     { background: rgba(255, 87, 0, 0.2);   color: #ff5700; }
+.source-tag.discord    { background: rgba(88, 101, 242, 0.2); color: #5865f2; }
+
+/* ── Sentiment bar ───────────────────────────────────────── */
+.sentiment-bar-wrap {
+  height: 3px;
+  background: var(--hud-text-muted);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.sentiment-bar {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.6s ease;
+}
+
+.sentiment-bar.pos { background: var(--hud-success); }
+.sentiment-bar.neg { background: var(--hud-error); }
+.sentiment-bar.neu { background: var(--hud-text-dim); }
+
+/* ── Activity feed ───────────────────────────────────────── */
+.activity-item {
+  display: flex;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(0, 229, 255, 0.04);
+  animation: fadeSlideIn 0.3s ease forwards;
+}
+
+.activity-time  { color: var(--hud-text-muted); font-size: 10px; white-space: nowrap; min-width: 50px; padding-top: 1px; }
+.activity-agent { font-size: 10px; font-weight: 600; white-space: nowrap; }
+.activity-agent.analyst   { color: var(--hud-purple); }
+.activity-agent.executor  { color: var(--hud-primary); }
+.activity-agent.risk      { color: var(--hud-error); }
+.activity-agent.sentiment { color: var(--hud-warning); }
+.activity-agent.mirofish  { color: var(--hud-success); }
+.activity-text  { color: var(--hud-text-dim); font-size: 11px; line-height: 1.4; }
+
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Signal research card ────────────────────────────────── */
+.research-card {
+  border: 1px solid var(--hud-border);
+  border-radius: var(--radius);
+  padding: 10px;
+  margin-bottom: 8px;
+  background: var(--hud-bg-card);
+  transition: border-color 0.2s;
+}
+
+.research-card:hover { border-color: var(--hud-border-hover); }
+
+.research-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 6px;
+}
+
+.research-symbol { font-size: 14px; font-weight: 700; color: var(--hud-text); }
+.confidence-bar  { height: 2px; background: var(--hud-text-muted); border-radius: 1px; overflow: hidden; margin-top: 8px; }
+.confidence-fill { height: 100%; background: var(--hud-primary); border-radius: 1px; }
+
+/* ── Chart container ─────────────────────────────────────── */
+.chart-wrap {
+  position: relative;
+  width: 100%;
+}
+
+/* ── Scrollable panel body ───────────────────────────────── */
+.panel-scroll {
+  overflow-y: auto;
+  max-height: 280px;
+}
+
+/* ── Status indicators ───────────────────────────────────── */
+.regime-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.regime-chip.bull     { background: rgba(0, 255, 136, 0.12); color: var(--hud-success); border: 1px solid rgba(0, 255, 136, 0.25); }
+.regime-chip.bear     { background: rgba(255, 59, 92, 0.12);  color: var(--hud-error);   border: 1px solid rgba(255, 59, 92, 0.25); }
+.regime-chip.sideways { background: rgba(255, 204, 0, 0.10);  color: var(--hud-warning); border: 1px solid rgba(255, 204, 0, 0.2); }
+
+/* ── Sparkline ───────────────────────────────────────────── */
+.sparkline { display: inline-block; }
+
+/* ── Loading / empty state ───────────────────────────────── */
+.hud-empty {
+  color: var(--hud-text-muted);
+  font-size: 11px;
+  text-align: center;
+  padding: 20px 0;
+  letter-spacing: 0.5px;
+}
+
+/* ── Ticker tape override ────────────────────────────────── */
+.gru-ticker-wrap { border-bottom: 1px solid var(--hud-border); }
+
+/* ── Responsive type scale ───────────────────────────────── */
+@media (max-width: 768px) {
+  .gru-logo-text  { font-size: 14px; }
+  .hud-big-num    { font-size: 20px; }
+}

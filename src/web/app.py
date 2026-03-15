@@ -97,7 +97,12 @@ load_latest_optimization_results()
 
 @app.route('/')
 def index():
-    """Main dashboard - Multi-Agent Trading"""
+    """GRU HUD — Main Dashboard"""
+    return render_template('gru_dashboard.html')
+
+@app.route('/legacy')
+def legacy_index():
+    """Legacy dashboard - Multi-Agent Trading"""
     return render_template('index_multiagent.html')
 
 @app.route('/strategy-optimizer')
@@ -2991,6 +2996,112 @@ def pnl_broadcast_thread():
         except Exception as e:
             cprint(f"⚠️ Broadcast thread error: {e}", "yellow")
             time.sleep(1)
+
+
+# ==================== GRU DASHBOARD ENDPOINTS ====================
+
+@app.route('/api/mirofish/regime', methods=['GET'])
+def get_mirofish_regime():
+    """Return cached MiroFish market regime JSON"""
+    regime_path = Path(project_root) / 'src' / 'data' / 'mirofish_regime.json'
+    try:
+        if regime_path.exists():
+            with open(regime_path) as f:
+                return jsonify(json.load(f))
+        return jsonify({
+            'direction': 'unknown',
+            'confidence': 0.0,
+            'narrative': 'No regime data — run MiroFish agent first.',
+            'timestamp': None
+        })
+    except Exception as e:
+        cprint(f"❌ MiroFish regime read error: {e}", "red")
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/gru/signals', methods=['GET'])
+def get_gru_signals():
+    """Aggregate sentiment signals from sentiment_history.csv for the GRU dashboard"""
+    try:
+        import csv as _csv
+        signals = []
+        history_path = Path(project_root) / 'src' / 'data' / 'sentiment_history.csv'
+        if history_path.exists():
+            with open(history_path, newline='') as f:
+                reader = _csv.DictReader(f)
+                rows = list(reader)
+
+            # Return the 20 most recent rows, newest first
+            for row in reversed(rows[-20:]):
+                score = float(row.get('sentiment_score', 0))
+                source = row.get('source', 'twitter')
+                token = row.get('token', row.get('symbol', ''))
+                direction = 'BUY' if score > 0.1 else ('SELL' if score < -0.1 else 'HOLD')
+                signals.append({
+                    'token': token,
+                    'score': round(score, 3),
+                    'direction': direction,
+                    'source': source,
+                    'timestamp': row.get('timestamp', ''),
+                    'num_posts': int(float(row.get('num_tweets', row.get('num_posts', 0)))),
+                    'confidence': float(row.get('confidence', abs(score))),
+                })
+
+        return jsonify({'signals': signals, 'count': len(signals), 'timestamp': datetime.now().isoformat()})
+    except Exception as e:
+        cprint(f"❌ GRU signals error: {e}", "red")
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/gru/research', methods=['GET'])
+def get_gru_research():
+    """Return recent swarm decisions as GRU research cards"""
+    try:
+        cards = []
+        # Pull decisions from active agent sessions
+        for agent_id, agent_data in agent_manager.agents.items():
+            trading_engine = agent_data.get('trading_engine')
+            if not trading_engine:
+                continue
+            decisions = getattr(trading_engine, 'decisions', []) or []
+            for d in decisions[-10:]:
+                signal = d.get('signal', 'HOLD')
+                verdict = 'BUY' if signal == 'BUY' else ('SKIP' if signal in ('HOLD', 'NOTHING') else 'SELL')
+                cards.append({
+                    'symbol': d.get('symbol', d.get('ticker', '')),
+                    'verdict': verdict,
+                    'confidence': d.get('confidence', 0),
+                    'catalyst': d.get('reasoning', d.get('rationale', ''))[:120],
+                    'risk': d.get('risk', ''),
+                    'tier': d.get('tier', ''),
+                    'timestamp': d.get('timestamp', ''),
+                    'source': 'swarm',
+                })
+
+        # Fallback: read from decisions log file if no live agents
+        if not cards:
+            decisions_path = Path(project_root) / 'src' / 'data' / 'decisions.json'
+            if decisions_path.exists():
+                with open(decisions_path) as f:
+                    raw = json.load(f)
+                for d in raw[-10:]:
+                    signal = d.get('signal', 'HOLD')
+                    verdict = 'BUY' if signal == 'BUY' else ('SKIP' if signal in ('HOLD', 'NOTHING') else 'SELL')
+                    cards.append({
+                        'symbol': d.get('symbol', ''),
+                        'verdict': verdict,
+                        'confidence': d.get('confidence', 0),
+                        'catalyst': d.get('reasoning', '')[:120],
+                        'risk': '',
+                        'tier': d.get('tier', ''),
+                        'timestamp': d.get('timestamp', ''),
+                        'source': 'swarm',
+                    })
+
+        return jsonify({'research': list(reversed(cards)), 'count': len(cards), 'timestamp': datetime.now().isoformat()})
+    except Exception as e:
+        cprint(f"❌ GRU research error: {e}", "red")
+        return jsonify({'error': str(e)}), 500
 
 
 # ==================== MAIN ====================
