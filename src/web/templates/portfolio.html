@@ -3,23 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portfolio | Moon Dev Trading Platform</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='modern-style.css') }}">
+    <title>GRU — Portfolio</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='gru-hud.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: var(--font-mono) !important; }
+        .card { background: var(--hud-bg-panel) !important; border: 1px solid var(--hud-border) !important; border-radius: var(--radius) !important; padding: 14px !important; position: relative; }
+        .card::before { content:''; position:absolute; top:0; left:0; width:20px; height:2px; background:var(--hud-primary); }
+        table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); }
+        table th { font-size: 9px !important; letter-spacing: 1.2px; text-transform: uppercase; color: var(--hud-text-dim) !important; padding: 6px 8px !important; border-bottom: 1px solid var(--hud-border) !important; font-weight: 500; }
+        table td { padding: 7px 8px !important; border-bottom: 1px solid rgba(0,229,255,0.04) !important; font-size: 12px !important; }
+        table tr:hover td { background: rgba(0,229,255,0.03); }
+        input[type="number"] { background: var(--hud-bg-card) !important; border: 1px solid var(--hud-border) !important; color: var(--hud-text) !important; font-family: var(--font-mono) !important; border-radius: var(--radius) !important; padding: 3px 6px !important; font-size: 11px !important; }
+        .btn-secondary { background: rgba(255,59,92,0.08) !important; border: 1px solid rgba(255,59,92,0.25) !important; color: var(--hud-error) !important; border-radius: var(--radius) !important; font-family: var(--font-mono) !important; font-size: 10px !important; padding: 4px 8px !important; cursor: pointer !important; }
+        h2 { color: var(--hud-primary) !important; font-size: 10px !important; font-weight: 600 !important; letter-spacing: 1.5px !important; text-transform: uppercase !important; margin-bottom: 12px !important; }
+        h3 { color: var(--hud-text-dim) !important; font-size: 9px !important; letter-spacing: 1.2px !important; text-transform: uppercase !important; }
+        #cycle-phase { color: var(--hud-primary) !important; }
+    </style>
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="navbar-container">
-            <div class="nav-links">
-                <a href="/strategy-lab">BACKTEST LAB</a>
-                <a href="/analyst">ANALYST</a>
-                <a href="/">LIVE AGENTS</a>
-                <a href="/portfolio" class="active">PORTFOLIO</a>
-            </div>
-        </div>
-    </nav>
+
+<header class="gru-header">
+  <div class="gru-logo">
+    <span class="gru-logo-text">GRU</span>
+    <span class="gru-logo-version">v1.0</span>
+    <div style="display:flex;align-items:center;gap:6px;margin-left:8px;">
+      <div class="market-status-dot" id="mktDot"></div>
+      <span class="hud-dim" style="font-size:10px;" id="mktLabel">CHECKING</span>
+    </div>
+  </div>
+  <div class="gru-header-right">
+    <div id="regimeChip" class="regime-chip sideways">⬤ SIDEWAYS</div>
+    <span class="hud-clock" id="liveClock">00:00:00</span>
+  </div>
+</header>
+
+<nav class="gru-nav">
+  <a href="/">LIVE HUD</a>
+  <a href="/agents">AGENTS</a>
+  <a href="/screener">SCREENER</a>
+  <a href="/analyst">ANALYST</a>
+  <a href="/strategy-lab">STRATEGY LAB</a>
+  <a href="/swarm">SWARM</a>
+  <a href="/portfolio" class="active">PORTFOLIO</a>
+</nav>
+
+<script>
+function updateClock() { document.getElementById('liveClock').textContent = new Date().toUTCString().split(' ')[4] + ' UTC'; }
+setInterval(updateClock, 1000); updateClock();
+function checkMarketStatus() {
+  const et = new Date(new Date().toLocaleString('en-US', {timeZone:'America/New_York'}));
+  const h = et.getHours(), m = et.getMinutes(), d = et.getDay();
+  const open = d >= 1 && d <= 5 && (h > 9 || (h === 9 && m >= 30)) && h < 16;
+  const dot = document.getElementById('mktDot'); const lbl = document.getElementById('mktLabel');
+  if (dot) dot.className = 'market-status-dot' + (open ? '' : ' closed');
+  if (lbl) lbl.textContent = open ? 'MARKET OPEN' : 'MARKET CLOSED';
+}
+checkMarketStatus(); setInterval(checkMarketStatus, 60000);
+</script>
 
     <div class="container" style="max-width: 1400px; margin: 0 auto; padding: 24px;">
 

@@ -6,24 +6,75 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Market Screener - Moon Dev</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='modern-style.css') }}?v=2.0">
+    <title>GRU — Screener</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='gru-hud.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body { font-family: var(--font-mono) !important; }
+        .container { max-width: 1600px; margin: 0 auto; padding: 14px 16px; }
+        .filter-tabs { display: flex; gap: 6px; }
+        .filter-tab { background: var(--hud-bg-panel); border: 1px solid var(--hud-border); color: var(--hud-text-dim); padding: 7px 16px; border-radius: var(--radius); font-family: var(--font-mono); font-size: 10px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: all 0.15s; }
+        .filter-tab:hover { border-color: var(--hud-primary); color: var(--hud-primary); }
+        .filter-tab.active { border-color: var(--hud-primary); color: var(--hud-primary); background: rgba(0,229,255,0.07); }
+        .opportunity-card { background: var(--hud-bg-panel); border: 1px solid var(--hud-border); border-radius: var(--radius); padding: 14px; position: relative; transition: border-color 0.2s; }
+        .opportunity-card::before { content:''; position:absolute; top:0; left:0; width:20px; height:2px; background:var(--hud-primary); }
+        .opportunity-card:hover { border-color: var(--hud-border-hover); }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; }
+        .modal.active { display: flex; }
+        .modal-content { background: var(--hud-bg-panel); border: 1px solid var(--hud-border); border-radius: var(--radius); padding: 20px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .sentiment-positive { background: rgba(0,255,136,0.1); border: 1px solid rgba(0,255,136,0.25); border-radius: var(--radius); }
+        .sentiment-neutral  { background: rgba(255,204,0,0.1); border: 1px solid rgba(255,204,0,0.2); border-radius: var(--radius); }
+        .sentiment-negative { background: rgba(255,59,92,0.1); border: 1px solid rgba(255,59,92,0.2); border-radius: var(--radius); }
+        .btn { background: rgba(0,229,255,0.08); border: 1px solid var(--hud-primary); color: var(--hud-primary); padding: 7px 14px; border-radius: var(--radius); font-family: var(--font-mono); font-size: 10px; font-weight: 600; letter-spacing: 1px; cursor: pointer; text-transform: uppercase; transition: background 0.15s; }
+        .btn:hover { background: rgba(0,229,255,0.15); }
+        .btn-secondary { background: rgba(90,122,138,0.1); border: 1px solid var(--hud-border); color: var(--hud-text-dim); }
+        .btn-secondary:hover { border-color: var(--hud-primary); color: var(--hud-primary); }
+        .confidence-bar { height: 3px; background: var(--hud-text-muted); border-radius: 2px; overflow: hidden; margin-top: 4px; }
+        .confidence-fill { height: 100%; background: var(--hud-primary); border-radius: 2px; }
+    </style>
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="navbar-container">
-            <div class="nav-links">
-                <a href="/">LIVE TRADING</a>
-                <a href="/screener" class="active">SCREENER</a>
-                <a href="/analyst">ANALYST</a>
-                <a href="/portfolio">PORTFOLIO</a>
-                <a href="/strategy-lab">STRATEGY LAB</a>
-            </div>
-        </div>
-    </nav>
+
+<header class="gru-header">
+  <div class="gru-logo">
+    <span class="gru-logo-text">GRU</span>
+    <span class="gru-logo-version">v1.0</span>
+    <div style="display:flex;align-items:center;gap:6px;margin-left:8px;">
+      <div class="market-status-dot" id="mktDot"></div>
+      <span class="hud-dim" style="font-size:10px;" id="mktLabel">CHECKING</span>
+    </div>
+  </div>
+  <div class="gru-header-right">
+    <div id="regimeChip" class="regime-chip sideways">⬤ SIDEWAYS</div>
+    <span class="hud-clock" id="liveClock">00:00:00</span>
+  </div>
+</header>
+
+<nav class="gru-nav">
+  <a href="/">LIVE HUD</a>
+  <a href="/agents">AGENTS</a>
+  <a href="/screener" class="active">SCREENER</a>
+  <a href="/analyst">ANALYST</a>
+  <a href="/strategy-lab">STRATEGY LAB</a>
+  <a href="/swarm">SWARM</a>
+  <a href="/portfolio">PORTFOLIO</a>
+</nav>
+
+<script>
+function updateClock() { document.getElementById('liveClock').textContent = new Date().toUTCString().split(' ')[4] + ' UTC'; }
+setInterval(updateClock, 1000); updateClock();
+function checkMarketStatus() {
+  const et = new Date(new Date().toLocaleString('en-US', {timeZone:'America/New_York'}));
+  const h = et.getHours(), m = et.getMinutes(), d = et.getDay();
+  const open = d >= 1 && d <= 5 && (h > 9 || (h === 9 && m >= 30)) && h < 16;
+  const dot = document.getElementById('mktDot'); const lbl = document.getElementById('mktLabel');
+  if (dot) dot.className = 'market-status-dot' + (open ? '' : ' closed');
+  if (lbl) lbl.textContent = open ? 'MARKET OPEN' : 'MARKET CLOSED';
+}
+checkMarketStatus(); setInterval(checkMarketStatus, 60000);
+</script>
 
     <div class="container">
 

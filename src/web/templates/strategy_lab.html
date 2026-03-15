@@ -1,1020 +1,631 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Strategy Lab - Moon Dev Trading</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='modern-style.css') }}">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GRU — Strategy Lab</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='gru-hud.css') }}">
+  <style>
+    .hud-textarea {
+      width: 100%;
+      background: var(--hud-bg-card);
+      border: 1px solid var(--hud-border);
+      border-radius: var(--radius);
+      padding: 12px;
+      color: var(--hud-text);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      resize: vertical;
+      transition: border-color 0.2s;
+    }
+    .hud-textarea:focus { outline: none; border-color: var(--hud-border-hover); }
+    .hud-textarea::placeholder { color: var(--hud-text-muted); }
+    .hud-select {
+      background: var(--hud-bg-card);
+      border: 1px solid var(--hud-border);
+      border-radius: var(--radius);
+      padding: 8px 10px;
+      color: var(--hud-text);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      width: 100%;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .hud-select:focus { outline: none; border-color: var(--hud-border-hover); }
+    .hud-btn-primary {
+      background: rgba(0,229,255,0.08);
+      border: 1px solid var(--hud-primary);
+      color: var(--hud-primary);
+      padding: 10px 24px;
+      border-radius: var(--radius);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      cursor: pointer;
+      width: 100%;
+      transition: background 0.15s;
+      text-transform: uppercase;
+    }
+    .hud-btn-primary:hover { background: rgba(0,229,255,0.15); }
+    .hud-btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+    .mode-card {
+      background: var(--hud-bg-card);
+      border: 1px solid var(--hud-border);
+      border-radius: var(--radius);
+      padding: 12px;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .mode-card.selected {
+      border-color: var(--hud-primary);
+      background: rgba(0,229,255,0.05);
+    }
+    .queue-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      background: var(--hud-bg-card);
+      border: 1px solid var(--hud-border);
+      border-radius: var(--radius);
+      margin-bottom: 6px;
+      font-size: 12px;
+    }
+    .hud-modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.85);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    .hud-modal.active { display: flex; }
+    .hud-modal-content {
+      background: var(--hud-bg-panel);
+      border: 1px solid var(--hud-border);
+      border-radius: var(--radius);
+      padding: 24px;
+      max-width: 900px;
+      width: 90%;
+      max-height: 85vh;
+      overflow-y: auto;
+      position: relative;
+    }
+    .hud-modal-close {
+      position: absolute; top: 12px; right: 12px;
+      background: none; border: none;
+      color: var(--hud-text-dim); font-size: 20px; cursor: pointer;
+    }
+    .hud-modal-close:hover { color: var(--hud-error); }
+    .detail-metric {
+      background: var(--hud-bg-card);
+      border: 1px solid var(--hud-border);
+      border-radius: var(--radius);
+      padding: 14px;
+      text-align: center;
+    }
+    .grade-circle {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      font-size: 12px; font-weight: 700;
+      color: #000;
+    }
+    .hud-toggle { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+    .hud-toggle input { width: 14px; height: 14px; accent-color: var(--hud-primary); }
+  </style>
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="navbar-container">
-            <div class="nav-links">
-                <a href="/strategy-lab" class="active">BACKTEST LAB</a>
-                <a href="/analyst">ANALYST</a>
-                <a href="/">LIVE AGENTS</a>
-                <a href="/portfolio">PORTFOLIO</a>
-            </div>
-        </div>
-    </nav>
-    
-    <div class="container">
-        
-        <!-- Strategy Input Section -->
-        <div class="chart-section">
-            <h2 style="font-size: 20px; font-weight: 600; color: #fff; margin-bottom: 20px;">
-                <i class="fas fa-lightbulb"></i> Submit Strategy Ideas
-            </h2>
-            
-            <div style="background: #1a1a24; border-radius: 8px; padding: 20px; margin-bottom: 16px;">
-                <div style="display: grid; grid-template-columns: 1fr 300px; gap: 20px;">
-                    <!-- Left: Textarea -->
-                    <div>
-                        <div style="color: #9ca3af; font-size: 14px; margin-bottom: 12px;">
-                            Enter one or more trading strategy ideas (one per line). The AI will research each strategy and generate backtests.
-                        </div>
-                        <textarea 
-                            id="strategyIdeas"
-                            placeholder="Enter strategy ideas (one per line):
+
+<header class="gru-header">
+  <div class="gru-logo">
+    <span class="gru-logo-text">GRU</span>
+    <span class="gru-logo-version">v1.0</span>
+    <div style="display:flex;align-items:center;gap:6px;margin-left:8px;">
+      <div class="market-status-dot" id="mktDot"></div>
+      <span class="hud-dim" style="font-size:10px;" id="mktLabel">CHECKING</span>
+    </div>
+  </div>
+  <div class="gru-header-right">
+    <div id="regimeChip" class="regime-chip sideways">⬤ SIDEWAYS</div>
+    <span class="hud-clock" id="liveClock">00:00:00</span>
+  </div>
+</header>
+
+<nav class="gru-nav">
+  <a href="/">LIVE HUD</a>
+  <a href="/agents">AGENTS</a>
+  <a href="/screener">SCREENER</a>
+  <a href="/analyst">ANALYST</a>
+  <a href="/strategy-lab" class="active">STRATEGY LAB</a>
+  <a href="/swarm">SWARM</a>
+  <a href="/portfolio">PORTFOLIO</a>
+</nav>
+
+<div class="gru-layout">
+
+  <div style="display:flex;align-items:baseline;gap:12px;padding:4px 0 8px;">
+    <span style="font-size:18px;font-weight:700;color:var(--hud-primary);letter-spacing:2px;">STRATEGY LAB</span>
+    <span class="hud-dim" style="font-size:11px;">research · backtest · iterate · deploy</span>
+  </div>
+
+  <!-- Input area -->
+  <div class="gru-panel">
+    <div class="gru-panel-title"><div class="dot"></div>SUBMIT STRATEGY IDEAS</div>
+
+    <div style="display:grid;grid-template-columns:1fr 280px;gap:var(--gap);">
+      <!-- Ideas textarea -->
+      <div>
+        <div class="hud-dim" style="font-size:10px;margin-bottom:6px;">Enter one or more trading strategy ideas (one per line). AI will research each and generate backtests.</div>
+        <textarea id="strategyIdeas" class="hud-textarea" style="min-height:160px;"
+          placeholder="Enter strategy ideas (one per line):
 
 RSI divergence with MACD confirmation
 Moving average crossover on 4H timeframe
 Bollinger Band squeeze breakout strategy
-https://youtube.com/watch?v=... (YouTube strategy video)
-Support/resistance bounce with volume confirmation"
-                            style="width: 100%; min-height: 200px; background: #0f0f16; border: 1px solid #2d2d3d; border-radius: 8px; padding: 16px; color: #fff; font-size: 14px; font-family: 'Courier New', monospace; resize: vertical;"
-                        ></textarea>
-                    </div>
-                    
-                    <!-- Right: RBI Settings Stacked -->
-                    <div style="display: flex; flex-direction: column; gap: 12px;">
-                        <!-- RBI Agent Version -->
-                        <div>
-                            <label style="display: block; color: #9ca3af; font-size: 13px; font-weight: 600; margin-bottom: 8px;">
-                                <i class="fas fa-robot"></i> RBI Agent Version
-                            </label>
-                            <select id="rbiAgentVersion" style="width: 100%; background: #0f0f16; border: 1px solid #2d2d3d; border-radius: 6px; padding: 10px; color: #fff; font-size: 13px;">
-                                <option value="v3">V3 (Optimized - Recommended)</option>
-                                <option value="v2">V2 (Full Execution Loop)</option>
-                                <option value="v2_simple">V2 Simple (Fast)</option>
-                                <option value="v1">V1 (Classic)</option>
-                            </select>
-                        </div>
-                        
-                        <!-- AI Model -->
-                        <div>
-                            <label style="display: block; color: #9ca3af; font-size: 13px; font-weight: 600; margin-bottom: 8px;">
-                                <i class="fas fa-brain"></i> AI Model
-                            </label>
-                            <select id="aiModel" style="width: 100%; background: #0f0f16; border: 1px solid #2d2d3d; border-radius: 6px; padding: 10px; color: #fff; font-size: 13px;">
-                                <option value="deepseek">DeepSeek (Fast & Cheap)</option>
-                                <option value="openai">OpenAI (GPT-4o)</option>
-                                <option value="claude">Claude (Opus)</option>
-                                <option value="gemini">Gemini (Flash)</option>
-                                <option value="xai">xAI Grok</option>
-                            </select>
-                        </div>
-                        
-                        <!-- Enable RL Optimization -->
-                        <div style="display: flex; align-items: center; padding-top: 4px;">
-                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                                <input type="checkbox" id="enableRL" style="width: 16px; height: 16px; cursor: pointer;">
-                                <span style="color: #fff; font-weight: 600; font-size: 13px;">Enable RL Optimization</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            
-            <!-- Analysis Mode Selector -->
-            <div style="background: #1a1a24; border-radius: 8px; padding: 20px; margin-bottom: 16px;">
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
-                    <!-- Single Agent Mode -->
-                    <label style="cursor: pointer;">
-                        <input type="radio" name="analysisMode" value="single" checked style="display: none;">
-                        <div class="mode-card" id="singleModeCard" style="background: #6366f1; border: 2px solid #6366f1; border-radius: 8px; padding: 14px; transition: all 0.3s; height: 100%;">
-                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-                                <div style="display: flex; align-items: center; gap: 8px;">
-                                    <div style="font-size: 24px;">⚡</div>
-                                    <div>
-                                        <div style="color: #fff; font-weight: 600; font-size: 14px;">Single Agent</div>
-                                        <div style="color: rgba(255,255,255,0.8); font-size: 11px;">Fast analysis</div>
-                                    </div>
-                                </div>
-                                <select id="singleAgentModel" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; padding: 6px 12px; color: #fff; font-size: 12px; min-width: 140px;">
-                                    <option value="gpt-5">GPT-5</option>
-                                    <option value="claude">Claude 4.5</option>
-                                    <option value="deepseek">DeepSeek</option>
-                                    <option value="grok">Grok</option>
-                                </select>
-                            </div>
-                        </div>
-                    </label>
-                    
-                    <!-- Swarm Mode -->
-                    <label style="cursor: pointer;">
-                        <input type="radio" name="analysisMode" value="swarm" style="display: none;">
-                        <div class="mode-card" id="swarmModeCard" style="background: #1a1a24; border: 2px solid #2d2d3d; border-radius: 8px; padding: 14px; transition: all 0.3s;">
-                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                                <div style="font-size: 24px;">🐝</div>
-                                <div>
-                                    <div style="color: #fff; font-weight: 600; font-size: 14px;">Swarm Mode</div>
-                                    <div style="color: #9ca3af; font-size: 11px;">Multi-model consensus</div>
-                                </div>
-                            </div>
-                            <div style="color: #6b7280; font-size: 11px; line-height: 1.4;">
-                                GPT-5, Claude, DeepSeek, Grok
-                            </div>
-                        </div>
-                    </label>
-                    
-                    <!-- Batch Mode -->
-                    <label style="cursor: pointer;">
-                        <input type="radio" name="analysisMode" value="batch" style="display: none;">
-                        <div class="mode-card" id="batchModeCard" style="background: #1a1a24; border: 2px solid #2d2d3d; border-radius: 8px; padding: 14px; transition: all 0.3s;">
-                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                                <div style="font-size: 24px;">🔄</div>
-                                <div>
-                                    <div style="color: #fff; font-weight: 600; font-size: 14px;">Batch Mode</div>
-                                    <div style="color: #9ca3af; font-size: 11px;">Test 10+ strategies</div>
-                                </div>
-                            </div>
-                            <div style="color: #6b7280; font-size: 11px; line-height: 1.4;">
-                                Auto-fix errors, compare results
-                            </div>
-                        </div>
-                    </label>
-                </div>
-                
-                <!-- Batch Upload Section (shown when batch mode selected) -->
-                <div id="batchUploadSection" style="display: none; margin-top: 20px;">
-                    <div style="background: #1a1a24; border: 2px solid #2d2d3d; border-radius: 8px; padding: 24px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                            <div style="color: #fff; font-weight: 600; font-size: 16px;">Batch Strategies</div>
-                            <button onclick="showAddStrategyModal()" style="background: #6366f1; color: #fff; padding: 8px 16px; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">
-                                <i class="fas fa-plus"></i> Add Strategy
-                            </button>
-                        </div>
-                        <div id="batchStrategiesList" style="min-height: 100px;">
-                            <div style="text-align: center; color: #6b7280; padding: 20px;">
-                                No strategies added yet. Click "Add Strategy" to begin.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <button 
-                onclick="submitStrategies()"
-                id="submitBtn"
-                style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: #fff; padding: 14px 32px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%;"
-            >
-                <i class="fas fa-rocket"></i> Research & Backtest Strategies
-            </button>
+https://youtube.com/watch?v=... (YouTube URL)
+Support/resistance bounce with volume confirmation"></textarea>
+        <div id="strategyInput"></div>
+      </div>
+
+      <!-- Settings -->
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div>
+          <div class="hud-label" style="margin-bottom:5px;">RBI AGENT VERSION</div>
+          <select id="rbiAgentVersion" class="hud-select">
+            <option value="v3">V3 — Optimized (Recommended)</option>
+            <option value="v2">V2 — Full Execution Loop</option>
+            <option value="v2_simple">V2 Simple — Fast</option>
+            <option value="v1">V1 — Classic</option>
+          </select>
         </div>
-        
-        <!-- Processing Queue -->
-        <div id="processingSection" style="display: none; margin-top: 24px;">
-            <div class="chart-section">
-                <h2 style="font-size: 20px; font-weight: 600; color: #fff; margin-bottom: 20px;">
-                    <i class="fas fa-tasks"></i> Processing Queue
-                </h2>
-                <div id="processingQueue"></div>
-            </div>
+        <div>
+          <div class="hud-label" style="margin-bottom:5px;">AI MODEL</div>
+          <select id="aiModel" class="hud-select">
+            <option value="deepseek">DeepSeek — Fast & Cheap</option>
+            <option value="openai">OpenAI — GPT-4o</option>
+            <option value="claude">Claude — Opus</option>
+            <option value="gemini">Gemini — Flash</option>
+            <option value="xai">xAI Grok</option>
+          </select>
         </div>
-        
-        <!-- Results Comparison Table -->
-        <div id="resultsSection" style="display: none; margin-top: 24px;">
-            <div class="chart-section">
-                <h2 style="font-size: 20px; font-weight: 600; color: #fff; margin-bottom: 20px;">
-                    <i class="fas fa-chart-bar"></i> Backtest Results Comparison
-                </h2>
-                <div style="overflow-x: auto;">
-                    <table id="resultsTable" style="width: 100%; border-collapse: collapse; font-size: 13px;">
-                        <thead>
-                            <tr style="background: #1a1a24; border-bottom: 2px solid #6366f1;">
-                                <th style="padding: 12px; text-align: left; color: #fff; font-weight: 600; font-size: 12px;">Strategy</th>
-                                <th style="padding: 12px; text-align: center; color: #fff; font-weight: 600; font-size: 12px;">Ticker</th>
-                                <th style="padding: 12px; text-align: center; color: #fff; font-weight: 600; font-size: 12px;">Timeframe</th>
-                                <th style="padding: 12px; text-align: center; color: #fff; font-weight: 600; font-size: 12px;">Period</th>
-                                <th style="padding: 12px; text-align: center; color: #fff; font-weight: 600; font-size: 12px;">Mode</th>
-                                <th style="padding: 12px; text-align: center; color: #fff; font-weight: 600; font-size: 12px;">Return</th>
-                                <th style="padding: 12px; text-align: center; color: #fff; font-weight: 600; font-size: 12px;">Buy&Hold</th>
-                                <th style="padding: 12px; text-align: center; color: #fff; font-weight: 600; font-size: 12px;">Win Rate</th>
-                                <th style="padding: 12px; text-align: center; color: #fff; font-weight: 600; font-size: 12px;">Sharpe</th>
-                                <th style="padding: 12px; text-align: center; color: #fff; font-weight: 600; font-size: 12px;">Max DD</th>
-                                <th style="padding: 12px; text-align: center; color: #fff; font-weight: 600; font-size: 12px;" title="Risk Rating: A=Excellent, B=Good, C=Average, D=Poor, F=High Risk">Risk <i class="fas fa-info-circle" style="font-size: 10px; opacity: 0.7;"></i></th>
-                                <th style="padding: 12px; text-align: center; color: #fff; font-weight: 600; font-size: 12px;">Trades</th>
-                                <th style="padding: 12px; text-align: center; color: #fff; font-weight: 600; font-size: 12px;">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="resultsBody">
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Strategy Details Modal -->
-        <div id="detailsModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; overflow-y: auto;">
-            <div style="max-width: 1200px; margin: 40px auto; background: #12121a; border-radius: 12px; padding: 32px; position: relative;">
-                <button onclick="closeDetails()" style="position: absolute; top: 20px; right: 20px; background: none; border: none; color: #9ca3af; font-size: 24px; cursor: pointer;">
-                    ×
-                </button>
-                <div id="detailsContent"></div>
-            </div>
-        </div>
-        
-        <!-- Add Strategy Modal -->
-        <div id="addStrategyModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000;">
-            <div style="max-width: 600px; margin: 80px auto; background: #12121a; border-radius: 12px; padding: 32px; position: relative;">
-                <button onclick="closeAddStrategyModal()" style="position: absolute; top: 20px; right: 20px; background: none; border: none; color: #9ca3af; font-size: 24px; cursor: pointer;">
-                    ×
-                </button>
-                <h2 style="color: #fff; font-size: 24px; font-weight: 700; margin-bottom: 24px;">
-                    <i class="fas fa-plus-circle"></i> Add Strategy
-                </h2>
-                <div style="margin-bottom: 20px;">
-                    <label style="display: block; color: #9ca3af; font-size: 14px; font-weight: 600; margin-bottom: 8px;">Strategy Description</label>
-                    <textarea id="newStrategyText" placeholder="e.g., RSI divergence with MACD confirmation on SPY (swing trade)" style="width: 100%; min-height: 120px; background: #1a1a24; border: 1px solid #2d2d3d; border-radius: 8px; padding: 12px; color: #fff; font-size: 14px; resize: vertical;"></textarea>
-                    <div style="color: #6b7280; font-size: 12px; margin-top: 6px;">Describe your trading strategy idea</div>
-                </div>
-                <div style="display: flex; gap: 12px;">
-                    <button onclick="addStrategyToBatch()" style="flex: 1; background: #6366f1; color: #fff; padding: 12px; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;">
-                        <i class="fas fa-check"></i> Add Strategy
-                    </button>
-                    <button onclick="closeAddStrategyModal()" style="background: #2d2d3d; color: #9ca3af; padding: 12px 24px; border: none; border-radius: 6px; font-size: 14px; cursor: pointer;">
-                        Cancel
-                    </button>
-                </div>
-            </div>
-        </div>
+        <label class="hud-toggle">
+          <input type="checkbox" id="enableRL">
+          <span style="font-size:11px;color:var(--hud-text);">Enable RL Optimization</span>
+        </label>
+      </div>
     </div>
-    
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        let strategies = [];
-        
-        // Load saved backtest results from localStorage
-        function loadSavedResults() {
-            try {
-                const saved = localStorage.getItem('backtest_results');
-                if (saved) {
-                    strategies = JSON.parse(saved);
-                    console.log(`Loaded ${strategies.length} saved backtest results`);
-                    
-                    // Clear processing queue on page refresh - only keep completed/failed strategies
-                    const beforeCount = strategies.length;
-                    strategies = strategies.filter(s => s.status === 'completed' || s.status === 'failed');
-                    const clearedCount = beforeCount - strategies.length;
-                    
-                    if (clearedCount > 0) {
-                        console.log(`🧹 Cleared ${clearedCount} in-progress strategies from queue`);
-                        saveResults(); // Save the cleaned list
-                    }
-                    
-                    if (strategies.length > 0) {
-                        document.getElementById('resultsSection').style.display = 'block';
-                        updateResultsTable();
-                    }
-                }
-            } catch (e) {
-                console.error('Error loading saved results:', e);
-            }
-        }
-        
-        // Save backtest results to localStorage
-        function saveResults() {
-            try {
-                localStorage.setItem('backtest_results', JSON.stringify(strategies));
-                console.log(`Saved ${strategies.length} backtest results`);
-            } catch (e) {
-                console.error('Error saving results:', e);
-            }
-        }
-        
-        // Mode switching
-        document.addEventListener('DOMContentLoaded', function() {
-            // Load saved results on page load
-            loadSavedResults();
-            const modeRadios = document.querySelectorAll('input[name="analysisMode"]');
-            modeRadios.forEach(radio => {
-                radio.addEventListener('change', function() {
-                    updateModeCards();
-                });
-            });
-            
-            // Click on card to select
-            document.getElementById('singleModeCard').addEventListener('click', function() {
-                document.querySelector('input[value="single"]').checked = true;
-                updateModeCards();
-            });
-            
-            document.getElementById('swarmModeCard').addEventListener('click', function() {
-                document.querySelector('input[value="swarm"]').checked = true;
-                updateModeCards();
-            });
-            
-            document.getElementById('batchModeCard').addEventListener('click', function() {
-                document.querySelector('input[value="batch"]').checked = true;
-                updateModeCards();
-            });
+
+    <!-- Mode selector -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--gap);margin:12px 0;">
+      <label style="cursor:pointer;">
+        <input type="radio" name="analysisMode" value="single" checked style="display:none;">
+        <div class="mode-card selected" id="singleModeCard">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+            <div>
+              <div style="font-size:12px;font-weight:600;color:var(--hud-text);">⚡ SINGLE AGENT</div>
+              <div class="hud-dim" style="font-size:10px;">Fast analysis</div>
+            </div>
+            <select id="singleAgentModel" class="hud-select" style="width:auto;" onclick="event.stopPropagation();">
+              <option value="gpt-5">GPT-5</option>
+              <option value="claude">Claude 4.5</option>
+              <option value="deepseek">DeepSeek</option>
+              <option value="grok">Grok</option>
+            </select>
+          </div>
+        </div>
+      </label>
+
+      <label style="cursor:pointer;">
+        <input type="radio" name="analysisMode" value="swarm" style="display:none;">
+        <div class="mode-card" id="swarmModeCard">
+          <div style="margin-bottom:6px;">
+            <div style="font-size:12px;font-weight:600;color:var(--hud-text);">⬡ SWARM MODE</div>
+            <div class="hud-dim" style="font-size:10px;">Multi-model consensus</div>
+          </div>
+          <div class="hud-dim" style="font-size:10px;">GPT-5 · Claude · DeepSeek · Grok</div>
+        </div>
+      </label>
+
+      <label style="cursor:pointer;">
+        <input type="radio" name="analysisMode" value="batch" style="display:none;">
+        <div class="mode-card" id="batchModeCard">
+          <div style="margin-bottom:6px;">
+            <div style="font-size:12px;font-weight:600;color:var(--hud-text);">⊞ BATCH MODE</div>
+            <div class="hud-dim" style="font-size:10px;">Test 10+ strategies</div>
+          </div>
+          <div class="hud-dim" style="font-size:10px;">Auto-fix errors · Compare results</div>
+        </div>
+      </label>
+    </div>
+
+    <!-- Batch strategies list -->
+    <div id="batchUploadSection" style="display:none;margin-bottom:10px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <div class="hud-label">BATCH STRATEGIES</div>
+        <button onclick="showAddStrategyModal()" style="background:rgba(0,229,255,0.08);border:1px solid var(--hud-border);color:var(--hud-primary);padding:5px 12px;border-radius:var(--radius);font-family:var(--font-mono);font-size:10px;font-weight:600;cursor:pointer;">+ ADD STRATEGY</button>
+      </div>
+      <div id="batchStrategiesList" class="hud-empty" style="padding:16px 0;">No strategies added yet. Click "Add Strategy" to begin.</div>
+    </div>
+
+    <button onclick="submitStrategies()" id="submitBtn" class="hud-btn-primary">
+      ⟶ RESEARCH &amp; BACKTEST STRATEGIES
+    </button>
+  </div>
+
+  <!-- Processing queue -->
+  <div class="gru-panel" id="processingSection" style="display:none;">
+    <div class="gru-panel-title"><div class="dot"></div>PROCESSING QUEUE</div>
+    <div id="processingQueue"></div>
+  </div>
+
+  <!-- Results table -->
+  <div class="gru-panel" id="resultsSection" style="display:none;">
+    <div class="gru-panel-title"><div class="dot"></div>BACKTEST RESULTS</div>
+    <div style="overflow-x:auto;">
+      <table class="hud-table" id="resultsTable">
+        <thead>
+          <tr>
+            <th>Strategy</th>
+            <th>Ticker</th>
+            <th>Timeframe</th>
+            <th>Period</th>
+            <th>Mode</th>
+            <th>Return</th>
+            <th>Buy&amp;Hold</th>
+            <th>Win Rate</th>
+            <th>Sharpe</th>
+            <th>Max DD</th>
+            <th title="A=Excellent B=Good C=Avg D=Poor F=High Risk">Risk</th>
+            <th>Trades</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="resultsBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- Details modal -->
+<div id="detailsModal" class="hud-modal">
+  <div class="hud-modal-content" style="max-width:1000px;">
+    <button class="hud-modal-close" onclick="closeDetails()">×</button>
+    <div id="detailsContent"></div>
+  </div>
+</div>
+
+<!-- Add strategy modal -->
+<div id="addStrategyModal" class="hud-modal">
+  <div class="hud-modal-content" style="max-width:560px;">
+    <button class="hud-modal-close" onclick="closeAddStrategyModal()">×</button>
+    <div class="gru-panel-title" style="margin-bottom:14px;"><div class="dot"></div>ADD STRATEGY</div>
+    <div class="hud-label" style="margin-bottom:6px;">STRATEGY DESCRIPTION</div>
+    <textarea id="newStrategyText" class="hud-textarea" style="min-height:100px;" placeholder="e.g., RSI divergence with MACD confirmation on SPY (swing trade)"></textarea>
+    <div class="hud-dim" style="font-size:10px;margin:6px 0 14px;">Describe your trading strategy idea</div>
+    <div style="display:flex;gap:8px;">
+      <button onclick="addStrategyToBatch()" class="hud-btn-primary" style="flex:1;">ADD STRATEGY</button>
+      <button onclick="closeAddStrategyModal()" style="background:none;border:1px solid var(--hud-border);color:var(--hud-text-dim);padding:10px 20px;border-radius:var(--radius);font-family:var(--font-mono);font-size:11px;cursor:pointer;text-transform:uppercase;letter-spacing:1px;">CANCEL</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+// Clock & Market Status
+function updateClock() {
+  document.getElementById('liveClock').textContent = new Date().toUTCString().split(' ')[4] + ' UTC';
+}
+setInterval(updateClock, 1000); updateClock();
+function checkMarketStatus() {
+  const et = new Date(new Date().toLocaleString('en-US', {timeZone:'America/New_York'}));
+  const h = et.getHours(), m = et.getMinutes(), d = et.getDay();
+  const open = d >= 1 && d <= 5 && (h > 9 || (h === 9 && m >= 30)) && h < 16;
+  const dot = document.getElementById('mktDot');
+  const lbl = document.getElementById('mktLabel');
+  if (dot) dot.className = 'market-status-dot' + (open ? '' : ' closed');
+  if (lbl) lbl.textContent = open ? 'MARKET OPEN' : 'MARKET CLOSED';
+}
+checkMarketStatus(); setInterval(checkMarketStatus, 60000);
+
+let strategies = [];
+
+function loadSavedResults() {
+  try {
+    const saved = localStorage.getItem('backtest_results');
+    if (saved) {
+      strategies = JSON.parse(saved);
+      const before = strategies.length;
+      strategies = strategies.filter(s => s.status === 'completed' || s.status === 'failed');
+      if (before !== strategies.length) saveResults();
+      if (strategies.length > 0) {
+        document.getElementById('resultsSection').style.display = 'block';
+        updateResultsTable();
+      }
+    }
+  } catch(e) { console.error(e); }
+}
+
+function saveResults() {
+  try { localStorage.setItem('backtest_results', JSON.stringify(strategies)); } catch(e) {}
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  loadSavedResults();
+  const radios = document.querySelectorAll('input[name="analysisMode"]');
+  radios.forEach(r => r.addEventListener('change', updateModeCards));
+  document.getElementById('singleModeCard').addEventListener('click', () => {
+    document.querySelector('input[value="single"]').checked = true; updateModeCards();
+  });
+  document.getElementById('swarmModeCard').addEventListener('click', () => {
+    document.querySelector('input[value="swarm"]').checked = true; updateModeCards();
+  });
+  document.getElementById('batchModeCard').addEventListener('click', () => {
+    document.querySelector('input[value="batch"]').checked = true; updateModeCards();
+  });
+});
+
+let batchStrategies = [];
+
+function showAddStrategyModal() {
+  document.getElementById('addStrategyModal').classList.add('active');
+  document.getElementById('newStrategyText').value = '';
+  document.getElementById('newStrategyText').focus();
+}
+function closeAddStrategyModal() { document.getElementById('addStrategyModal').classList.remove('active'); }
+
+function addStrategyToBatch() {
+  const text = document.getElementById('newStrategyText').value.trim();
+  if (!text) return;
+  batchStrategies.push({id: Date.now(), text});
+  updateBatchStrategiesList();
+  closeAddStrategyModal();
+}
+function removeBatchStrategy(id) {
+  batchStrategies = batchStrategies.filter(s => s.id !== id);
+  updateBatchStrategiesList();
+}
+function updateBatchStrategiesList() {
+  const el = document.getElementById('batchStrategiesList');
+  if (batchStrategies.length === 0) {
+    el.className = 'hud-empty'; el.style.padding = '16px 0';
+    el.textContent = 'No strategies added yet.'; return;
+  }
+  el.className = ''; el.style.padding = '0';
+  el.innerHTML = batchStrategies.map((s, i) => `
+    <div class="queue-item">
+      <span class="hud-dim" style="font-size:10px;min-width:24px;">${i+1}</span>
+      <span style="flex:1;font-size:11px;color:var(--hud-text);">${s.text.length > 80 ? s.text.substring(0,80)+'…' : s.text}</span>
+      <button onclick="removeBatchStrategy(${s.id})" style="background:none;border:none;color:var(--hud-error);cursor:pointer;font-size:14px;">×</button>
+    </div>`).join('');
+}
+
+function updateModeCards() {
+  const mode = document.querySelector('input[name="analysisMode"]:checked').value;
+  ['single','swarm','batch'].forEach(m => {
+    const el = document.getElementById(m + 'ModeCard');
+    el.classList.toggle('selected', m === mode);
+    el.style.borderColor = m === mode ? 'var(--hud-primary)' : '';
+  });
+  document.getElementById('batchUploadSection').style.display = mode === 'batch' ? 'block' : 'none';
+}
+
+async function submitStrategies() {
+  let ideas = document.getElementById('strategyIdeas').value.trim();
+  if (!ideas) { ideas = 'RSI divergence with MACD confirmation on SPY (swing trade)'; document.getElementById('strategyIdeas').value = ideas; }
+  const rbiAgentVersion = document.getElementById('rbiAgentVersion').value;
+  const aiModel = document.getElementById('aiModel').value;
+  const enableRL = document.getElementById('enableRL').checked;
+  const mode = document.querySelector('input[name="analysisMode"]:checked').value;
+  const model = mode === 'single' ? document.getElementById('singleAgentModel').value : null;
+  const strategyList = ideas.split('\n').map(s => s.trim()).filter(s => s && !s.startsWith('#'));
+  if (strategyList.length === 0) { alert('Please enter at least one strategy idea'); return; }
+
+  document.getElementById('processingSection').style.display = 'block';
+  document.getElementById('resultsSection').style.display = 'block';
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true; btn.textContent = '⟳ PROCESSING…';
+
+  const newStrategies = strategyList.map((idea, i) => ({
+    id: Date.now() + i, idea, status: 'queued', research: null, backtest: null, results: null,
+    mode, model, rbiAgentVersion, aiModel, enableRL, rlStatus: enableRL ? 'training' : null, rlTrainingCount: 0
+  }));
+  strategies.push(...newStrategies);
+  saveResults(); updateProcessingQueue(); updateResultsTable();
+
+  const startIndex = strategies.length - newStrategies.length;
+  for (let i = startIndex; i < strategies.length; i++) {
+    if (strategies[i].status === 'completed' || strategies[i].status === 'failed') continue;
+    await processStrategy(i);
+  }
+  btn.disabled = false; btn.textContent = '⟶ RESEARCH & BACKTEST STRATEGIES';
+}
+
+async function processStrategy(index) {
+  const strategy = strategies[index];
+  strategy.status = 'researching'; updateProcessingQueue(); updateResultsTable();
+  try {
+    if (strategy.mode === 'swarm') {
+      const sr = await fetch('/api/swarm/analyze', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({prompt: `Analyze this trading strategy: ${strategy.idea}`})
+      });
+      const sd = await sr.json();
+      strategy.swarm_consensus = sd.consensus; strategy.models_count = sd.models_count;
+    }
+    const res = await fetch('/api/rbi/submit', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({trading_idea: strategy.idea, model: strategy.model, rbi_agent_version: strategy.rbiAgentVersion, ai_model: strategy.aiModel})
+    });
+    const result = await res.json();
+    if (result.status === 'success') {
+      strategy.research = result.result; strategy.status = 'backtesting';
+      updateProcessingQueue(); updateResultsTable();
+      const strategyName = result.result.strategy_name || strategy.idea.substring(0,30).replace(/[^a-zA-Z0-9]/g, '');
+      try {
+        const br = await fetch('/api/rbi/backtest', {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({strategy_name: strategyName, enable_rbi_rl: strategy.enableRL})
         });
-        
-        let batchStrategies = [];
-        
-        function showAddStrategyModal() {
-            document.getElementById('addStrategyModal').style.display = 'block';
-            document.getElementById('newStrategyText').value = '';
-            document.getElementById('newStrategyText').focus();
-        }
-        
-        function closeAddStrategyModal() {
-            document.getElementById('addStrategyModal').style.display = 'none';
-        }
-        
-        function addStrategyToBatch() {
-            const strategyText = document.getElementById('newStrategyText').value.trim();
-            
-            if (!strategyText) {
-                alert('Please enter a strategy description');
-                return;
-            }
-            
-            batchStrategies.push({
-                id: Date.now(),
-                text: strategyText
-            });
-            
-            updateBatchStrategiesList();
-            closeAddStrategyModal();
-        }
-        
-        function removeBatchStrategy(id) {
-            batchStrategies = batchStrategies.filter(s => s.id !== id);
-            updateBatchStrategiesList();
-        }
-        
-        function updateBatchStrategiesList() {
-            const listDiv = document.getElementById('batchStrategiesList');
-            
-            if (batchStrategies.length === 0) {
-                listDiv.innerHTML = '<div style="text-align: center; color: #6b7280; padding: 20px;">No strategies added yet. Click "Add Strategy" to begin.</div>';
-                return;
-            }
-            
-            let html = '';
-            batchStrategies.forEach((strategy, index) => {
-                const preview = strategy.text.length > 80 ? strategy.text.substring(0, 80) + '...' : strategy.text;
-                html += `
-                    <div style="background: #2d2d3d; padding: 12px; border-radius: 6px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
-                        <div style="flex: 1;">
-                            <div style="color: #6b7280; font-size: 11px; margin-bottom: 4px;">Strategy ${index + 1}</div>
-                            <div style="color: #fff; font-size: 13px;">${preview}</div>
-                        </div>
-                        <button onclick="removeBatchStrategy(${strategy.id})" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 8px; margin-left: 12px;">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                `;
-            });
-            
-            listDiv.innerHTML = html;
-        }
-        
-        function removeBatchFile(index) {
-            batchFiles.splice(index, 1);
-            updateBatchFileList();
-        }
-        
-        function updateModeCards() {
-            const mode = document.querySelector('input[name="analysisMode"]:checked').value;
-            const singleCard = document.getElementById('singleModeCard');
-            const swarmCard = document.getElementById('swarmModeCard');
-            const batchCard = document.getElementById('batchModeCard');
-            const batchSection = document.getElementById('batchUploadSection');
-            const strategyInput = document.getElementById('strategyInput');
-            
-            // Reset all cards
-            singleCard.style.background = '#1a1a24';
-            singleCard.style.borderColor = '#2d2d3d';
-            swarmCard.style.background = '#1a1a24';
-            swarmCard.style.borderColor = '#2d2d3d';
-            batchCard.style.background = '#1a1a24';
-            batchCard.style.borderColor = '#2d2d3d';
-            
-            if (mode === 'single') {
-                singleCard.style.background = '#6366f1';
-                singleCard.style.borderColor = '#6366f1';
-                batchSection.style.display = 'none';
-                strategyInput.style.display = 'block';
-            } else if (mode === 'swarm') {
-                swarmCard.style.background = '#6366f1';
-                swarmCard.style.borderColor = '#6366f1';
-                batchSection.style.display = 'none';
-                strategyInput.style.display = 'block';
-            } else if (mode === 'batch') {
-                batchCard.style.background = '#6366f1';
-                batchCard.style.borderColor = '#6366f1';
-                batchSection.style.display = 'block';
-                strategyInput.style.display = 'none';
-            }
-        }
-        
-        async function submitStrategies() {
-            let ideas = document.getElementById('strategyIdeas').value.trim();
-            
-            // If empty, use default prompt
-            if (!ideas) {
-                ideas = 'RSI divergence with MACD confirmation on SPY (swing trade)';
-                document.getElementById('strategyIdeas').value = ideas;
-            }
-            
-            // Get RBI agent version and model
-            const rbiAgentVersion = document.getElementById('rbiAgentVersion').value;
-            const aiModel = document.getElementById('aiModel').value;
-            
-            // Get RL flag
-            const enableRL = document.getElementById('enableRL').checked;
-            
-            // Get analysis mode
-            const mode = document.querySelector('input[name="analysisMode"]:checked').value;
-            const model = mode === 'single' ? document.getElementById('singleAgentModel').value : null;
-            
-            // Parse strategies (one per line, ignore empty lines)
-            const strategyList = ideas.split('\n')
-                .map(s => s.trim())
-                .filter(s => s && !s.startsWith('#'));
-            
-            if (strategyList.length === 0) {
-                alert('❌ Please enter at least one valid strategy idea');
-                return;
-            }
-            
-            // Show processing section
-            document.getElementById('processingSection').style.display = 'block';
-            document.getElementById('resultsSection').style.display = 'block';
-            
-            // Disable submit button
-            const btn = document.getElementById('submitBtn');
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-            
-            // CRITICAL: Append to strategies array instead of replacing
-            const newStrategies = strategyList.map((idea, index) => ({
-                id: Date.now() + index,
-                idea: idea,
-                status: 'queued',
-                research: null,
-                backtest: null,
-                results: null,
-                mode: mode,
-                model: model,
-                rbiAgentVersion: rbiAgentVersion,
-                aiModel: aiModel,
-                enableRL: enableRL,
-                rlStatus: enableRL ? 'training' : null,
-                rlTrainingCount: 0
-            }));
-            
-            // Add new strategies to existing array
-            strategies.push(...newStrategies);
-            
-            // Save immediately
-            saveResults();
-            
-            updateProcessingQueue();
-            updateResultsTable();
-            
-            // Process only NEW strategies (not already completed/failed)
-            const startIndex = strategies.length - newStrategies.length;
-            for (let i = startIndex; i < strategies.length; i++) {
-                // Skip if already processed
-                if (strategies[i].status === 'completed' || strategies[i].status === 'failed') {
-                    continue;
-                }
-                await processStrategy(i);
-            }
-            
-            // Re-enable button
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-rocket"></i> Research & Backtest Strategies';
-        }
-        
-        async function processStrategy(index) {
-            const strategy = strategies[index];
-            
-            // Update status: researching
-            strategy.status = 'researching';
-            updateProcessingQueue();
-            updateResultsTable();
-            
-            try {
-                if (strategy.mode === 'swarm') {
-                    // Use swarm mode
-                    const swarmRes = await fetch('/api/swarm/analyze', {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({prompt: `Analyze this trading strategy: ${strategy.idea}`})
-                    });
-                    const swarmData = await swarmRes.json();
-                    strategy.swarm_consensus = swarmData.consensus;
-                    strategy.models_count = swarmData.models_count;
-                }
-                
-                // Call RBI research API with agent version and model
-                const response = await fetch('/api/rbi/submit', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        trading_idea: strategy.idea,
-                        model: strategy.model,
-                        rbi_agent_version: strategy.rbiAgentVersion,
-                        ai_model: strategy.aiModel
-                    })
-                });
-                
-                const result = await response.json();
-                
-                if (result.status === 'success') {
-                    strategy.research = result.result;
-                    strategy.status = 'backtesting';
-                    updateProcessingQueue();
-                    updateResultsTable();
-                    
-                    // Extract strategy name from research result
-                    const strategyName = result.result.strategy_name || strategy.idea.substring(0, 30).replace(/[^a-zA-Z0-9]/g, '');
-                    
-                    // Run REAL backtest
-                    try {
-                        const backtestResponse = await fetch('/api/rbi/backtest', {
-                            method: 'POST',
-                            headers: {'Content-Type': 'application/json'},
-                            body: JSON.stringify({
-                                strategy_name: strategyName,
-                                enable_rbi_rl: strategy.enableRL
-                            })
-                        });
-                        
-                        const backtestResult = await backtestResponse.json();
-                        
-                        if (backtestResult.status === 'success') {
-                            // Use REAL backtest results
-                            const results = backtestResult.results;
-                            
-                            // Extract ticker from strategy idea (default to SPY)
-                            const tickerMatch = strategy.idea.match(/\b(SPY|QQQ|AAPL|TSLA|BTC|ETH|SOL)\b/i);
-                            const ticker = tickerMatch ? tickerMatch[0].toUpperCase() : 'SPY';
-                            
-                            // Determine timeframe (default to 1D)
-                            const timeframeMatch = strategy.idea.match(/\b(1m|5m|15m|1h|4h|1d|1w)\b/i);
-                            const timeframe = timeframeMatch ? timeframeMatch[0].toUpperCase() : '1D';
-                            
-                            strategy.results = {
-                                ticker: ticker,
-                                timeframe: timeframe,
-                                total_return: results.total_return || 0,
-                                buy_hold_return: results.buy_hold_return || 0,
-                                win_rate: results.win_rate || 50,
-                                sharpe_ratio: results.sharpe_ratio || 0,
-                                max_drawdown: results.max_drawdown || 0,
-                                total_trades: results.total_trades || 0,
-                                risk_grade: results.risk_grade || 'C',
-                                start_date: '2023-01-01',
-                                end_date: '2024-12-31'
-                            };
-                            
-                            // Handle RL status if returned
-                            if (backtestResult.rl_status) {
-                                strategy.rlStatus = backtestResult.rl_status.status;
-                                strategy.rlTrainingCount = backtestResult.rl_status.progress || 0;
-                            }
-                            
-                            // Check for underperformance
-                            const totalReturn = parseFloat(results.total_return) || 0;
-                            const buyHoldReturn = parseFloat(results.buy_hold_return) || 0;
-                            const winRate = parseFloat(results.win_rate) || 0;
-                            
-                            // Warning removed per user request
-                            
-                            strategy.status = 'completed';
-                        } else {
-                            // Backtest failed - show error
-                            strategy.status = 'failed';
-                            strategy.error = backtestResult.message || 'Backtest execution failed';
-                        }
-                    } catch (backtestError) {
-                        // Backtest API call failed
-                        strategy.status = 'failed';
-                        strategy.error = `Backtest error: ${backtestError.message}`;
-                    }
-                } else {
-                    strategy.status = 'failed';
-                    strategy.error = result.message;
-                }
-                
-            } catch (error) {
-                strategy.status = 'failed';
-                strategy.error = error.message;
-            }
-            
-            // CRITICAL: Save to localStorage after each update
-            saveResults();
-            updateProcessingQueue();
-            updateResultsTable();
-        }
-        
-        function updateProcessingQueue() {
-            const queueDiv = document.getElementById('processingQueue');
-            
-            // Only show strategies that are in progress (queued, researching, backtesting)
-            const inProgressStrategies = strategies.filter(s => 
-                s.status === 'queued' || s.status === 'researching' || s.status === 'backtesting'
-            );
-            
-            const queueHTML = inProgressStrategies.map(s => {
-                let icon, color, statusText;
-                
-                switch(s.status) {
-                    case 'queued':
-                        icon = 'clock';
-                        color = '#6b7280';
-                        statusText = 'Queued';
-                        break;
-                    case 'researching':
-                        icon = 'spinner fa-spin';
-                        color = '#6366f1';
-                        statusText = 'Researching...';
-                        break;
-                    case 'backtesting':
-                        icon = 'spinner fa-spin';
-                        color = '#8b5cf6';
-                        statusText = 'Backtesting...';
-                        break;
-                    case 'completed':
-                        icon = 'check-circle';
-                        color = '#22c55e';
-                        statusText = 'Completed';
-                        break;
-                    case 'failed':
-                        icon = 'times-circle';
-                        color = '#ef4444';
-                        statusText = 'Failed';
-                        break;
-                }
-                
-                return `
-                    <div style="display: flex; align-items: center; padding: 12px; background: #1a1a24; border-radius: 6px; margin-bottom: 8px;">
-                        <i class="fas fa-${icon}" style="margin-right: 12px; color: ${color};"></i>
-                        <span style="flex: 1; color: #d1d5db;">${s.idea.substring(0, 80)}${s.idea.length > 80 ? '...' : ''}</span>
-                        <span style="color: ${color}; font-weight: 600; font-size: 13px;">${statusText}</span>
-                    </div>
-                `;
-            }).join('');
-            
-            queueDiv.innerHTML = queueHTML;
-        }
-        
-        function updateResultsTable() {
-            const tbody = document.getElementById('resultsBody');
-            
-            // Save to localStorage whenever table is updated
-            saveResults();
-            
-            const rowsHTML = strategies.map(s => {
-                if (s.status === 'queued' || s.status === 'researching' || s.status === 'backtesting') {
-                    return `
-                        <tr style="border-bottom: 1px solid #1f1f2e;">
-                            <td style="padding: 12px; color: #d1d5db; font-size: 13px;">${s.idea.substring(0, 50)}${s.idea.length > 50 ? '...' : ''}</td>
-                            <td colspan="12" style="padding: 12px; text-align: center; color: #6b7280; font-size: 13px;">
-                                <i class="fas fa-spinner fa-spin"></i> Processing...
-                            </td>
-                        </tr>
-                    `;
-                }
-                
-                if (s.status === 'failed') {
-                    return `
-                        <tr style="border-bottom: 1px solid #1f1f2e;">
-                            <td colspan="11" style="padding: 12px; text-align: left; color: #ef4444; font-size: 13px;">
-                                <i class="fas fa-times-circle"></i> Failed: ${s.error || 'Unknown error'}
-                                <div style="font-size: 11px; color: #9ca3af; margin-top: 4px;">${s.idea.substring(0, 80)}${s.idea.length > 80 ? '...' : ''}</div>
-                            </td>
-                            <td style="padding: 12px; text-align: center;">
-                                <button onclick="deleteStrategy(${s.id})" style="background: #ef4444; color: #fff; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600;">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-                }
-                
-                if (s.status === 'completed' && s.results) {
-                    const returnColor = parseFloat(s.results.total_return) >= 0 ? '#22c55e' : '#ef4444';
-                    const returnIcon = parseFloat(s.results.total_return) >= 0 ? 'arrow-up' : 'arrow-down';
-                    const buyHoldColor = parseFloat(s.results.buy_hold_return) >= 0 ? '#22c55e' : '#ef4444';
-                    const buyHoldIcon = parseFloat(s.results.buy_hold_return) >= 0 ? 'arrow-up' : 'arrow-down';
-                    
-                    // Risk grade colors
-                    const gradeColors = {
-                        'A': '#22c55e',
-                        'B': '#84cc16',
-                        'C': '#eab308',
-                        'D': '#f97316',
-                        'F': '#ef4444'
-                    };
-                    
-                    // Mode badge
-                    const modeBadge = s.mode === 'swarm' 
-                        ? '<span style="background: rgba(139, 92, 246, 0.15); color: #8b5cf6; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">🐝 SWARM</span>'
-                        : `<span style="background: rgba(99, 102, 241, 0.15); color: #6366f1; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">⚡ ${s.model || 'SINGLE'}</span>`;
-                    
-                    // RL badge
-                    let rlBadge = '';
-                    if (s.enableRL) {
-                        if (s.rlStatus === 'training') {
-                            rlBadge = `<span style="background: #f59e0b; color: #000; padding: 2px 6px; border-radius: 3px; font-size: 9px; font-weight: 600; margin-left: 6px;">🔄 Training (${s.rlTrainingCount || 0}/10)</span>`;
-                        } else if (s.rlStatus === 'optimized') {
-                            rlBadge = `<span style="background: #10b981; color: #fff; padding: 2px 6px; border-radius: 3px; font-size: 9px; font-weight: 600; margin-left: 6px;">✨ RL Optimized</span>`;
-                        }
-                    }
-                    
-                    // Calculate period
-                    const period = s.results.period || '1 year';
-                    
-                    // Warning badge for underperformance
-                    const warningBadge = s.warning ? `<div style="color: #f59e0b; font-size: 11px; margin-top: 4px;"><i class="fas fa-exclamation-triangle"></i> ${s.warning}</div>` : '';
-                    
-                    return `
-                        <tr style="border-bottom: 1px solid #1f1f2e;">
-                            <td style="padding: 12px; color: #d1d5db; max-width: 300px; font-size: 13px;">
-                                <div style="font-weight: 600; margin-bottom: 4px;">${s.idea.substring(0, 60)}${s.idea.length > 60 ? '...' : ''}${rlBadge}</div>
-                                ${warningBadge}
-                            </td>
-                            <td style="padding: 12px; text-align: center; color: #d1d5db; font-weight: 600; font-size: 13px;">${s.results.ticker}</td>
-                            <td style="padding: 12px; text-align: center; color: #9ca3af; font-size: 13px;">${s.results.timeframe}</td>
-                            <td style="padding: 12px; text-align: center; color: #9ca3af; font-size: 13px;">${period}</td>
-                            <td style="padding: 12px; text-align: center;">
-                                ${modeBadge}
-                            </td>
-                            <td style="padding: 12px; text-align: center; color: ${returnColor}; font-weight: 600; font-size: 13px;">
-                                <i class="fas fa-${returnIcon}"></i> ${parseFloat(s.results.total_return).toFixed(2)}%
-                            </td>
-                            <td style="padding: 12px; text-align: center; color: ${buyHoldColor}; font-size: 13px;">
-                                <i class="fas fa-${buyHoldIcon}"></i> ${parseFloat(s.results.buy_hold_return).toFixed(2)}%
-                            </td>
-                            <td style="padding: 12px; text-align: center; color: #d1d5db; font-size: 13px;">${parseFloat(s.results.win_rate).toFixed(2)}%</td>
-                            <td style="padding: 12px; text-align: center; color: #d1d5db; font-size: 13px;">${parseFloat(s.results.sharpe_ratio).toFixed(2)}</td>
-                            <td style="padding: 12px; text-align: center; color: #ef4444; font-size: 13px;">-${parseFloat(s.results.max_drawdown).toFixed(2)}%</td>
-                            <td style="padding: 12px; text-align: center;">
-                                <div style="display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; background: ${gradeColors[s.results.risk_grade]}; color: #fff; font-weight: 700; font-size: 14px;" title="Risk Rating: A=Excellent, B=Good, C=Average, D=Poor, F=High Risk">
-                                    ${s.results.risk_grade}
-                                </div>
-                            </td>
-                            <td style="padding: 12px; text-align: center; color: #d1d5db; font-size: 13px;">${s.results.total_trades}</td>
-                            <td style="padding: 12px; text-align: center;">
-                                <button onclick="viewDetails(${s.id})" style="background: #6366f1; color: #fff; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600; margin-right: 4px;">
-                                    <i class="fas fa-eye"></i> View
-                                </button>
-                                <button onclick="downloadBacktestData(${s.id})" style="background: #10b981; color: #fff; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600; margin-right: 4px;">
-                                    <i class="fas fa-download"></i>
-                                </button>
-                                <button onclick="deleteStrategy(${s.id})" style="background: #ef4444; color: #fff; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600;">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-                }
-                
-                return '';
-            }).join('');
-            
-            tbody.innerHTML = rowsHTML;
-        }
-        
-        function viewDetails(strategyId) {
-            const strategy = strategies.find(s => s.id === strategyId);
-            if (!strategy) return;
-            
-            const detailsHTML = `
-                <h2 style="font-size: 24px; font-weight: 700; color: #fff; margin-bottom: 12px;">
-                    ${strategy.idea}
-                </h2>
-                <div style="color: #9ca3af; font-size: 14px; margin-bottom: 24px;">
-                    ${strategy.results.ticker} • ${strategy.results.timeframe} • ${strategy.results.start_date} to ${strategy.results.end_date}
-                </div>
-                
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 32px;">
-                    <div style="background: #1a1a24; padding: 20px; border-radius: 8px;">
-                        <div style="color: #9ca3af; font-size: 12px; margin-bottom: 8px;">Total Return</div>
-                        <div style="color: ${parseFloat(strategy.results.total_return) >= 0 ? '#22c55e' : '#ef4444'}; font-size: 28px; font-weight: 700;">
-                            ${parseFloat(strategy.results.total_return).toFixed(2)}%
-                        </div>
-                    </div>
-                    <div style="background: #1a1a24; padding: 20px; border-radius: 8px;">
-                        <div style="color: #9ca3af; font-size: 12px; margin-bottom: 8px;">Buy & Hold</div>
-                        <div style="color: ${parseFloat(strategy.results.buy_hold_return) >= 0 ? '#22c55e' : '#ef4444'}; font-size: 28px; font-weight: 700;">
-                            ${parseFloat(strategy.results.buy_hold_return).toFixed(2)}%
-                        </div>
-                    </div>
-                    <div style="background: #1a1a24; padding: 20px; border-radius: 8px;">
-                        <div style="color: #9ca3af; font-size: 12px; margin-bottom: 8px;">Win Rate</div>
-                        <div style="color: #fff; font-size: 28px; font-weight: 700;">${parseFloat(strategy.results.win_rate).toFixed(2)}%</div>
-                    </div>
-                    <div style="background: #1a1a24; padding: 20px; border-radius: 8px;">
-                        <div style="color: #9ca3af; font-size: 12px; margin-bottom: 8px;">Sharpe Ratio</div>
-                        <div style="color: #fff; font-size: 28px; font-weight: 700;">${parseFloat(strategy.results.sharpe_ratio).toFixed(2)}</div>
-                    </div>
-                    <div style="background: #1a1a24; padding: 20px; border-radius: 8px;">
-                        <div style="color: #9ca3af; font-size: 12px; margin-bottom: 8px;">Max Drawdown</div>
-                        <div style="color: #ef4444; font-size: 28px; font-weight: 700;">-${parseFloat(strategy.results.max_drawdown).toFixed(2)}%</div>
-                    </div>
-                </div>
-                
-                <div style="background: #1a1a24; padding: 24px; border-radius: 8px; margin-bottom: 24px;">
-                    <h3 style="color: #fff; font-size: 18px; margin-bottom: 16px;">
-                        <i class="fas fa-brain"></i> AI Research Summary
-                    </h3>
-                    <div style="color: #d1d5db; line-height: 1.8; white-space: pre-wrap;">
-                        ${strategy.research?.strategy_writeup || strategy.research?.writeup || (typeof strategy.research === 'string' ? strategy.research : 'No research available')}
-                    </div>
-                </div>
-                
-                <div style="display: flex; gap: 12px;">
-                    <button onclick="deployStrategy(${strategy.id})" style="flex: 1; background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: #fff; border: none; padding: 14px; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer;">
-                        <i class="fas fa-rocket"></i> Deploy to Live Trading
-                    </button>
-                    <button onclick="downloadCode(${strategy.id})" style="flex: 1; background: #1a1a24; color: #fff; border: 1px solid #2d2d3d; padding: 14px; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer;">
-                        <i class="fas fa-download"></i> Download Backtest Code
-                    </button>
-                </div>
-            `;
-            
-            document.getElementById('detailsContent').innerHTML = detailsHTML;
-            document.getElementById('detailsModal').style.display = 'block';
-        }
-        
-        function closeDetails() {
-            document.getElementById('detailsModal').style.display = 'none';
-        }
-        
-        async function deployStrategy(strategyId) {
-            // Find strategy in strategies array (not backtestResults)
-            const strategy = strategies.find(s => s.id === strategyId);
-            if (!strategy) {
-                alert('❌ Strategy not found');
-                return;
-            }
-            
-            // Extract ticker from strategy idea (look for common patterns)
-            let ticker = 'BTC';  // default
-            const ideaUpper = strategy.idea.toUpperCase();
-            const cryptoTickers = ['BTC', 'ETH', 'SOL', 'DOGE', 'ADA', 'DOT', 'LINK', 'UNI', 'AVAX', 'MATIC'];
-            const stockTickers = ['SPY', 'QQQ', 'AAPL', 'TSLA', 'NVDA', 'MSFT', 'GOOGL', 'AMZN', 'META', 'AMD'];
-            
-            for (const t of [...cryptoTickers, ...stockTickers]) {
-                if (ideaUpper.includes(t)) {
-                    ticker = t;
-                    break;
-                }
-            }
-            
-            // Extract timeframe (look for patterns like "1H", "4H", "Daily", "1D")
-            let timeframe = '1D';  // default
-            if (ideaUpper.includes('15M') || ideaUpper.includes('15 MIN')) timeframe = '15m';
-            else if (ideaUpper.includes('1H') || ideaUpper.includes('HOUR')) timeframe = '1H';
-            else if (ideaUpper.includes('4H')) timeframe = '4H';
-            else if (ideaUpper.includes('DAILY') || ideaUpper.includes('1D')) timeframe = '1D';
-            else if (ideaUpper.includes('WEEK') || ideaUpper.includes('1W')) timeframe = '1W';
-            
-            // Get strategy name from research result
-            const strategyName = strategy.research?.strategy_name || strategy.idea.substring(0, 30).replace(/[^a-zA-Z0-9]/g, '');
-            
-            // Find backtest file path
-            const today = new Date();
-            const dateStr = `${String(today.getMonth() + 1).padStart(2, '0')}_${String(today.getDate()).padStart(2, '0')}_${today.getFullYear()}`;
-            const backtestFile = `C:\\Users\\ahmed\\CascadeProjects\\moon-dev-ai-agents\\src\\data\\rbi\\${dateStr}\\backtests_final\\${strategyName}_BTFinal.py`;
-            
-            if (!confirm(`Deploy "${strategyName}" to Live Trading?\n\nTicker: ${ticker}\nTimeframe: ${timeframe}\nStrategy: ${strategy.idea}\n\nThis will create a new trading agent.`)) {
-                return;
-            }
-            
-            try {
-                // Use new RBI deployment pipeline
-                const response = await fetch('/api/rbi/deploy', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        strategy_name: strategyName,
-                        backtest_file: backtestFile,
-                        backtest_results: {
-                            sharpe_ratio: strategy.results?.sharpe_ratio || 2.0,
-                            total_return: strategy.results?.total_return || 25.0,
-                            total_trades: strategy.results?.total_trades || 100,
-                            max_drawdown: Math.abs(strategy.results?.max_drawdown || -5.0),
-                            win_rate: strategy.results?.win_rate || 55.0
-                        },
-                        config: {
-                            ticker: ticker,
-                            timeframe: timeframe,
-                            asset_type: cryptoTickers.includes(ticker) ? 'crypto' : 'stock',
-                            initial_balance: 100000,
-                            system_prompt: strategy.idea  // Use trading idea as system prompt
-                        }
-                    })
-                });
-                
-                const result = await response.json();
-                
-                if (result.status === 'success') {
-                    alert(`✅ Strategy deployed to RBI Pipeline!\n\nDeployment ID: ${result.deployment_id}\nAgent ID: ${result.agent_id}\nStatus: ${result.deployment_status}\n\n${result.deployment_status === 'paper_trading' ? 'Agent will run in paper trading for 14 days before auto-promotion to live.' : 'Agent is ready to start!'}\n\nGo to LIVE TRADING page to activate and monitor it.`);
-                    // Redirect to live trading page
-                    window.location.href = '/';
-                } else {
-                    alert(`❌ Deployment failed: ${result.message}`);
-                }
-            } catch (error) {
-                console.error('Deployment error:', error);
-                alert('❌ Error deploying strategy. Check console for details.');
-            }
-        }
-        
-        function downloadCode(strategyId) {
-            alert('📥 Code download feature coming soon!\n\nThis will provide the complete Python backtest code for your strategy.');
-        }
-        
-        function downloadBacktestData(strategyId) {
-            const strategy = strategies.find(s => s.id === strategyId);
-            if (!strategy || !strategy.results) {
-                alert('❌ No backtest data available for this strategy');
-                return;
-            }
-            
-            // Create comprehensive backtest data object
-            const backtestData = {
-                strategy_name: strategy.idea,
-                ticker: strategy.results.ticker,
-                timeframe: strategy.results.timeframe,
-                period: `${strategy.results.start_date} to ${strategy.results.end_date}`,
-                mode: strategy.mode,
-                model: strategy.model,
-                performance_metrics: {
-                    total_return: strategy.results.total_return + '%',
-                    buy_hold_return: strategy.results.buy_hold_return + '%',
-                    win_rate: strategy.results.win_rate + '%',
-                    sharpe_ratio: strategy.results.sharpe_ratio,
-                    max_drawdown: strategy.results.max_drawdown + '%',
-                    risk_grade: strategy.results.risk_grade,
-                    total_trades: strategy.results.total_trades
-                },
-                research_summary: strategy.research || 'N/A',
-                swarm_consensus: strategy.swarm_consensus || null,
-                models_count: strategy.models_count || null,
-                generated_at: new Date().toISOString()
-            };
-            
-            // Convert to JSON and download
-            const dataStr = JSON.stringify(backtestData, null, 2);
-            const dataBlob = new Blob([dataStr], {type: 'application/json'});
-            const url = URL.createObjectURL(dataBlob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `backtest_${strategy.results.ticker}_${Date.now()}.json`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-            
-            console.log('✅ Backtest data downloaded successfully');
-        }
-        
-        function deleteStrategy(strategyId) {
-            if (!confirm('Are you sure you want to delete this strategy? This action cannot be undone.')) {
-                return;
-            }
-            
-            // Remove from strategies array
-            strategies = strategies.filter(s => s.id !== strategyId);
-            
-            // Save updated list
-            saveResults();
-            
-            // Update UI
-            updateResultsTable();
-            
-            // Hide results section if no strategies left
-            if (strategies.length === 0) {
-                document.getElementById('resultsSection').style.display = 'none';
-            }
-            
-            console.log('✅ Strategy deleted successfully');
-        }
-        
-    </script>
+        const bt = await br.json();
+        if (bt.status === 'success') {
+          const r = bt.results;
+          const tickerM = strategy.idea.match(/\b(SPY|QQQ|AAPL|TSLA|BTC|ETH|SOL)\b/i);
+          const tfM = strategy.idea.match(/\b(1m|5m|15m|1h|4h|1d|1w)\b/i);
+          strategy.results = {ticker: tickerM ? tickerM[0].toUpperCase() : 'SPY', timeframe: tfM ? tfM[0].toUpperCase() : '1D',
+            total_return: r.total_return||0, buy_hold_return: r.buy_hold_return||0, win_rate: r.win_rate||50,
+            sharpe_ratio: r.sharpe_ratio||0, max_drawdown: r.max_drawdown||0, total_trades: r.total_trades||0,
+            risk_grade: r.risk_grade||'C', start_date:'2023-01-01', end_date:'2024-12-31'};
+          if (bt.rl_status) { strategy.rlStatus = bt.rl_status.status; strategy.rlTrainingCount = bt.rl_status.progress||0; }
+          strategy.status = 'completed';
+        } else { strategy.status = 'failed'; strategy.error = bt.message||'Backtest failed'; }
+      } catch(be) { strategy.status = 'failed'; strategy.error = `Backtest error: ${be.message}`; }
+    } else { strategy.status = 'failed'; strategy.error = result.message; }
+  } catch(err) { strategy.status = 'failed'; strategy.error = err.message; }
+  saveResults(); updateProcessingQueue(); updateResultsTable();
+}
+
+function updateProcessingQueue() {
+  const inProgress = strategies.filter(s => ['queued','researching','backtesting'].includes(s.status));
+  const statusColor = {queued:'var(--hud-text-dim)', researching:'var(--hud-primary)', backtesting:'var(--hud-purple)'};
+  const statusLabel = {queued:'QUEUED', researching:'RESEARCHING…', backtesting:'BACKTESTING…'};
+  document.getElementById('processingQueue').innerHTML = inProgress.map(s => `
+    <div class="queue-item">
+      <span style="width:8px;height:8px;border-radius:50%;background:${statusColor[s.status]};flex-shrink:0;"></span>
+      <span style="flex:1;font-size:11px;color:var(--hud-text);">${s.idea.substring(0,80)}${s.idea.length>80?'…':''}</span>
+      <span style="font-size:10px;font-weight:600;color:${statusColor[s.status]};">${statusLabel[s.status]}</span>
+    </div>`).join('');
+}
+
+function updateResultsTable() {
+  saveResults();
+  const gradeColors = {A:'#00ff88',B:'#84cc16',C:'#ffcc00',D:'#f97316',F:'#ff3b5c'};
+  document.getElementById('resultsBody').innerHTML = strategies.map(s => {
+    if (['queued','researching','backtesting'].includes(s.status)) {
+      return `<tr><td class="hud-dim">${s.idea.substring(0,50)}…</td><td colspan="12" style="text-align:center;" class="hud-dim">⟳ Processing…</td></tr>`;
+    }
+    if (s.status === 'failed') {
+      return `<tr>
+        <td colspan="12" class="hud-red" style="font-size:11px;padding:8px;">✕ ${s.error||'Unknown error'} — ${s.idea.substring(0,60)}</td>
+        <td><button onclick="deleteStrategy(${s.id})" style="background:rgba(255,59,92,0.15);border:1px solid rgba(255,59,92,0.3);color:var(--hud-error);padding:4px 8px;border-radius:var(--radius);font-family:var(--font-mono);font-size:9px;cursor:pointer;">DEL</button></td>
+      </tr>`;
+    }
+    if (s.status === 'completed' && s.results) {
+      const r = s.results;
+      const rc = parseFloat(r.total_return) >= 0 ? 'var(--hud-success)' : 'var(--hud-error)';
+      const bh = parseFloat(r.buy_hold_return) >= 0 ? 'var(--hud-success)' : 'var(--hud-error)';
+      const modeBadge = s.mode === 'swarm'
+        ? `<span class="hud-badge s1">⬡ SWARM</span>`
+        : `<span class="hud-badge s2">⚡ ${(s.model||'SINGLE').toUpperCase()}</span>`;
+      let rlBadge = '';
+      if (s.enableRL) {
+        rlBadge = s.rlStatus === 'training'
+          ? ` <span class="hud-badge hold">RL ${s.rlTrainingCount||0}%</span>`
+          : s.rlStatus === 'optimized' ? ` <span class="hud-badge buy">RL ✓</span>` : '';
+      }
+      return `<tr>
+        <td style="max-width:220px;font-size:11px;">${s.idea.substring(0,55)}${s.idea.length>55?'…':''}${rlBadge}</td>
+        <td style="font-weight:600;color:var(--hud-primary);">${r.ticker}</td>
+        <td class="hud-dim">${r.timeframe}</td>
+        <td class="hud-dim">${r.period||'1yr'}</td>
+        <td>${modeBadge}</td>
+        <td style="color:${rc};font-weight:600;">${parseFloat(r.total_return).toFixed(2)}%</td>
+        <td style="color:${bh};">${parseFloat(r.buy_hold_return).toFixed(2)}%</td>
+        <td>${parseFloat(r.win_rate).toFixed(1)}%</td>
+        <td>${parseFloat(r.sharpe_ratio).toFixed(2)}</td>
+        <td class="hud-red">-${parseFloat(r.max_drawdown).toFixed(1)}%</td>
+        <td><span class="grade-circle" style="background:${gradeColors[r.risk_grade]||'#aaa'}">${r.risk_grade}</span></td>
+        <td>${r.total_trades}</td>
+        <td style="white-space:nowrap;">
+          <button onclick="viewDetails(${s.id})" style="background:rgba(0,229,255,0.08);border:1px solid var(--hud-border);color:var(--hud-primary);padding:4px 8px;border-radius:var(--radius);font-family:var(--font-mono);font-size:9px;cursor:pointer;margin-right:4px;">VIEW</button>
+          <button onclick="downloadBacktestData(${s.id})" style="background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);color:var(--hud-success);padding:4px 8px;border-radius:var(--radius);font-family:var(--font-mono);font-size:9px;cursor:pointer;margin-right:4px;">DL</button>
+          <button onclick="deleteStrategy(${s.id})" style="background:rgba(255,59,92,0.08);border:1px solid rgba(255,59,92,0.2);color:var(--hud-error);padding:4px 8px;border-radius:var(--radius);font-family:var(--font-mono);font-size:9px;cursor:pointer;">DEL</button>
+        </td>
+      </tr>`;
+    }
+    return '';
+  }).join('');
+}
+
+function viewDetails(strategyId) {
+  const s = strategies.find(x => x.id === strategyId);
+  if (!s || !s.results) return;
+  const r = s.results;
+  const rc = parseFloat(r.total_return) >= 0 ? 'var(--hud-success)' : 'var(--hud-error)';
+  const bh = parseFloat(r.buy_hold_return) >= 0 ? 'var(--hud-success)' : 'var(--hud-error)';
+  document.getElementById('detailsContent').innerHTML = `
+    <div style="margin-bottom:16px;">
+      <div style="font-size:16px;font-weight:700;color:var(--hud-text);margin-bottom:4px;">${s.idea}</div>
+      <div class="hud-dim" style="font-size:11px;">${r.ticker} · ${r.timeframe} · ${r.start_date} to ${r.end_date}</div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:16px;">
+      <div class="detail-metric"><div class="hud-label">TOTAL RETURN</div><div style="font-size:22px;font-weight:700;color:${rc};">${parseFloat(r.total_return).toFixed(2)}%</div></div>
+      <div class="detail-metric"><div class="hud-label">BUY &amp; HOLD</div><div style="font-size:22px;font-weight:700;color:${bh};">${parseFloat(r.buy_hold_return).toFixed(2)}%</div></div>
+      <div class="detail-metric"><div class="hud-label">WIN RATE</div><div style="font-size:22px;font-weight:700;color:var(--hud-text);">${parseFloat(r.win_rate).toFixed(1)}%</div></div>
+      <div class="detail-metric"><div class="hud-label">SHARPE</div><div style="font-size:22px;font-weight:700;color:var(--hud-text);">${parseFloat(r.sharpe_ratio).toFixed(2)}</div></div>
+      <div class="detail-metric"><div class="hud-label">MAX DRAWDOWN</div><div style="font-size:22px;font-weight:700;color:var(--hud-error);">-${parseFloat(r.max_drawdown).toFixed(1)}%</div></div>
+    </div>
+    ${s.research ? `<div class="gru-panel" style="margin-bottom:14px;">
+      <div class="gru-panel-title"><div class="dot"></div>AI RESEARCH SUMMARY</div>
+      <div class="hud-dim" style="font-size:11px;line-height:1.8;white-space:pre-wrap;">${s.research?.strategy_writeup||s.research?.writeup||(typeof s.research==='string'?s.research:'No research available')}</div>
+    </div>` : ''}
+    <div style="display:flex;gap:8px;">
+      <button onclick="deployStrategy(${s.id})" style="flex:1;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.3);color:var(--hud-success);padding:10px;border-radius:var(--radius);font-family:var(--font-mono);font-size:11px;font-weight:600;cursor:pointer;text-transform:uppercase;letter-spacing:1px;">⟶ DEPLOY TO LIVE TRADING</button>
+      <button onclick="downloadCode(${s.id})" style="flex:1;background:rgba(0,229,255,0.08);border:1px solid var(--hud-border);color:var(--hud-primary);padding:10px;border-radius:var(--radius);font-family:var(--font-mono);font-size:11px;font-weight:600;cursor:pointer;text-transform:uppercase;letter-spacing:1px;">↓ DOWNLOAD CODE</button>
+    </div>`;
+  document.getElementById('detailsModal').classList.add('active');
+}
+function closeDetails() { document.getElementById('detailsModal').classList.remove('active'); }
+
+async function deployStrategy(strategyId) {
+  const s = strategies.find(x => x.id === strategyId);
+  if (!s) { alert('Strategy not found'); return; }
+  let ticker = 'BTC';
+  const ideaUpper = s.idea.toUpperCase();
+  const cryptoTickers = ['BTC','ETH','SOL','DOGE','ADA','DOT','LINK','UNI','AVAX','MATIC'];
+  const stockTickers = ['SPY','QQQ','AAPL','TSLA','NVDA','MSFT','GOOGL','AMZN','META','AMD'];
+  for (const t of [...cryptoTickers, ...stockTickers]) { if (ideaUpper.includes(t)) { ticker = t; break; } }
+  let timeframe = '1D';
+  if (ideaUpper.includes('15M')) timeframe = '15m';
+  else if (ideaUpper.includes('1H') || ideaUpper.includes('HOUR')) timeframe = '1H';
+  else if (ideaUpper.includes('4H')) timeframe = '4H';
+  const strategyName = s.research?.strategy_name || s.idea.substring(0,30).replace(/[^a-zA-Z0-9]/g,'');
+  if (!confirm(`Deploy "${strategyName}" to Live Trading?\n\nTicker: ${ticker}\nTimeframe: ${timeframe}`)) return;
+  try {
+    const res = await fetch('/api/rbi/deploy', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({strategy_name: strategyName, backtest_results: {sharpe_ratio: s.results?.sharpe_ratio||2, total_return: s.results?.total_return||25, total_trades: s.results?.total_trades||100, max_drawdown: Math.abs(s.results?.max_drawdown||-5), win_rate: s.results?.win_rate||55}, config: {ticker, timeframe, asset_type: cryptoTickers.includes(ticker)?'crypto':'stock', initial_balance:100000, system_prompt: s.idea}})
+    });
+    const result = await res.json();
+    if (result.status === 'success') { alert(`Strategy deployed!\nDeployment ID: ${result.deployment_id}`); window.location.href = '/'; }
+    else { alert(`Deployment failed: ${result.message}`); }
+  } catch(err) { alert('Error deploying strategy: ' + err.message); }
+}
+
+function downloadCode(strategyId) {
+  alert('Code download feature coming soon!');
+}
+
+function downloadBacktestData(strategyId) {
+  const s = strategies.find(x => x.id === strategyId);
+  if (!s || !s.results) { alert('No backtest data available'); return; }
+  const data = JSON.stringify({strategy_name:s.idea, ticker:s.results.ticker, timeframe:s.results.timeframe, performance_metrics:{total_return:s.results.total_return+'%', win_rate:s.results.win_rate+'%', sharpe_ratio:s.results.sharpe_ratio, max_drawdown:s.results.max_drawdown+'%', risk_grade:s.results.risk_grade}, research_summary:s.research||'N/A', generated_at:new Date().toISOString()}, null, 2);
+  const blob = new Blob([data], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download=`backtest_${s.results.ticker}_${Date.now()}.json`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+
+function deleteStrategy(strategyId) {
+  if (!confirm('Delete this strategy? This cannot be undone.')) return;
+  strategies = strategies.filter(s => s.id !== strategyId);
+  saveResults(); updateResultsTable();
+  if (strategies.length === 0) document.getElementById('resultsSection').style.display = 'none';
+}
+</script>
 </body>
 </html>

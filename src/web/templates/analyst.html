@@ -6,12 +6,42 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Market Analyst - Moon Dev Trading</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='modern-style.css') }}?v=2.0">
+    <title>GRU — Analyst</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='gru-hud.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
     <style>
+        /* GRU HUD color overrides for analyst page */
+        body { font-family: var(--font-mono) !important; }
+        .navbar, .navbar-container { display: none; }
+        .container { max-width: 1600px; margin: 0 auto; padding: 14px 16px; }
+        .input-section { background: var(--hud-bg-panel) !important; border: 1px solid var(--hud-border) !important; border-radius: var(--radius) !important; }
+        .analysis-card { background: var(--hud-bg-panel) !important; border: 1px solid var(--hud-border) !important; border-radius: var(--radius) !important; }
+        .card-header { background: var(--hud-bg-card) !important; border-bottom: 1px solid var(--hud-border) !important; }
+        .case-container { background: var(--hud-bg-card) !important; }
+        .flip-card-back { background: var(--hud-bg-panel) !important; border: 1px solid var(--hud-border) !important; }
+        .form-control { background: var(--hud-bg-card) !important; border: 1px solid var(--hud-border) !important; color: var(--hud-text) !important; font-family: var(--font-mono) !important; border-radius: var(--radius) !important; }
+        .form-control:focus { border-color: var(--hud-border-hover) !important; outline: none !important; }
+        .btn-primary { background: rgba(0,229,255,0.08) !important; border: 1px solid var(--hud-primary) !important; color: var(--hud-primary) !important; font-family: var(--font-mono) !important; border-radius: var(--radius) !important; box-shadow: none !important; }
+        .btn-primary:hover { background: rgba(0,229,255,0.15) !important; transform: none !important; }
+        .btn-secondary { background: rgba(90,122,138,0.1) !important; border: 1px solid var(--hud-border) !important; color: var(--hud-text-dim) !important; font-family: var(--font-mono) !important; }
+        .filter-tab { background: rgba(0,229,255,0.05) !important; border: 1px solid var(--hud-border) !important; color: var(--hud-text-dim) !important; font-family: var(--font-mono) !important; border-radius: var(--radius) !important; }
+        .filter-tab:hover { border-color: var(--hud-primary) !important; color: var(--hud-primary) !important; }
+        .model-selector-btn { background: rgba(0,229,255,0.08) !important; border: 1px solid var(--hud-border) !important; color: var(--hud-primary) !important; border-radius: var(--radius) !important; }
+        .modal-content { background: var(--hud-bg-panel) !important; border: 1px solid var(--hud-border) !important; border-radius: var(--radius) !important; }
+        .modal-content h3 { color: var(--hud-primary) !important; font-family: var(--font-mono) !important; letter-spacing: 1px; }
+        .model-options label { background: var(--hud-bg-card) !important; border: 1px solid var(--hud-border) !important; border-radius: var(--radius) !important; }
+        .model-options label:hover { border-color: var(--hud-primary) !important; }
+        .model-options input[type="radio"] { accent-color: var(--hud-primary) !important; }
+        select { background: var(--hud-bg-card) !important; border: 1px solid var(--hud-border) !important; color: var(--hud-text) !important; font-family: var(--font-mono) !important; border-radius: var(--radius) !important; }
+        table { font-family: var(--font-mono) !important; }
+        table th { color: var(--hud-text-dim) !important; font-size: 9px !important; letter-spacing: 1.2px !important; border-bottom: 1px solid var(--hud-border) !important; }
+        table td { border-bottom: 1px solid rgba(0,229,255,0.04) !important; font-size: 12px !important; }
+        .conclusion-box { background: rgba(0,229,255,0.06) !important; border: 1px solid rgba(0,229,255,0.2) !important; }
+        .view-toggle { background: var(--hud-bg-card) !important; }
+        .view-toggle-btn.active { background: var(--hud-primary) !important; color: #000 !important; }
+        .empty-state { color: var(--hud-text-dim) !important; }
 
         .container {
             max-width: 1400px;
@@ -1043,17 +1073,45 @@
     </style>
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="navbar-container">
-            <div class="nav-links">
-                <a href="/strategy-lab">BACKTEST LAB</a>
-                <a href="/analyst" class="active">ANALYST</a>
-                <a href="/">LIVE AGENTS</a>
-                <a href="/portfolio">PORTFOLIO</a>
-            </div>
-        </div>
-    </nav>
+
+<header class="gru-header">
+  <div class="gru-logo">
+    <span class="gru-logo-text">GRU</span>
+    <span class="gru-logo-version">v1.0</span>
+    <div style="display:flex;align-items:center;gap:6px;margin-left:8px;">
+      <div class="market-status-dot" id="mktDot"></div>
+      <span class="hud-dim" style="font-size:10px;" id="mktLabel">CHECKING</span>
+    </div>
+  </div>
+  <div class="gru-header-right">
+    <div id="regimeChip" class="regime-chip sideways">⬤ SIDEWAYS</div>
+    <span class="hud-clock" id="liveClock">00:00:00</span>
+  </div>
+</header>
+
+<nav class="gru-nav">
+  <a href="/">LIVE HUD</a>
+  <a href="/agents">AGENTS</a>
+  <a href="/screener">SCREENER</a>
+  <a href="/analyst" class="active">ANALYST</a>
+  <a href="/strategy-lab">STRATEGY LAB</a>
+  <a href="/swarm">SWARM</a>
+  <a href="/portfolio">PORTFOLIO</a>
+</nav>
+
+<script>
+function updateClock() { document.getElementById('liveClock').textContent = new Date().toUTCString().split(' ')[4] + ' UTC'; }
+setInterval(updateClock, 1000); updateClock();
+function checkMarketStatus() {
+  const et = new Date(new Date().toLocaleString('en-US', {timeZone:'America/New_York'}));
+  const h = et.getHours(), m = et.getMinutes(), d = et.getDay();
+  const open = d >= 1 && d <= 5 && (h > 9 || (h === 9 && m >= 30)) && h < 16;
+  const dot = document.getElementById('mktDot'); const lbl = document.getElementById('mktLabel');
+  if (dot) dot.className = 'market-status-dot' + (open ? '' : ' closed');
+  if (lbl) lbl.textContent = open ? 'MARKET OPEN' : 'MARKET CLOSED';
+}
+checkMarketStatus(); setInterval(checkMarketStatus, 60000);
+</script>
 
     <div class="container">
 

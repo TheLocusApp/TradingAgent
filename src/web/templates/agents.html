@@ -1,179 +1,226 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Agents - Moon Dev</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='modern-style.css') }}">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GRU — Agents</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='gru-hud.css') }}">
 </head>
 <body>
-    <!-- Top Navigation -->
-    <div class="top-nav">
-        <div class="nav-links">
-            <a href="/">LIVE</a>
-            <a href="/strategy-analyzer">ANALYZER</a>
-            <a href="/rbi">RBI LAB</a>
-            <a href="/agents" class="active">AGENTS</a>
-            <button class="settings-btn" onclick="window.location.href='/'">
-                <i class="fas fa-cog"></i> Settings
-            </button>
-        </div>
+
+<header class="gru-header">
+  <div class="gru-logo">
+    <span class="gru-logo-text">GRU</span>
+    <span class="gru-logo-version">v1.0</span>
+    <div style="display:flex;align-items:center;gap:6px;margin-left:8px;">
+      <div class="market-status-dot" id="mktDot"></div>
+      <span class="hud-dim" style="font-size:10px;" id="mktLabel">CHECKING</span>
     </div>
-    
-    <div class="container">
-        <!-- Header -->
-        <div style="margin: 40px 0 30px 0;">
-            <h1 style="font-size: 32px; font-weight: 700; color: #fff; margin-bottom: 12px;">
-                <i class="fas fa-robot"></i> AI Agents
-            </h1>
-            <p style="color: #9ca3af; font-size: 16px;">
-                Explore and manage all available AI trading and analysis agents
-            </p>
+  </div>
+  <div class="gru-header-right">
+    <div id="regimeChip" class="regime-chip sideways">⬤ SIDEWAYS</div>
+    <span class="hud-clock" id="liveClock">00:00:00</span>
+  </div>
+</header>
+
+<nav class="gru-nav">
+  <a href="/">LIVE HUD</a>
+  <a href="/agents" class="active">AGENTS</a>
+  <a href="/screener">SCREENER</a>
+  <a href="/analyst">ANALYST</a>
+  <a href="/strategy-lab">STRATEGY LAB</a>
+  <a href="/swarm">SWARM</a>
+  <a href="/portfolio">PORTFOLIO</a>
+</nav>
+
+<div class="gru-layout">
+
+  <!-- Page title row -->
+  <div style="display:flex;align-items:baseline;gap:12px;padding:4px 0 8px;">
+    <span style="font-size:18px;font-weight:700;color:var(--hud-primary);letter-spacing:2px;">AGENTS</span>
+    <span class="hud-dim" style="font-size:11px;">configure &amp; manage autonomous trading agents</span>
+  </div>
+
+  <!-- Agents grid -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:var(--gap);">
+
+    <!-- Universal Trading Agent -->
+    <div class="gru-panel">
+      <div class="gru-panel-title">
+        <div class="dot"></div>UNIVERSAL TRADING AGENT
+        <span class="hud-badge buy" style="margin-left:auto;">ACTIVE</span>
+      </div>
+      <p class="hud-dim" style="font-size:12px;line-height:1.7;margin-bottom:16px;">
+        Multi-model AI trading agent supporting stocks and crypto. Real-time decision making with configurable timeframes and risk management.
+      </p>
+      <div class="hud-metrics" style="margin-bottom:16px;">
+        <div class="hud-metric">
+          <span class="hud-label">Type</span>
+          <span class="hud-value">Execution</span>
         </div>
-        
-        <!-- Agents Grid -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 24px;">
-            
-            <!-- Trading Agent -->
-            <div class="chart-section">
-                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
-                    <div>
-                        <h3 style="font-size: 18px; font-weight: 600; color: #fff; margin-bottom: 8px;">
-                            <i class="fas fa-chart-line" style="color: #6366f1;"></i> Universal Trading Agent
-                        </h3>
-                        <span style="background: rgba(34, 197, 94, 0.15); color: #22c55e; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">ACTIVE</span>
-                    </div>
-                </div>
-                <p style="color: #9ca3af; font-size: 14px; line-height: 1.6; margin-bottom: 16px;">
-                    Multi-model AI trading agent supporting stocks and crypto. Real-time decision making with configurable timeframes and risk management.
-                </p>
-                <div style="display: flex; gap: 12px;">
-                    <button onclick="window.location.href='/'" style="flex: 1; background: #6366f1; color: #fff; padding: 10px; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;">
-                        <i class="fas fa-play"></i> Open Dashboard
-                    </button>
-                </div>
-            </div>
-            
-            <!-- RBI Agent -->
-            <div class="chart-section">
-                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
-                    <div>
-                        <h3 style="font-size: 18px; font-weight: 600; color: #fff; margin-bottom: 8px;">
-                            <i class="fas fa-flask" style="color: #8b5cf6;"></i> RBI Agent
-                        </h3>
-                        <span style="background: rgba(34, 197, 94, 0.15); color: #22c55e; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">ACTIVE</span>
-                    </div>
-                </div>
-                <p style="color: #9ca3af; font-size: 14px; line-height: 1.6; margin-bottom: 16px;">
-                    Research-Backtest-Iterate workflow. Analyzes trading ideas, generates backtest code, and optimizes strategies automatically.
-                </p>
-                <div style="display: flex; gap: 12px;">
-                    <button onclick="window.location.href='/rbi'" style="flex: 1; background: #8b5cf6; color: #fff; padding: 10px; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;">
-                        <i class="fas fa-flask"></i> Open Lab
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Sentiment Agent -->
-            <div class="chart-section">
-                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
-                    <div>
-                        <h3 style="font-size: 18px; font-weight: 600; color: #fff; margin-bottom: 8px;">
-                            <i class="fab fa-twitter" style="color: #1da1f2;"></i> Sentiment Agent
-                        </h3>
-                        <span style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">COMING SOON</span>
-                    </div>
-                </div>
-                <p style="color: #9ca3af; font-size: 14px; line-height: 1.6; margin-bottom: 16px;">
-                    Monitors Twitter sentiment for crypto tokens using HuggingFace models. Tracks mentions and sentiment scores over time.
-                </p>
-                <div style="display: flex; gap: 12px;">
-                    <button disabled style="flex: 1; background: #1f1f2e; color: #6b7280; padding: 10px; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: not-allowed;">
-                        <i class="fas fa-lock"></i> Coming Soon
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Polymarket Agent -->
-            <div class="chart-section">
-                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
-                    <div>
-                        <h3 style="font-size: 18px; font-weight: 600; color: #fff; margin-bottom: 8px;">
-                            <i class="fas fa-poll" style="color: #10b981;"></i> Polymarket Agent
-                        </h3>
-                        <span style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">COMING SOON</span>
-                    </div>
-                </div>
-                <p style="color: #9ca3af; font-size: 14px; line-height: 1.6; margin-bottom: 16px;">
-                    Scans Polymarket prediction markets and uses AI to make predictions. Tracks market trends and analyzes outcomes.
-                </p>
-                <div style="display: flex; gap: 12px;">
-                    <button disabled style="flex: 1; background: #1f1f2e; color: #6b7280; padding: 10px; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: not-allowed;">
-                        <i class="fas fa-lock"></i> Coming Soon
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Risk Agent -->
-            <div class="chart-section">
-                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
-                    <div>
-                        <h3 style="font-size: 18px; font-weight: 600; color: #fff; margin-bottom: 8px;">
-                            <i class="fas fa-shield-alt" style="color: #ef4444;"></i> Risk Agent
-                        </h3>
-                        <span style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">COMING SOON</span>
-                    </div>
-                </div>
-                <p style="color: #9ca3af; font-size: 14px; line-height: 1.6; margin-bottom: 16px;">
-                    Portfolio risk analysis and management. Calculates position sizing, drawdown limits, and risk-adjusted returns.
-                </p>
-                <div style="display: flex; gap: 12px;">
-                    <button disabled style="flex: 1; background: #1f1f2e; color: #6b7280; padding: 10px; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: not-allowed;">
-                        <i class="fas fa-lock"></i> Coming Soon
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Research Agent -->
-            <div class="chart-section">
-                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
-                    <div>
-                        <h3 style="font-size: 18px; font-weight: 600; color: #fff; margin-bottom: 8px;">
-                            <i class="fas fa-search" style="color: #f59e0b;"></i> Research Agent
-                        </h3>
-                        <span style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">COMING SOON</span>
-                    </div>
-                </div>
-                <p style="color: #9ca3af; font-size: 14px; line-height: 1.6; margin-bottom: 16px;">
-                    Automated market research and analysis. Gathers data from multiple sources and generates comprehensive reports.
-                </p>
-                <div style="display: flex; gap: 12px;">
-                    <button disabled style="flex: 1; background: #1f1f2e; color: #6b7280; padding: 10px; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: not-allowed;">
-                        <i class="fas fa-lock"></i> Coming Soon
-                    </button>
-                </div>
-            </div>
-            
+        <div class="hud-metric">
+          <span class="hud-label">Markets</span>
+          <span class="hud-value">Stocks · Crypto</span>
         </div>
-        
-        <!-- Info Section -->
-        <div style="margin-top: 40px; padding: 24px; background: #12121a; border: 1px solid #1f1f2e; border-radius: 12px;">
-            <h3 style="color: #fff; font-size: 18px; margin-bottom: 16px;">
-                <i class="fas fa-info-circle"></i> About AI Agents
-            </h3>
-            <div style="color: #9ca3af; line-height: 1.8; font-size: 14px;">
-                <p style="margin-bottom: 12px;">
-                    Moon Dev's AI Agents are specialized tools designed to automate different aspects of trading and market analysis. Each agent uses advanced AI models to perform specific tasks.
-                </p>
-                <p style="margin-bottom: 12px;">
-                    <strong>Active Agents</strong> are fully functional and ready to use. <strong>Coming Soon</strong> agents are in development and will be available in future updates.
-                </p>
-                <p style="color: #6b7280; font-size: 12px; margin-top: 16px;">
-                    <i class="fas fa-code"></i> All agents are located in: <code>src/agents/</code>
-                </p>
-            </div>
-        </div>
+      </div>
+      <button onclick="window.location.href='/'" style="width:100%;background:rgba(0,229,255,0.08);border:1px solid var(--hud-border);color:var(--hud-primary);padding:9px;border-radius:var(--radius);font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:1px;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background='rgba(0,229,255,0.15)'" onmouseout="this.style.background='rgba(0,229,255,0.08)'">
+        OPEN DASHBOARD →
+      </button>
     </div>
+
+    <!-- RBI Agent -->
+    <div class="gru-panel">
+      <div class="gru-panel-title">
+        <div class="dot"></div>RBI AGENT
+        <span class="hud-badge buy" style="margin-left:auto;">ACTIVE</span>
+      </div>
+      <p class="hud-dim" style="font-size:12px;line-height:1.7;margin-bottom:16px;">
+        Research-Backtest-Iterate workflow. Analyzes trading ideas, generates backtest code, and optimizes strategies automatically.
+      </p>
+      <div class="hud-metrics" style="margin-bottom:16px;">
+        <div class="hud-metric">
+          <span class="hud-label">Type</span>
+          <span class="hud-value">Research</span>
+        </div>
+        <div class="hud-metric">
+          <span class="hud-label">Output</span>
+          <span class="hud-value">Python Backtests</span>
+        </div>
+      </div>
+      <button onclick="window.location.href='/strategy-lab'" style="width:100%;background:rgba(0,229,255,0.08);border:1px solid var(--hud-border);color:var(--hud-primary);padding:9px;border-radius:var(--radius);font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:1px;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background='rgba(0,229,255,0.15)'" onmouseout="this.style.background='rgba(0,229,255,0.08)'">
+        OPEN STRATEGY LAB →
+      </button>
+    </div>
+
+    <!-- Sentiment Agent -->
+    <div class="gru-panel" style="opacity:0.6;">
+      <div class="gru-panel-title">
+        <div class="dot" style="background:var(--hud-text-dim);"></div>SENTIMENT AGENT
+        <span class="hud-badge skip" style="margin-left:auto;">COMING SOON</span>
+      </div>
+      <p class="hud-dim" style="font-size:12px;line-height:1.7;margin-bottom:16px;">
+        Monitors social sentiment for crypto tokens using HuggingFace models. Tracks mentions and sentiment scores over time.
+      </p>
+      <div class="hud-metrics" style="margin-bottom:16px;">
+        <div class="hud-metric">
+          <span class="hud-label">Sources</span>
+          <span class="hud-value">Twitter/X · StockTwits</span>
+        </div>
+        <div class="hud-metric">
+          <span class="hud-label">Model</span>
+          <span class="hud-value">HuggingFace NLP</span>
+        </div>
+      </div>
+      <button disabled style="width:100%;background:rgba(90,122,138,0.08);border:1px solid var(--hud-border);color:var(--hud-text-dim);padding:9px;border-radius:var(--radius);font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:1px;cursor:not-allowed;">
+        IN DEVELOPMENT
+      </button>
+    </div>
+
+    <!-- Polymarket Agent -->
+    <div class="gru-panel" style="opacity:0.6;">
+      <div class="gru-panel-title">
+        <div class="dot" style="background:var(--hud-text-dim);"></div>POLYMARKET AGENT
+        <span class="hud-badge skip" style="margin-left:auto;">COMING SOON</span>
+      </div>
+      <p class="hud-dim" style="font-size:12px;line-height:1.7;margin-bottom:16px;">
+        Scans Polymarket prediction markets and uses AI to make predictions. Tracks market trends and analyzes outcomes.
+      </p>
+      <div class="hud-metrics" style="margin-bottom:16px;">
+        <div class="hud-metric">
+          <span class="hud-label">Type</span>
+          <span class="hud-value">Prediction Markets</span>
+        </div>
+        <div class="hud-metric">
+          <span class="hud-label">Output</span>
+          <span class="hud-value">Market Predictions</span>
+        </div>
+      </div>
+      <button disabled style="width:100%;background:rgba(90,122,138,0.08);border:1px solid var(--hud-border);color:var(--hud-text-dim);padding:9px;border-radius:var(--radius);font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:1px;cursor:not-allowed;">
+        IN DEVELOPMENT
+      </button>
+    </div>
+
+    <!-- Risk Agent -->
+    <div class="gru-panel" style="opacity:0.6;">
+      <div class="gru-panel-title">
+        <div class="dot" style="background:var(--hud-text-dim);"></div>RISK AGENT
+        <span class="hud-badge skip" style="margin-left:auto;">COMING SOON</span>
+      </div>
+      <p class="hud-dim" style="font-size:12px;line-height:1.7;margin-bottom:16px;">
+        Portfolio risk analysis and management. Calculates position sizing, drawdown limits, and risk-adjusted returns.
+      </p>
+      <div class="hud-metrics" style="margin-bottom:16px;">
+        <div class="hud-metric">
+          <span class="hud-label">Type</span>
+          <span class="hud-value">Risk Management</span>
+        </div>
+        <div class="hud-metric">
+          <span class="hud-label">Output</span>
+          <span class="hud-value">Sizing · Limits</span>
+        </div>
+      </div>
+      <button disabled style="width:100%;background:rgba(90,122,138,0.08);border:1px solid var(--hud-border);color:var(--hud-text-dim);padding:9px;border-radius:var(--radius);font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:1px;cursor:not-allowed;">
+        IN DEVELOPMENT
+      </button>
+    </div>
+
+    <!-- Research Agent -->
+    <div class="gru-panel" style="opacity:0.6;">
+      <div class="gru-panel-title">
+        <div class="dot" style="background:var(--hud-text-dim);"></div>RESEARCH AGENT
+        <span class="hud-badge skip" style="margin-left:auto;">COMING SOON</span>
+      </div>
+      <p class="hud-dim" style="font-size:12px;line-height:1.7;margin-bottom:16px;">
+        Automated market research and analysis. Gathers data from multiple sources and generates comprehensive reports.
+      </p>
+      <div class="hud-metrics" style="margin-bottom:16px;">
+        <div class="hud-metric">
+          <span class="hud-label">Sources</span>
+          <span class="hud-value">Multi-source</span>
+        </div>
+        <div class="hud-metric">
+          <span class="hud-label">Output</span>
+          <span class="hud-value">Research Reports</span>
+        </div>
+      </div>
+      <button disabled style="width:100%;background:rgba(90,122,138,0.08);border:1px solid var(--hud-border);color:var(--hud-text-dim);padding:9px;border-radius:var(--radius);font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:1px;cursor:not-allowed;">
+        IN DEVELOPMENT
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Info panel -->
+  <div class="gru-panel">
+    <div class="gru-panel-title"><div class="dot"></div>ABOUT AGENTS</div>
+    <p class="hud-dim" style="font-size:12px;line-height:1.8;margin-bottom:8px;">
+      GRU agents are specialized tools automating different aspects of trading. Each uses advanced AI models for specific tasks.
+      <strong style="color:var(--hud-text);">Active</strong> agents are live and ready.
+      <strong style="color:var(--hud-text-dim);">Coming Soon</strong> agents are in development.
+    </p>
+    <span class="hud-dim" style="font-size:11px;">source: <span style="color:var(--hud-primary);">src/agents/</span></span>
+  </div>
+
+</div>
+
+<script>
+function updateClock() {
+  const now = new Date();
+  const t = now.toUTCString().split(' ')[4];
+  document.getElementById('liveClock').textContent = t + ' UTC';
+}
+setInterval(updateClock, 1000); updateClock();
+
+function checkMarketStatus() {
+  const et = new Date(new Date().toLocaleString('en-US', {timeZone:'America/New_York'}));
+  const h = et.getHours(), m = et.getMinutes(), d = et.getDay();
+  const open = d >= 1 && d <= 5 && (h > 9 || (h === 9 && m >= 30)) && h < 16;
+  const dot = document.getElementById('mktDot');
+  const lbl = document.getElementById('mktLabel');
+  if (dot) dot.className = 'market-status-dot' + (open ? '' : ' closed');
+  if (lbl) lbl.textContent = open ? 'MARKET OPEN' : 'MARKET CLOSED';
+}
+checkMarketStatus(); setInterval(checkMarketStatus, 60000);
+</script>
 </body>
 </html>

@@ -1,305 +1,299 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Swarm Consensus - Moon Dev</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='modern-style.css') }}">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GRU — Swarm</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='gru-hud.css') }}">
+  <style>
+    .swarm-input {
+      width: 100%;
+      background: var(--hud-bg-card);
+      border: 1px solid var(--hud-border);
+      border-radius: var(--radius);
+      padding: 12px;
+      color: var(--hud-text);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      resize: vertical;
+      min-height: 120px;
+      transition: border-color 0.2s;
+    }
+    .swarm-input:focus { outline: none; border-color: var(--hud-border-hover); }
+    .swarm-input::placeholder { color: var(--hud-text-muted); }
+    .hud-btn-primary {
+      background: rgba(0,229,255,0.08);
+      border: 1px solid var(--hud-primary);
+      color: var(--hud-primary);
+      padding: 10px 24px;
+      border-radius: var(--radius);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      cursor: pointer;
+      width: 100%;
+      transition: background 0.15s;
+      text-transform: uppercase;
+    }
+    .hud-btn-primary:hover { background: rgba(0,229,255,0.15); }
+    .hud-btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+    .model-card {
+      background: var(--hud-bg-card);
+      border: 1px solid var(--hud-border);
+      border-radius: var(--radius);
+      padding: 12px;
+      margin-bottom: 8px;
+    }
+    .model-card.success { border-left: 3px solid var(--hud-success); }
+    .model-card.failed  { border-left: 3px solid var(--hud-error); }
+    .weight-bar-bg { height: 3px; background: var(--hud-text-muted); border-radius: 2px; overflow: hidden; margin-top: 4px; }
+    .weight-bar-fill { height: 100%; background: var(--hud-primary); border-radius: 2px; transition: width 0.6s ease; }
+    .consensus-box {
+      background: rgba(0,229,255,0.05);
+      border: 1px solid rgba(0,229,255,0.2);
+      border-radius: var(--radius);
+      padding: 14px;
+    }
+    .rl-toggle { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+    .rl-toggle input { width: 16px; height: 16px; cursor: pointer; accent-color: var(--hud-primary); }
+    .history-item {
+      background: var(--hud-bg-card);
+      border: 1px solid var(--hud-border);
+      border-radius: var(--radius);
+      padding: 12px;
+      margin-bottom: 8px;
+    }
+  </style>
 </head>
 <body>
-    <!-- Top Navigation -->
-    <div class="top-nav">
-        <div class="nav-links">
-            <a href="/">LIVE TRADING</a>
-            <a href="/strategy-lab">STRATEGY LAB</a>
-            <a href="/swarm" class="active">SWARM CONSENSUS</a>
-            <button class="settings-btn" onclick="window.location.href='/'">
-                <i class="fas fa-cog"></i> Settings
-            </button>
-        </div>
+
+<header class="gru-header">
+  <div class="gru-logo">
+    <span class="gru-logo-text">GRU</span>
+    <span class="gru-logo-version">v1.0</span>
+    <div style="display:flex;align-items:center;gap:6px;margin-left:8px;">
+      <div class="market-status-dot" id="mktDot"></div>
+      <span class="hud-dim" style="font-size:10px;" id="mktLabel">CHECKING</span>
     </div>
-    
-    <div class="container">
-        <!-- Header -->
-        <div style="margin: 40px 0 30px 0;">
-            <h1 style="font-size: 32px; font-weight: 700; color: #fff; margin-bottom: 12px;">
-                <i class="fas fa-users"></i> Swarm Consensus
-            </h1>
-            <p style="color: #9ca3af; font-size: 16px;">
-                Get multi-model AI consensus on trading decisions and market analysis
-            </p>
-        </div>
-        
-        <!-- RL Optimization Section -->
-        <div style="background: #1a1a24; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
-            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin-bottom: 12px;">
-                <input type="checkbox" id="enable-swarm-rl" style="cursor: pointer; width: 18px; height: 18px;">
-                <span style="color: #fff; font-weight: 600; font-size: 14px;">Enable RL Optimization for Swarm</span>
-            </label>
-            <div style="font-size: 12px; color: #6b7280; padding: 12px; background: #0f0f16; border-radius: 6px; border-left: 3px solid #6366f1;">
-                <div style="font-weight: 600; margin-bottom: 6px;">🤖 Agent Lightning RL</div>
-                <div>Swarm will optimize agent weights after 50 trades. Shows training progress with tags on each consensus.</div>
-            </div>
-        </div>
-        
-        <!-- Query Section -->
-        <div class="chart-section">
-            <h2 style="font-size: 20px; font-weight: 600; color: #fff; margin-bottom: 20px;">
-                <i class="fas fa-question-circle"></i> Ask the Swarm
-            </h2>
-            
-            <textarea 
-                id="swarmQuery"
-                placeholder="Ask a trading question or request market analysis...
+  </div>
+  <div class="gru-header-right">
+    <div id="regimeChip" class="regime-chip sideways">⬤ SIDEWAYS</div>
+    <span class="hud-clock" id="liveClock">00:00:00</span>
+  </div>
+</header>
+
+<nav class="gru-nav">
+  <a href="/">LIVE HUD</a>
+  <a href="/agents">AGENTS</a>
+  <a href="/screener">SCREENER</a>
+  <a href="/analyst">ANALYST</a>
+  <a href="/strategy-lab">STRATEGY LAB</a>
+  <a href="/swarm" class="active">SWARM</a>
+  <a href="/portfolio">PORTFOLIO</a>
+</nav>
+
+<div class="gru-layout">
+
+  <div style="display:flex;align-items:baseline;gap:12px;padding:4px 0 8px;">
+    <span style="font-size:18px;font-weight:700;color:var(--hud-primary);letter-spacing:2px;">SWARM CONSENSUS</span>
+    <span class="hud-dim" style="font-size:11px;">multi-model AI analysis · get consensus on any trading question</span>
+  </div>
+
+  <!-- Query + Results row -->
+  <div class="gru-row" style="grid-template-columns:1fr 1fr;gap:var(--gap);">
+
+    <!-- Query panel -->
+    <div class="gru-panel">
+      <div class="gru-panel-title"><div class="dot"></div>ASK THE SWARM</div>
+
+      <textarea id="swarmQuery" class="swarm-input" placeholder="Ask a trading question...
 
 Examples:
 • Should I buy Bitcoin at current levels?
-• What's the outlook for QQQ in the next month?
+• What's the outlook for QQQ this month?
 • Is now a good time to enter SOL?
-• Analyze the current market sentiment for tech stocks"
-                style="width: 100%; min-height: 150px; background: #1a1a24; border: 1px solid #2d2d3d; border-radius: 8px; padding: 16px; color: #fff; font-size: 14px; font-family: inherit; resize: vertical; margin-bottom: 16px;"
-            ></textarea>
-            
-            <button 
-                onclick="querySwarm()"
-                id="queryBtn"
-                style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: #fff; padding: 14px 32px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%;"
-            >
-                <i class="fas fa-brain"></i> Query All Models
-            </button>
+• Analyze market sentiment for tech stocks"></textarea>
+
+      <div style="margin:10px 0;">
+        <label class="rl-toggle">
+          <input type="checkbox" id="enable-swarm-rl">
+          <span style="font-size:11px;color:var(--hud-text);">Enable RL Optimization</span>
+        </label>
+        <div class="hud-dim" style="font-size:10px;margin-top:6px;padding:8px;background:var(--hud-bg-card);border-radius:var(--radius);border-left:2px solid var(--hud-primary);">
+          Agent Lightning RL — optimizes model weights after 50 trades
         </div>
-        
-        <!-- Results Section -->
-        <div id="resultsSection" style="display: none; margin-top: 24px;">
-            <!-- Consensus Summary with RL Tag -->
-            <div class="chart-section" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
-                    <h2 style="font-size: 20px; font-weight: 700; color: #fff; margin: 0;">
-                        <i class="fas fa-check-circle"></i> Consensus Summary
-                    </h2>
-                    <div id="rlTag" style="display: none;"></div>
-                </div>
-                <div id="consensusText" style="color: #fff; font-size: 16px; line-height: 1.8;"></div>
-                <div id="agreementLevel" style="margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.2);"></div>
-            </div>
-            
-            <!-- Agent Weights Display -->
-            <div id="weightsSection" style="display: none; margin-top: 24px;">
-                <div class="chart-section">
-                    <h2 style="font-size: 20px; font-weight: 600; color: #fff; margin-bottom: 20px;">
-                        <i class="fas fa-balance-scale"></i> Agent Weights (RL Optimized)
-                    </h2>
-                    <div id="weightsDisplay"></div>
-                </div>
-            </div>
-            
-            <!-- Individual Model Responses -->
-            <div class="chart-section" style="margin-top: 24px;">
-                <h2 style="font-size: 20px; font-weight: 600; color: #fff; margin-bottom: 20px;">
-                    <i class="fas fa-robot"></i> Individual Model Responses
-                </h2>
-                <div id="modelResponses"></div>
-            </div>
-        </div>
-        
-        <!-- History -->
-        <div id="historySection" style="margin-top: 24px;">
-            <div class="chart-section">
-                <h2 style="font-size: 20px; font-weight: 600; color: #fff; margin-bottom: 20px;">
-                    <i class="fas fa-history"></i> Recent Queries
-                </h2>
-                <div id="historyList" style="text-align: center; color: #6b7280; padding: 60px 0;">
-                    <i class="fas fa-brain" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
-                    <div style="font-size: 16px;">No queries yet</div>
-                    <div style="font-size: 13px; margin-top: 8px;">Ask your first question to get started</div>
-                </div>
-            </div>
-        </div>
+      </div>
+
+      <button class="hud-btn-primary" onclick="querySwarm()" id="queryBtn">
+        ⬡ QUERY ALL MODELS
+      </button>
     </div>
-    
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        let history = [];
-        let swarmRLStatus = null;
-        let swarmTradeCount = 0;
-        
-        async function querySwarm() {
-            const query = document.getElementById('swarmQuery').value.trim();
-            const enableRL = document.getElementById('enable-swarm-rl').checked;
-            
-            if (!query) {
-                alert('❌ Please enter a question');
-                return;
-            }
-            
-            // Show loading state
-            const btn = document.getElementById('queryBtn');
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Querying Models...';
-            
-            // Show results section
-            document.getElementById('resultsSection').style.display = 'block';
-            document.getElementById('consensusText').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing responses from multiple models...';
-            document.getElementById('modelResponses').innerHTML = '';
-            
-            try {
-                const response = await fetch('/api/swarm/analyze', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({prompt: query, enable_rl: enableRL})
-                });
-                
-                const result = await response.json();
-                
-                if (result.status === 'success') {
-                    // Display consensus
-                    document.getElementById('consensusText').innerHTML = result.consensus;
-                    
-                    // Handle RL status if present
-                    if (result.rl_status) {
-                        swarmRLStatus = result.rl_status.status;
-                        swarmTradeCount = result.rl_status.progress || 0;
-                        
-                        const rlTag = document.getElementById('rlTag');
-                        if (swarmRLStatus === 'training') {
-                            rlTag.innerHTML = `<span style="background: #f59e0b; color: #000; padding: 4px 12px; border-radius: 4px; font-size: 11px; font-weight: 600;">🔄 Training (${swarmTradeCount}%)</span>`;
-                        } else if (swarmRLStatus === 'optimized') {
-                            rlTag.innerHTML = `<span style="background: #10b981; color: #fff; padding: 4px 12px; border-radius: 4px; font-size: 11px; font-weight: 600;">✨ RL Optimized</span>`;
-                        }
-                        rlTag.style.display = 'block';
-                        
-                        // Display weights if available
-                        if (result.rl_weights) {
-                            const weightsHTML = Object.entries(result.rl_weights).map(([agent, weight]) => {
-                                const percentage = (weight * 100).toFixed(1);
-                                return `
-                                    <div style="margin-bottom: 16px;">
-                                        <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
-                                            <span style="color: #fff; font-weight: 500;">${agent}</span>
-                                            <span style="color: #6b7280; font-size: 13px;">${percentage}%</span>
-                                        </div>
-                                        <div style="background: #0f0f16; border-radius: 4px; height: 8px; overflow: hidden;">
-                                            <div style="background: linear-gradient(90deg, #6366f1, #8b5cf6); height: 100%; width: ${percentage}%;"></div>
-                                        </div>
-                                    </div>
-                                `;
-                            }).join('');
-                            document.getElementById('weightsDisplay').innerHTML = weightsHTML;
-                            document.getElementById('weightsSection').style.display = 'block';
-                        }
-                    }
-                    
-                    // Calculate agreement level
-                    const modelsCount = result.models_count || 0;
-                    const agreementHTML = `
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <div style="color: rgba(255,255,255,0.8); font-size: 14px;">Models Consulted:</div>
-                            <div style="background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 6px; font-weight: 600;">${modelsCount}</div>
-                        </div>
-                    `;
-                    document.getElementById('agreementLevel').innerHTML = agreementHTML;
-                    
-                    // Display individual responses
-                    if (result.full_result && result.full_result.responses) {
-                        const responsesHTML = Object.entries(result.full_result.responses).map(([model, data]) => {
-                            if (!data.success) {
-                                return `
-                                    <div style="background: #1a1a24; border-radius: 8px; padding: 20px; margin-bottom: 16px; border-left: 4px solid #ef4444;">
-                                        <div style="display: flex; align-items: center; margin-bottom: 12px;">
-                                            <i class="fas fa-robot" style="color: #ef4444; margin-right: 12px; font-size: 20px;"></i>
-                                            <div style="color: #fff; font-weight: 600; text-transform: uppercase;">${model}</div>
-                                            <div style="margin-left: auto; background: rgba(239, 68, 68, 0.15); color: #ef4444; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 600;">
-                                                FAILED
-                                            </div>
-                                        </div>
-                                        <div style="color: #9ca3af; font-size: 14px;">${data.error || 'Model unavailable'}</div>
-                                    </div>
-                                `;
-                            }
-                            
-                            const modelColors = {
-                                'openai': '#10a37f',
-                                'claude': '#8b5cf6',
-                                'deepseek': '#6366f1',
-                                'xai': '#1da1f2',
-                                'gemini': '#4285f4'
-                            };
-                            
-                            const color = modelColors[model.toLowerCase()] || '#6366f1';
-                            
-                            return `
-                                <div style="background: #1a1a24; border-radius: 8px; padding: 20px; margin-bottom: 16px; border-left: 4px solid ${color};">
-                                    <div style="display: flex; align-items: center; margin-bottom: 12px;">
-                                        <i class="fas fa-robot" style="color: ${color}; margin-right: 12px; font-size: 20px;"></i>
-                                        <div style="color: #fff; font-weight: 600; text-transform: uppercase;">${model}</div>
-                                        <div style="margin-left: auto; background: rgba(34, 197, 94, 0.15); color: #22c55e; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 600;">
-                                            SUCCESS
-                                        </div>
-                                    </div>
-                                    <div style="color: #d1d5db; font-size: 14px; line-height: 1.8; white-space: pre-wrap;">${data.response || 'No response'}</div>
-                                </div>
-                            `;
-                        }).join('');
-                        
-                        document.getElementById('modelResponses').innerHTML = responsesHTML;
-                    }
-                    
-                    // Add to history
-                    history.unshift({
-                        query: query,
-                        consensus: result.consensus,
-                        timestamp: new Date().toLocaleString(),
-                        models_count: modelsCount
-                    });
-                    
-                    updateHistory();
-                    
-                    // Clear input
-                    document.getElementById('swarmQuery').value = '';
-                    
-                } else {
-                    document.getElementById('consensusText').innerHTML = `<span style="color: #ef4444;">❌ Error: ${result.message}</span>`;
-                }
-                
-            } catch (error) {
-                document.getElementById('consensusText').innerHTML = `<span style="color: #ef4444;">❌ Failed to query models: ${error.message}</span>`;
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-brain"></i> Query All Models';
-            }
+
+    <!-- Consensus result -->
+    <div class="gru-panel">
+      <div class="gru-panel-title">
+        <div class="dot"></div>CONSENSUS
+        <span id="rlTag" style="display:none;margin-left:auto;"></span>
+      </div>
+      <div id="consensusBox" style="display:none;">
+        <div class="consensus-box" id="consensusText" style="font-size:12px;line-height:1.8;color:var(--hud-text);margin-bottom:12px;"></div>
+        <div id="agreementLevel" style="font-size:11px;color:var(--hud-text-dim);"></div>
+      </div>
+      <div id="consensusEmpty" class="hud-empty" style="padding:40px 0;">AWAITING QUERY…</div>
+
+      <!-- Weights section -->
+      <div id="weightsSection" style="display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--hud-border);">
+        <div class="gru-panel-title" style="margin-bottom:10px;"><div class="dot"></div>RL WEIGHTS</div>
+        <div id="weightsDisplay"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Model responses -->
+  <div class="gru-panel" id="responsesPanel" style="display:none;">
+    <div class="gru-panel-title"><div class="dot"></div>MODEL RESPONSES</div>
+    <div id="modelResponses"></div>
+  </div>
+
+  <!-- History -->
+  <div class="gru-panel">
+    <div class="gru-panel-title"><div class="dot"></div>RECENT QUERIES</div>
+    <div id="historyList" class="hud-empty" style="padding:20px 0;">No queries yet — ask your first question above</div>
+  </div>
+
+</div>
+
+<script>
+let history = [];
+
+// Clock
+function updateClock() {
+  document.getElementById('liveClock').textContent = new Date().toUTCString().split(' ')[4] + ' UTC';
+}
+setInterval(updateClock, 1000); updateClock();
+
+// Market status
+function checkMarketStatus() {
+  const et = new Date(new Date().toLocaleString('en-US', {timeZone:'America/New_York'}));
+  const h = et.getHours(), m = et.getMinutes(), d = et.getDay();
+  const open = d >= 1 && d <= 5 && (h > 9 || (h === 9 && m >= 30)) && h < 16;
+  const dot = document.getElementById('mktDot');
+  const lbl = document.getElementById('mktLabel');
+  if (dot) dot.className = 'market-status-dot' + (open ? '' : ' closed');
+  if (lbl) lbl.textContent = open ? 'MARKET OPEN' : 'MARKET CLOSED';
+}
+checkMarketStatus(); setInterval(checkMarketStatus, 60000);
+
+async function querySwarm() {
+  const query = document.getElementById('swarmQuery').value.trim();
+  const enableRL = document.getElementById('enable-swarm-rl').checked;
+  if (!query) return;
+
+  const btn = document.getElementById('queryBtn');
+  btn.disabled = true;
+  btn.textContent = '⟳ QUERYING MODELS…';
+
+  document.getElementById('consensusEmpty').style.display = 'none';
+  document.getElementById('consensusBox').style.display = 'block';
+  document.getElementById('consensusText').innerHTML = '<span class="hud-dim">Analyzing responses from multiple models…</span>';
+  document.getElementById('modelResponses').innerHTML = '';
+  document.getElementById('responsesPanel').style.display = 'none';
+
+  try {
+    const response = await fetch('/api/swarm/analyze', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({prompt: query, enable_rl: enableRL})
+    });
+    const result = await response.json();
+
+    if (result.status === 'success') {
+      document.getElementById('consensusText').innerHTML = result.consensus;
+
+      // RL tag
+      if (result.rl_status) {
+        const rlTag = document.getElementById('rlTag');
+        const s = result.rl_status;
+        if (s.status === 'training') {
+          rlTag.innerHTML = `<span class="hud-badge hold">TRAINING ${s.progress||0}%</span>`;
+        } else if (s.status === 'optimized') {
+          rlTag.innerHTML = `<span class="hud-badge buy">RL OPTIMIZED</span>`;
         }
-        
-        function updateHistory() {
-            const historyDiv = document.getElementById('historyList');
-            
-            if (history.length === 0) {
-                historyDiv.innerHTML = `
-                    <div style="text-align: center; color: #6b7280; padding: 60px 0;">
-                        <i class="fas fa-brain" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
-                        <div style="font-size: 16px;">No queries yet</div>
-                        <div style="font-size: 13px; margin-top: 8px;">Ask your first question to get started</div>
-                    </div>
-                `;
-                return;
-            }
-            
-            const historyHTML = history.map(h => `
-                <div style="background: #1a1a24; border-radius: 8px; padding: 20px; margin-bottom: 16px;">
-                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
-                        <div style="flex: 1;">
-                            <div style="color: #fff; font-weight: 600; margin-bottom: 8px;">${h.query}</div>
-                            <div style="color: #6b7280; font-size: 12px;">${h.timestamp} • ${h.models_count} models</div>
-                        </div>
-                    </div>
-                    <div style="background: #0f0f16; border-radius: 6px; padding: 12px; margin-top: 12px;">
-                        <div style="color: #9ca3af; font-size: 13px; line-height: 1.6;">${h.consensus}</div>
-                    </div>
-                </div>
-            `).join('');
-            
-            historyDiv.innerHTML = historyHTML;
+        rlTag.style.display = 'block';
+
+        if (result.rl_weights) {
+          const html = Object.entries(result.rl_weights).map(([agent, w]) => {
+            const pct = (w * 100).toFixed(1);
+            return `<div style="margin-bottom:10px;">
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+                <span class="hud-label">${agent}</span>
+                <span class="hud-cyan" style="font-size:11px;">${pct}%</span>
+              </div>
+              <div class="weight-bar-bg"><div class="weight-bar-fill" style="width:${pct}%"></div></div>
+            </div>`;
+          }).join('');
+          document.getElementById('weightsDisplay').innerHTML = html;
+          document.getElementById('weightsSection').style.display = 'block';
         }
-    </script>
+      }
+
+      const mc = result.models_count || 0;
+      document.getElementById('agreementLevel').innerHTML = `<span class="hud-label">MODELS CONSULTED</span> <span class="hud-cyan">${mc}</span>`;
+
+      // Individual responses
+      if (result.full_result && result.full_result.responses) {
+        const modelColors = {openai:'#10a37f', claude:'#a78bfa', deepseek:'#00e5ff', xai:'#1da1f2', gemini:'#4285f4'};
+        const html = Object.entries(result.full_result.responses).map(([model, data]) => {
+          const color = modelColors[model.toLowerCase()] || 'var(--hud-primary)';
+          const ok = data.success !== false;
+          return `<div class="model-card ${ok ? 'success' : 'failed'}">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+              <span style="font-size:11px;font-weight:600;color:${color};letter-spacing:1px;">${model.toUpperCase()}</span>
+              <span class="hud-badge ${ok ? 'buy' : 'sell'}">${ok ? 'SUCCESS' : 'FAILED'}</span>
+            </div>
+            <div class="hud-dim" style="font-size:11px;line-height:1.7;white-space:pre-wrap;">${ok ? (data.response||'No response') : (data.error||'Model unavailable')}</div>
+          </div>`;
+        }).join('');
+        document.getElementById('modelResponses').innerHTML = html;
+        document.getElementById('responsesPanel').style.display = 'block';
+      }
+
+      history.unshift({query, consensus: result.consensus, time: new Date().toLocaleTimeString(), models: mc});
+      renderHistory();
+      document.getElementById('swarmQuery').value = '';
+
+    } else {
+      document.getElementById('consensusText').innerHTML = `<span class="hud-red">ERROR: ${result.message}</span>`;
+    }
+  } catch (err) {
+    document.getElementById('consensusText').innerHTML = `<span class="hud-red">FAILED: ${err.message}</span>`;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '⬡ QUERY ALL MODELS';
+  }
+}
+
+function renderHistory() {
+  if (history.length === 0) {
+    document.getElementById('historyList').className = 'hud-empty';
+    document.getElementById('historyList').style.padding = '20px 0';
+    document.getElementById('historyList').textContent = 'No queries yet';
+    return;
+  }
+  document.getElementById('historyList').className = '';
+  document.getElementById('historyList').style.padding = '0';
+  document.getElementById('historyList').innerHTML = history.map(h => `
+    <div class="history-item">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+        <span style="font-size:12px;color:var(--hud-text);font-weight:600;">${h.query}</span>
+        <span class="hud-dim" style="font-size:10px;white-space:nowrap;margin-left:12px;">${h.time} · ${h.models} models</span>
+      </div>
+      <div class="hud-dim" style="font-size:11px;line-height:1.6;">${h.consensus}</div>
+    </div>
+  `).join('');
+}
+</script>
 </body>
 </html>
